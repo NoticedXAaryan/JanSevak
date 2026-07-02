@@ -222,3 +222,9 @@
 2. **Knowledge base cold start**: The RAG system needs to be populated with actual government service data. This is a data collection effort, not a code problem.
 3. **Authority hierarchy data**: The anonymous reporting routing engine requires a maintained database of government authority hierarchies per district. This data doesn't exist in a structured format and needs to be manually compiled.
 4. **Rate limiting**: Telegram API has rate limits (30 messages/second per bot, 20 messages/minute per chat). The system must respect these.
+
+## Deployment Gotchas & Prevention
+
+1. **Missing `[build-system]` in `pyproject.toml`:** If using `uv` to build the Docker container, `pyproject.toml` MUST have a `[build-system]` and package discovery section. Otherwise, `uv sync` will install all dependencies but will NOT install the internal package (e.g., `janseva`), causing `ModuleNotFoundError` during migrations or bot startup inside Docker.
+2. **Out of Space Errors on VPS:** Machine learning dependencies (like `openai-whisper`, PyTorch, and CUDA binaries) are massive (multiple gigabytes). Building Docker images with these dependencies on a budget VPS will likely exhaust disk space and crash the build. **Prevention:** Use cloud APIs (like Groq) for models instead of local inference wherever possible to keep the Docker image slim.
+3. **Database Hostnames in Docker:** `alembic.ini` has a hardcoded `localhost` URL which will fail inside Docker because the database is hosted in another container (e.g., `postgres`). **Prevention:** `env.py` has been explicitly configured to read the `DATABASE_URL_SYNC` environment variable to override `alembic.ini`. Always ensure this env var points to the container's hostname, not `localhost`.
