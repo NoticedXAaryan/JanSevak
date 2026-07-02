@@ -33,6 +33,22 @@ services:
       timeout: 5s
       retries: 5
 
+  bot:
+    build: .
+    container_name: janseva-bot
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # In Dockply, you will typically provide env vars in the UI. 
+    # For local testing, we load them from .env
+    env_file:
+      - .env
+    volumes:
+      - chromadata:/app/.chromadb
+
 volumes:
   pgdata:
   redisdata:
+  chromadata:
