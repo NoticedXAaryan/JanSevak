@@ -24,7 +24,7 @@ RUN uv sync --frozen --no-install-project --no-dev
 COPY . .
 
 # Install the project itself
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --reinstall-package janseva
 
 # Setup entrypoint script
 COPY scripts/start.sh /app/scripts/start.sh
