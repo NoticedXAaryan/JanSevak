@@ -5,6 +5,12 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy import create_engine
 
+import sys
+from pathlib import Path
+
+# Explicitly add src to python path for Docker/uv
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
 from janseva.db.models import Base  # Import Base to get all model metadata
 
 # Alembic Config object
