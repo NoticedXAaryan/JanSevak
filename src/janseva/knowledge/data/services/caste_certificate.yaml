@@ -1,0 +1,84 @@
+service_id: caste_certificate
+name_en: Caste Certificate
+name_hi: जाति प्रमाण पत्र
+department: Revenue Department / राजस्व विभाग
+issuing_authority: Sub-Divisional Magistrate (SDM) / उप-जिलाधिकारी
+
+description_en: |
+  A Caste Certificate is an official document that certifies a person belongs
+  to a specific Scheduled Caste (SC), Scheduled Tribe (ST), or Other Backward
+  Class (OBC). Required for reservations in education, government jobs, and
+  various welfare schemes.
+
+description_hi: |
+  जाति प्रमाण पत्र एक आधिकारिक दस्तावेज है जो प्रमाणित करता है कि व्यक्ति
+  एक विशिष्ट अनुसूचित जाति (SC), अनुसूचित जनजाति (ST), या अन्य पिछड़ा
+  वर्ग (OBC) से संबंधित है। शिक्षा, सरकारी नौकरियों और विभिन्न कल्याणकारी
+  योजनाओं में आरक्षण के लिए आवश्यक है।
+
+required_documents:
+  - name_en: "Aadhaar Card"
+    name_hi: "आधार कार्ड"
+    mandatory: true
+
+  - name_en: "Father's/Grandfather's Caste Certificate (if available)"
+    name_hi: "पिता/दादा का जाति प्रमाण पत्र (यदि उपलब्ध हो)"
+    mandatory: false
+    note: "Strongly recommended. Speeds up verification."
+
+  - name_en: "School/College records mentioning caste"
+    name_hi: "जाति का उल्लेख करने वाले स्कूल/कॉलेज रिकॉर्ड"
+    mandatory: false
+
+  - name_en: "Voter ID Card"
+    name_hi: "मतदाता पहचान पत्र"
+    mandatory: true
+
+  - name_en: "Ration Card"
+    name_hi: "राशन कार्ड"
+    mandatory: true
+
+  - name_en: "Affidavit / Self-declaration on stamp paper"
+    name_hi: "स्टाम्प पेपर पर शपथ पत्र / स्व-घोषणा"
+    mandatory: true
+
+  - name_en: "Passport-size photographs (2)"
+    name_hi: "पासपोर्ट साइज फोटो (2)"
+    mandatory: true
+
+process_steps:
+  - step: 1
+    en: "Collect all required documents."
+    hi: "सभी आवश्यक दस्तावेज इकट्ठा करें।"
+
+  - step: 2
+    en: "Get an affidavit prepared on stamp paper (INR 10-100) from a notary."
+    hi: "नोटरी से स्टाम्प पेपर (₹10-100) पर शपथ पत्र तैयार करवाएं।"
+
+  - step: 3
+    en: "Visit the Tehsil/SDM office or apply online via e-District portal."
+    hi: "तहसील/SDM कार्यालय जाएं या ई-जिला पोर्टल से ऑनलाइन आवेदन करें।"
+
+  - step: 4
+    en: "Submit the application with all documents."
+    hi: "सभी दस्तावेजों के साथ आवेदन जमा करें।"
+
+  - step: 5
+    en: "Field verification will be conducted by revenue officials."
+    hi: "राजस्व अधिकारियों द्वारा क्षेत्रीय सत्यापन किया जाएगा।"
+
+  - step: 6
+    en: "Certificate issued within 15-30 working days."
+    hi: "15-30 कार्य दिवसों में प्रमाण पत्र जारी।"
+
+estimated_timeline: "15-30 working days"
+approximate_fee: "INR 10-100 (varies by state)"
+
+tags:
+  - caste
+  - certificate
+  - SC
+  - ST
+  - OBC
+  - reservation
+  - revenue

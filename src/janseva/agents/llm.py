@@ -32,8 +32,18 @@ def get_llm() -> BaseChatModel:
             base_url=settings.ollama_base_url,
             temperature=0.3,
         )
+    elif settings.llm_provider == "openrouter":
+        from langchain_openai import ChatOpenAI
+        
+        return ChatOpenAI(
+            model=settings.llm_model,
+            api_key=settings.openrouter_api_key,
+            base_url="https://openrouter.ai/api/v1",
+            temperature=0.3,
+            max_tokens=2048,
+        )
     else:
         raise ValueError(
             f"Unknown LLM provider: {settings.llm_provider}. "
-            "Set LLM_PROVIDER to 'gemini' or 'ollama' in .env"
+            "Set LLM_PROVIDER to 'gemini', 'ollama', or 'openrouter' in .env"
         )

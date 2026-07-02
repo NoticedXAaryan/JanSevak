@@ -27,7 +27,9 @@ class Settings(BaseSettings):
 
     # --- LLM ---
     google_api_key: str = Field("", description="Google Gemini API key")
-    llm_provider: str = Field("gemini", description="LLM provider: 'gemini' or 'ollama'")
+    openrouter_api_key: str = Field("", description="OpenRouter API key")
+    groq_api_key: str = Field("", description="Groq API key")
+    llm_provider: str = Field("gemini", description="LLM provider: 'gemini', 'ollama', or 'openrouter'")
     llm_model: str = Field("gemini-2.0-flash", description="LLM model name")
     ollama_base_url: str = Field("http://localhost:11434")
 

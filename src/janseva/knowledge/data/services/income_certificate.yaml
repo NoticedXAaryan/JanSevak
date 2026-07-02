@@ -1,0 +1,103 @@
+service_id: income_certificate
+name_en: Income Certificate
+name_hi: आय प्रमाण पत्र
+department: Revenue Department / राजस्व विभाग
+issuing_authority: Sub-Divisional Magistrate (SDM) / उप-जिलाधिकारी
+applicable_states:
+  - all  # Most states follow similar process
+
+description_en: |
+  An Income Certificate is an official document issued by the state government
+  that certifies the annual income of an individual or family. It is commonly
+  required for admission to educational institutions, scholarships, government
+  job applications, subsidized services, and various government schemes.
+
+description_hi: |
+  आय प्रमाण पत्र राज्य सरकार द्वारा जारी एक आधिकारिक दस्तावेज है जो किसी
+  व्यक्ति या परिवार की वार्षिक आय को प्रमाणित करता है। यह शैक्षणिक संस्थानों
+  में प्रवेश, छात्रवृत्ति, सरकारी नौकरी के आवेदन, सब्सिडी वाली सेवाओं और
+  विभिन्न सरकारी योजनाओं के लिए आवश्यक है।
+
+required_documents:
+  - name_en: "Aadhaar Card"
+    name_hi: "आधार कार्ड"
+    mandatory: true
+
+  - name_en: "Ration Card"
+    name_hi: "राशन कार्ड"
+    mandatory: true
+
+  - name_en: "Self-declaration / Affidavit of income"
+    name_hi: "आय का स्व-घोषणा पत्र / शपथ पत्र"
+    mandatory: true
+
+  - name_en: "Salary slip (for employed individuals)"
+    name_hi: "वेतन पर्ची (नौकरीपेशा लोगों के लिए)"
+    mandatory: false
+    note: "Required if employed. Self-employed can provide business income proof."
+
+  - name_en: "Form 16 / ITR (Income Tax Return)"
+    name_hi: "फॉर्म 16 / आयकर रिटर्न"
+    mandatory: false
+    note: "If available, strengthens the application."
+
+  - name_en: "Passport-size photographs (2)"
+    name_hi: "पासपोर्ट साइज फोटो (2)"
+    mandatory: true
+
+  - name_en: "Application form (available at Tehsil office or online portal)"
+    name_hi: "आवेदन पत्र (तहसील कार्यालय या ऑनलाइन पोर्टल पर उपलब्ध)"
+    mandatory: true
+
+process_steps:
+  - step: 1
+    en: "Collect all required documents listed above."
+    hi: "ऊपर सूचीबद्ध सभी आवश्यक दस्तावेज इकट्ठा करें।"
+
+  - step: 2
+    en: "Visit the Tehsil or SDM office, or apply online through your state's e-District portal."
+    hi: "तहसील या SDM कार्यालय जाएं, या अपने राज्य के ई-जिला पोर्टल के माध्यम से ऑनलाइन आवेदन करें।"
+
+  - step: 3
+    en: "Fill the application form and attach all documents."
+    hi: "आवेदन पत्र भरें और सभी दस्तावेज संलग्न करें।"
+
+  - step: 4
+    en: "Submit the application. You will receive an acknowledgment receipt."
+    hi: "आवेदन जमा करें। आपको एक पावती रसीद मिलेगी।"
+
+  - step: 5
+    en: "A field verification may be conducted by the Patwari/Lekhpal."
+    hi: "पटवारी/लेखपाल द्वारा क्षेत्रीय सत्यापन किया जा सकता है।"
+
+  - step: 6
+    en: "Certificate is issued within 7-15 working days (varies by state)."
+    hi: "प्रमाण पत्र 7-15 कार्य दिवसों में जारी किया जाता है (राज्य के अनुसार भिन्न)।"
+
+estimated_timeline: "7-15 working days"
+approximate_fee: "INR 10-50 (varies by state)"
+online_portals:
+  - state: "Uttar Pradesh"
+    url: "https://edistrict.up.gov.in"
+  - state: "Madhya Pradesh"
+    url: "https://mpedistrict.gov.in"
+  - state: "Bihar"
+    url: "https://serviceonline.bihar.gov.in"
+  - state: "Rajasthan"
+    url: "https://emitra.rajasthan.gov.in"
+
+common_mistakes:
+  - en: "Not getting the income affidavit notarized"
+    hi: "आय शपथ पत्र को नोटरी नहीं करवाना"
+  - en: "Submitting expired or unclear photocopies"
+    hi: "समय सीमा समाप्त या अस्पष्ट फोटोकॉपी जमा करना"
+  - en: "Mismatch between Aadhaar name and application name"
+    hi: "आधार में नाम और आवेदन में नाम का मेल न खाना"
+
+tags:
+  - income
+  - certificate
+  - revenue
+  - SDM
+  - scholarship
+  - government_scheme

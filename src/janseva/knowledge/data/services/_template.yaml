@@ -1,0 +1,31 @@
+# Copy this template to create new service entries.
+# File name should be: <service_name_snake_case>.yaml
+
+service_id: unique_service_id
+name_en: Service Name in English
+name_hi: सेवा का नाम हिंदी में
+department: Department Name
+issuing_authority: Authority Name
+
+description_en: |
+  English description of the service.
+
+description_hi: |
+  हिंदी में सेवा का विवरण।
+
+required_documents:
+  - name_en: "Document Name"
+    name_hi: "दस्तावेज का नाम"
+    mandatory: true
+
+process_steps:
+  - step: 1
+    en: "Step description in English"
+    hi: "चरण का विवरण हिंदी में"
+
+estimated_timeline: "X working days"
+approximate_fee: "INR X-Y"
+
+tags:
+  - tag1
+  - tag2
