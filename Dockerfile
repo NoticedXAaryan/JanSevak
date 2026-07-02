@@ -12,6 +12,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Set working directory
 WORKDIR /app
+ENV PYTHONPATH=/app/src
 
 # Copy the lockfile and pyproject.toml
 COPY pyproject.toml uv.lock ./
