@@ -33,7 +33,7 @@ redisdata/
 .chromadb/
 
 # Models (large files)
-models/
+/models/
 
 # Logs
 *.log
