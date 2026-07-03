@@ -22,18 +22,18 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 
 # Install dependencies only (NOT the project itself).
-# We rely on PYTHONPATH=/app/src for imports — no editable install needed.
 RUN uv sync --frozen --no-install-project --no-dev
 
 # Copy the rest of the application source
 COPY . .
 
-# Verify the source code is importable via PYTHONPATH
-RUN .venv/bin/python -c "\
-import sys; print('sys.path:', sys.path); \
-from janseva.db.models import Base; \
-from janseva.config import Settings; \
-print('All imports OK')"
+# DEBUG: List what actually got copied to find out what's missing
+RUN echo "=== /app/src contents ===" && \
+    find /app/src -type f -name "*.py" | head -50 && \
+    echo "=== Looking for db/models ===" && \
+    find /app/src -path "*/db/models*" && \
+    echo "=== Full directory tree ===" && \
+    find /app/src -type d | sort
 
 # Setup entrypoint script
 RUN chmod +x /app/scripts/start.sh
