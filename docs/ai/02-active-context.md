@@ -4,18 +4,18 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built the **Healthcare Agent** (Guide 09):
-  - Created `HealthcareFacility` database model.
-  - Built `healthcare_agent.py` to search facilities by district and simulate queue number generation.
-  - Registered the healthcare intent in `orchestrator.py`.
-  - Seeded sample data for Bhopal, Indore, and Delhi hospitals.
+- Built the **Farmer Services Agent** (Guide 10):
+  - Added subsidy YAML knowledge base structure (`pm_kisan.yaml`).
+  - Created `MandiPrice` database model and seed script.
+  - Built `farmer_agent.py` to handle mandi price and subsidy queries.
+  - Registered the farmer intent in `orchestrator.py`.
 
 ## Current Focus
-Integrating the Healthcare Agent. Need to ensure the production database gets seeded with hospital data upon deployment.
+Integrating the Farmer Services Agent. Ensure the production database gets seeded with mandi prices upon deployment.
 
 ## Next Steps
 1. Push changes to Dokploy.
-2. Build the Farmer Services Agent (Guide 10) or Admin Dashboard (Guide 07).
+2. Build the Admin Dashboard (Guide 07) or Profile Notifications (Guide 11).
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
