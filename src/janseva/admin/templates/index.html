@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="relative bg-white dark:bg-gray-900 overflow-hidden h-full flex flex-col justify-center py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
+                <span class="block">AI-Powered Public Services</span>
+                <span class="block text-primary-600 dark:text-primary-400">for Indian Citizens</span>
+            </h1>
+            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-400 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                JanSeva (जनसेवा) is an intelligent Telegram bot designed to help you navigate government services, find healthcare facilities, check agricultural prices, and safely report local issues.
+            </p>
+            <div class="mt-10 flex justify-center gap-x-6">
+                <a href="https://t.me/jansevak_bot" target="_blank" class="rounded-md bg-primary-600 px-8 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 transition-colors">
+                    Start Chatting on Telegram
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Feature Section -->
+    <div class="mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+            <!-- Feature 1 -->
+            <div class="pt-6">
+                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
+                    <div class="-mt-6">
+                        <div>
+                            <span class="inline-flex items-center justify-center p-3 bg-primary-500 rounded-md shadow-lg text-2xl text-white">
+                                📄
+                            </span>
+                        </div>
+                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Service Navigation</h3>
+                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                            Find exactly what documents you need for income certificates, caste certificates, and more.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 2 -->
+            <div class="pt-6">
+                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
+                    <div class="-mt-6">
+                        <div>
+                            <span class="inline-flex items-center justify-center p-3 bg-red-500 rounded-md shadow-lg text-2xl text-white">
+                                🚨
+                            </span>
+                        </div>
+                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Anonymous Reporting</h3>
+                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                            Safely and securely report corruption or local issues. Your metadata is stripped before reaching admins.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 3 -->
+            <div class="pt-6">
+                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
+                    <div class="-mt-6">
+                        <div>
+                            <span class="inline-flex items-center justify-center p-3 bg-green-500 rounded-md shadow-lg text-2xl text-white">
+                                🌾
+                            </span>
+                        </div>
+                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Farmer Services</h3>
+                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                            Get real-time Mandi crop prices and understand your eligibility for PM-Kisan subsidies.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Feature 4 -->
+            <div class="pt-6">
+                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
+                    <div class="-mt-6">
+                        <div>
+                            <span class="inline-flex items-center justify-center p-3 bg-blue-400 rounded-md shadow-lg text-2xl text-white">
+                                🏥
+                            </span>
+                        </div>
+                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Healthcare Access</h3>
+                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
+                            Find nearby government hospitals and dynamically generate queue numbers for appointments.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

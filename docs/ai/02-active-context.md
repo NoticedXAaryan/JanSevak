@@ -4,18 +4,18 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built the **Farmer Services Agent** (Guide 10):
-  - Added subsidy YAML knowledge base structure (`pm_kisan.yaml`).
-  - Created `MandiPrice` database model and seed script.
-  - Built `farmer_agent.py` to handle mandi price and subsidy queries.
-  - Registered the farmer intent in `orchestrator.py`.
+- Built the **Admin Dashboard** (Guide 07):
+  - Created a FastAPI sub-app with JWT cookie auth.
+  - Built a public landing page (`index.html`) linking to Telegram.
+  - Implemented HTMX-powered dashboard routes for viewing stats, user queries, and managing anonymous reports.
+  - Updated `start.sh` to spin up the web server alongside the Telegram bot.
 
 ## Current Focus
-Integrating the Farmer Services Agent. Ensure the production database gets seeded with mandi prices upon deployment.
+Integrating the Admin Dashboard. The web server now runs on port 8000 alongside the bot.
 
 ## Next Steps
 1. Push changes to Dokploy.
-2. Build the Admin Dashboard (Guide 07) or Profile Notifications (Guide 11).
+2. Build Profile Notifications (Guide 11) or WhatsApp Integration (Guide 12).
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
