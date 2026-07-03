@@ -5,5 +5,6 @@ from janseva.db.models.conversation import Conversation
 from janseva.db.models.message import Message
 from janseva.db.models.authority import Authority
 from janseva.db.models.anonymous_report import AnonymousReport
+from janseva.db.models.healthcare_facility import HealthcareFacility
 
-__all__ = ["Base", "User", "Conversation", "Message", "Authority", "AnonymousReport"]
+__all__ = ["Base", "User", "Conversation", "Message", "Authority", "AnonymousReport", "HealthcareFacility"]

@@ -18,6 +18,7 @@ from janseva.agents.llm import get_llm
 from janseva.agents.specialists.service_navigator import handle_service_query
 from janseva.agents.specialists.escalation import handle_escalation
 from janseva.agents.specialists.anonymous_reporter import handle_anonymous_report
+from janseva.agents.specialists.healthcare_agent import handle_healthcare_query
 
 logger = structlog.get_logger()
 
@@ -161,7 +162,7 @@ def handle_general_chat(state: AgentState) -> dict:
 def handle_placeholder(state: AgentState) -> dict:
     """
     Placeholder node for agents not yet implemented.
-    Used for healthcare, farmer, and anonymous_report until their guides are completed.
+    Used for farmer and other missing specialists until their guides are completed.
     """
     intent = state.get("intent", "unknown")
     user_language = state.get("user_language", "hi")
@@ -171,11 +172,6 @@ def handle_placeholder(state: AgentState) -> dict:
             "🚨 गुमनाम शिकायत प्रणाली जल्द ही उपलब्ध होगी।\n"
             "Anonymous reporting system coming soon.\n\n"
             "कृपया /report कमांड का उपयोग करें जब यह तैयार हो।"
-        ),
-        "healthcare": (
-            "🏥 स्वास्थ्य सेवा सहायता जल्द ही उपलब्ध होगी।\n"
-            "Healthcare assistance coming soon.\n\n"
-            "अभी के लिए, अपने नजदीकी सरकारी अस्पताल से संपर्क करें।"
         ),
         "farmer": (
             "🌾 किसान सेवा सहायता जल्द ही उपलब्ध होगी।\n"
@@ -197,7 +193,7 @@ def route_by_intent(state: AgentState) -> str:
     route_map = {
         "service_query": "service_navigator",
         "anonymous_report": "anonymous_report_node",
-        "healthcare": "placeholder",             # TODO: Guide 09
+        "healthcare": "healthcare_agent_node",
         "farmer": "placeholder",                 # TODO: Guide 10
         "general": "general_chat",
         "escalate": "escalation",
@@ -223,6 +219,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("general_chat", handle_general_chat)
     graph.add_node("escalation", handle_escalation)
     graph.add_node("anonymous_report_node", handle_anonymous_report)
+    graph.add_node("healthcare_agent_node", handle_healthcare_query)
     graph.add_node("placeholder", handle_placeholder)
     
     # Set entry point
@@ -235,6 +232,7 @@ def build_agent_graph() -> StateGraph:
         {
             "service_navigator": "service_navigator",
             "anonymous_report_node": "anonymous_report_node",
+            "healthcare_agent_node": "healthcare_agent_node",
             "general_chat": "general_chat",
             "escalation": "escalation",
             "placeholder": "placeholder",
@@ -244,6 +242,7 @@ def build_agent_graph() -> StateGraph:
     # All specialist nodes lead to END
     graph.add_edge("service_navigator", END)
     graph.add_edge("anonymous_report_node", END)
+    graph.add_edge("healthcare_agent_node", END)
     graph.add_edge("general_chat", END)
     graph.add_edge("escalation", END)
     graph.add_edge("placeholder", END)

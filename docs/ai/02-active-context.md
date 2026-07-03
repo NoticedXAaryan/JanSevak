@@ -4,17 +4,18 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built the **Voice Processing Pipeline** (Guide 08):
-  - Added `openai-whisper` and `pydub` dependencies.
-  - Implemented STT (`stt.py`) and audio conversions (`audio_utils.py`).
-  - Integrated full Voice-to-Text routing into the Telegram `voice.py` router so users can send voice notes and get text responses.
+- Built the **Healthcare Agent** (Guide 09):
+  - Created `HealthcareFacility` database model.
+  - Built `healthcare_agent.py` to search facilities by district and simulate queue number generation.
+  - Registered the healthcare intent in `orchestrator.py`.
+  - Seeded sample data for Bhopal, Indore, and Delhi hospitals.
 
 ## Current Focus
-Integrating the Voice Processing Pipeline. Ensure the deployment container has `ffmpeg` installed for `pydub` to function correctly.
+Integrating the Healthcare Agent. Need to ensure the production database gets seeded with hospital data upon deployment.
 
 ## Next Steps
 1. Push changes to Dokploy.
-2. Build the remaining agents (Healthcare, Farmer) or Admin Dashboard (Guide 07).
+2. Build the Farmer Services Agent (Guide 10) or Admin Dashboard (Guide 07).
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
