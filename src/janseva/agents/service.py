@@ -99,6 +99,24 @@ async def process_message(
                 from langchain_core.messages import AIMessage
                 langchain_messages.append(AIMessage(content=msg.content))
         
+        from janseva.common.cache import query_cache
+        
+        # Check cache for identical queries
+        cached_response = await query_cache.get(user_text)
+        if cached_response:
+            logger.info("cache_hit", telegram_id=telegram_id)
+            
+            # Still store the messages in DB for history
+            assistant_message = Message(
+                conversation_id=conversation.id,
+                role="assistant",
+                content=cached_response,
+                language=user.language or language,
+            )
+            session.add(assistant_message)
+            await session.commit()
+            return cached_response
+        
         # 5. Run the agent graph
         try:
             initial_state = {
@@ -121,6 +139,9 @@ async def process_message(
                     "कृपया दोबारा कोशिश करें या /help टाइप करें।"
                 )
             
+            # Save to cache on success
+            await query_cache.set(user_text, response_text)
+            
         except Exception as e:
             logger.error("agent_error", error=str(e), telegram_id=telegram_id)
             response_text = (
@@ -141,7 +162,7 @@ async def process_message(
         logger.info(
             "message_processed",
             telegram_id=telegram_id,
-            intent=result_state.get("intent", "unknown") if 'result_state' in dir() else "error",
+            intent=result_state.get("intent", "unknown") if 'result_state' in locals() else "error",
             response_length=len(response_text),
         )
         

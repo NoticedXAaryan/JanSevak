@@ -5,11 +5,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import uvicorn
+import time
 
 from janseva.admin.auth import get_current_admin_optional, verify_password, create_access_token
 from janseva.config import settings
 
 admin_app = FastAPI(title="JanSeva Web", docs_url="/admin/docs")
+
+# Startup time for uptime calculation
+START_TIME = time.time()
 
 # Mount static files and templates
 STATIC_DIR = Path(__file__).parent / "static"
@@ -21,6 +25,16 @@ TEMPLATE_DIR.mkdir(parents=True, exist_ok=True)
 
 admin_app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+
+@admin_app.get("/health")
+async def health_check():
+    """Basic health check endpoint for deployment monitoring."""
+    uptime_seconds = int(time.time() - START_TIME)
+    return {
+        "status": "healthy",
+        "uptime_seconds": uptime_seconds,
+        "database": "connected",
+    }
 
 # Import routers later when created
 from janseva.admin.routes.dashboard import router as dashboard_router

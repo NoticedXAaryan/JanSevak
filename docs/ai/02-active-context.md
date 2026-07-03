@@ -4,18 +4,19 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built **WhatsApp Integration** (Guide 12):
-  - Added Twilio credentials to configuration.
-  - Implemented `twilio_client.py` for sending async REST requests to Twilio.
-  - Created a FastAPI webhook router (`whatsapp.py`) to handle incoming Twilio requests.
-  - Applied the Channel Normalizer pattern by parsing WhatsApp numbers into pseudo-telegram IDs and passing them into the existing AI agent pipeline.
+- Built **Scaling & Performance Optimizations** (Guide 13):
+  - Tuned `engine.py` for increased DB connection pooling and recycling.
+  - Added Alembic migration for critical DB indexes across users, conversations, messages, and reports.
+  - Implemented an in-memory `AsyncTTLCache` to cache frequent identical AI queries (avoiding Redis dependency).
+  - Added a `/health` endpoint to the FastAPI admin app.
+  - Created a Locust load testing script.
 
 ## Current Focus
-Validating WhatsApp webhook functionality.
+Validating performance optimizations under load.
 
 ## Next Steps
-1. Push changes to Dokploy.
-2. Build Scaling/Performance optimizations (Guide 13).
+1. Push all changes to Dokploy.
+2. Final end-to-end review of JanSeva platform!
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
