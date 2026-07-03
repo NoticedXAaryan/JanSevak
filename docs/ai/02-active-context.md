@@ -4,19 +4,17 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built the **Anonymous Reporting System** (Guide 05):
-  - Created `Authority` and `AnonymousReport` database models with no user FK to guarantee anonymity.
-  - Implemented AES-128-CBC (Fernet) encryption for report contents at rest.
-  - Implemented metadata stripping (phone numbers, Aadhaar, email, Telegram usernames).
-  - Built smart routing to automatically route complaints to a superior if a specific official is named.
-  - Built the `anonymous_reporter` LangGraph conversational node and integrated it into the central orchestrator.
+- Built the **Voice Processing Pipeline** (Guide 08):
+  - Added `openai-whisper` and `pydub` dependencies.
+  - Implemented STT (`stt.py`) and audio conversions (`audio_utils.py`).
+  - Integrated full Voice-to-Text routing into the Telegram `voice.py` router so users can send voice notes and get text responses.
 
 ## Current Focus
-Integrating the newly built Anonymous Reporting System into production and verifying that reports are successfully encrypted and routed.
+Integrating the Voice Processing Pipeline. Ensure the deployment container has `ffmpeg` installed for `pydub` to function correctly.
 
 ## Next Steps
-1. Push changes to Dokploy and supply the `REPORT_ENCRYPTION_KEY` environment variable.
-2. Integrate voice processing (Guide 06).
+1. Push changes to Dokploy.
+2. Build the remaining agents (Healthcare, Farmer) or Admin Dashboard (Guide 07).
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
