@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     admin_username: str = Field("admin")
     admin_password: str = Field("change-me")
 
+    # --- Twilio (WhatsApp) Settings ---
+    twilio_account_sid: str = Field("", description="Twilio Account SID")
+    twilio_auth_token: str = Field("", description="Twilio Auth Token")
+    twilio_whatsapp_number: str = Field("", description="Twilio WhatsApp number (e.g., whatsapp:+1234567890)")
+
     # --- App ---
     env: str = Field("development")
     log_level: str = Field("DEBUG")

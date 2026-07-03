@@ -4,19 +4,18 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built **Notifications & Interest Profiling** (Guide 11):
-  - Created `profiler.py` using Gemini to extract interests and integrated into voice/text handlers as background tasks.
-  - Added `notifications_enabled` to `User` DB model.
-  - Built `engine.py` to broadcast scheme alerts to relevant users.
-  - Created an asyncio `scheduler.py` loop (replacing ARQ/Redis) to periodically check for new alerts.
-  - Added `/notifications on|off` command to the bot.
+- Built **WhatsApp Integration** (Guide 12):
+  - Added Twilio credentials to configuration.
+  - Implemented `twilio_client.py` for sending async REST requests to Twilio.
+  - Created a FastAPI webhook router (`whatsapp.py`) to handle incoming Twilio requests.
+  - Applied the Channel Normalizer pattern by parsing WhatsApp numbers into pseudo-telegram IDs and passing them into the existing AI agent pipeline.
 
 ## Current Focus
-Validating notifications functionality.
+Validating WhatsApp webhook functionality.
 
 ## Next Steps
 1. Push changes to Dokploy.
-2. Build WhatsApp Integration (Guide 12) or Scaling/Performance optimizations (Guide 13).
+2. Build Scaling/Performance optimizations (Guide 13).
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.

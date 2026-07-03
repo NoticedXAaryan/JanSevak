@@ -31,6 +31,10 @@ admin_app.include_router(dashboard_router, prefix="/admin")
 admin_app.include_router(queries_router, prefix="/admin/queries")
 admin_app.include_router(reports_router, prefix="/admin/reports")
 
+# Mount WhatsApp Webhook
+from janseva.api.whatsapp import router as whatsapp_router
+admin_app.include_router(whatsapp_router, prefix="/api")
+
 @admin_app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     """Public landing page."""
