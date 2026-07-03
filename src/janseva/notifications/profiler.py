@@ -27,7 +27,7 @@ async def extract_interests(query: str) -> List[str]:
     try:
         llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
-            google_api_key=settings.gemini_api_key,
+            google_api_key=settings.google_api_key,
             temperature=0
         )
         structured_llm = llm.with_structured_output(ExtractedInterests)
