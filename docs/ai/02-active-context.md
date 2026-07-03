@@ -1,28 +1,30 @@
 # JanSeva — Active Context
 
 ## Current Phase
-**Phase 0: Foundation & Documentation**
+**Phase 1: Deployment & Stabilization**
 
-## Last Session (2026-07-02)
-- Created project brief (`00-project-brief.md`)
-- Created architecture document (`01-architecture.md`)
-- Created active context (`02-active-context.md`)
-- Creating implementation master guide (`03-implementation-master.md`)
-- Creating all detailed implementation guides under `docs/ai/guides/`
-- Research completed on: AI agent frameworks, Telegram bot frameworks, Hindi/Indian language voice tech, anonymous reporting platforms, databases, admin panels, task queues
+## Last Session (2026-07-03)
+- Resolved critical `ModuleNotFoundError` during Dokploy deployment:
+  - Root cause was an unanchored `models/` rule in `.gitignore` that excluded the `src/janseva/db/models` directory from GitHub.
+  - Fixed by anchoring to `/models/` and committing the database models.
+- Resolved `uv sync` failure during container runtime:
+  - `uv run` inside the container forced a re-sync and wiped the installation.
+  - Fixed by calling `.venv/bin/python` directly in `scripts/start.sh`.
+- Removed local `postgres` and `redis` from `docker-compose.yml`:
+  - Adopted external managed PostgreSQL to save local disk space on the VPS.
+  - Redis was dropped as rate-limiting currently uses in-memory logic.
 
 ## Current Focus
-Building the complete documentation suite that serves as a self-contained implementation manual. No code has been written yet — documentation first, then implementation.
+Monitoring the stability of the Dokploy deployment and confirming the external PostgreSQL instance connection is functioning properly with URL-encoded passwords.
 
 ## Next Steps
-1. Complete all implementation guide documents
-2. Begin Phase 1 implementation: project scaffolding, database setup, basic Telegram bot
-3. Build the AI agent layer (LangGraph orchestrator + specialist agents)
-4. Build the anonymous reporting system
-5. Integrate voice processing
+1. Finalize the deployment using the external DB.
+2. Build the AI agent layer (LangGraph orchestrator + specialist agents).
+3. Build the anonymous reporting system.
+4. Integrate voice processing.
 
 ## Key Decisions Made
-- **Project name**: JanSeva (जनसेवा)
+- **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
 - **Telegram framework**: aiogram 3.x (async-native, modern architecture)
 - **Agent framework**: LangGraph (stateful workflows, checkpointing, explicit control flow)
 - **Voice STT**: AI4Bharat IndicWhisper (best open-source for Indian languages)
