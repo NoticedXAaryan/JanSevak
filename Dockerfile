@@ -21,20 +21,21 @@ WORKDIR /app
 # Copy the lockfile and pyproject.toml
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies (without the project itself — source isn't copied yet)
+# Install dependencies only (NOT the project itself).
+# We rely on PYTHONPATH=/app/src for imports — no editable install needed.
 RUN uv sync --frozen --no-install-project --no-dev
 
-# Copy the rest of the application
+# Copy the rest of the application source
 COPY . .
 
-# Install the project itself (force reinstall to avoid stale cache)
-RUN uv sync --frozen --no-dev --reinstall-package janseva
-
-# Verify the package installed correctly (fail the build early if broken)
-RUN .venv/bin/python -c "from janseva.db.models import Base; print('Package verification OK:', Base)"
+# Verify the source code is importable via PYTHONPATH
+RUN .venv/bin/python -c "\
+import sys; print('sys.path:', sys.path); \
+from janseva.db.models import Base; \
+from janseva.config import Settings; \
+print('All imports OK')"
 
 # Setup entrypoint script
 RUN chmod +x /app/scripts/start.sh
 
-# Run the startup script
 CMD ["/app/scripts/start.sh"]
