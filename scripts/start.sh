@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Use the venv binaries directly — DO NOT use "uv run" here.
+# "uv run" triggers a re-sync that rebuilds the janseva package,
+# producing a broken install that can't find submodules.
+VENV_BIN="/app/.venv/bin"
+
 if [[ "${RUN_MIGRATIONS:-true}" != "false" ]]; then
     echo "Running database migrations..."
-    uv run alembic upgrade head
+    "$VENV_BIN/alembic" upgrade head
 else
     echo "Skipping database migrations because RUN_MIGRATIONS=false"
 fi
 
 if [[ "${SEED_KNOWLEDGE_BASE:-true}" != "false" ]]; then
     echo "Seeding knowledge base if needed..."
-    uv run python scripts/seed_knowledge_base.py --skip-if-populated
+    "$VENV_BIN/python" scripts/seed_knowledge_base.py --skip-if-populated
 else
     echo "Skipping knowledge base seed because SEED_KNOWLEDGE_BASE=false"
 fi
 
 echo "Starting Telegram bot..."
-exec uv run python -m janseva.bot
+exec "$VENV_BIN/python" -m janseva.bot
