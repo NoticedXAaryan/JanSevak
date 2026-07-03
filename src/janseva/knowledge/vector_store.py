@@ -2,12 +2,10 @@
 Vector store interface for RAG.
 Uses ChromaDB for development. Can be swapped to pgvector for production.
 """
-import structlog
 from pathlib import Path
+from typing import Any
 
-from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.embeddings import OllamaEmbeddings
+import structlog
 
 from janseva.config import settings
 
@@ -16,39 +14,47 @@ logger = structlog.get_logger()
 # Persistent storage for ChromaDB
 CHROMA_PERSIST_DIR = Path(__file__).parent.parent.parent.parent / ".chromadb"
 
-_vector_store = None
+_vector_store: Any | None = None
 
 
-def get_embeddings():
+def get_embeddings() -> Any:
     """Get the embedding model based on LLM provider."""
-    if settings.llm_provider == "gemini":
+    provider = settings.embedding_provider.lower()
+
+    if provider in {"gemini", "google"}:
+        if not settings.google_api_key:
+            raise ValueError("GOOGLE_API_KEY is required when EMBEDDING_PROVIDER=gemini")
+
+        from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
         return GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001",
+            model=settings.embedding_model or "models/embedding-001",
             google_api_key=settings.google_api_key,
         )
-    elif settings.llm_provider == "openrouter":
-        # Let's use text-embedding-3-small via openrouter if available or fallback
-        # Wait, OpenRouter doesn't host an embedding model directly in a way that matches OpenAI's embedding API.
-        # So typically we just use Ollama locally or HuggingFace for embeddings when using OpenRouter.
-        # I'll default to HuggingFace embeddings for a free robust option
-        from langchain_huggingface import HuggingFaceEmbeddings
-        return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    elif settings.llm_provider == "ollama":
+
+    if provider == "ollama":
+        from langchain_community.embeddings import OllamaEmbeddings
+
         return OllamaEmbeddings(
-            model="nomic-embed-text",  # Good multilingual embedding model
+            model=settings.embedding_model or "nomic-embed-text",
             base_url=settings.ollama_base_url,
         )
-    else:
-        raise ValueError(f"Unknown LLM provider: {settings.llm_provider}")
+
+    raise ValueError(
+        f"Unknown embedding provider: {settings.embedding_provider}. "
+        "Set EMBEDDING_PROVIDER to 'gemini' or 'ollama'."
+    )
 
 
-def get_vector_store() -> Chroma:
+def get_vector_store() -> Any:
     """
     Get or create the ChromaDB vector store singleton.
     Uses persistent storage so embeddings survive restarts.
     """
     global _vector_store
     if _vector_store is None:
+        from langchain_community.vectorstores import Chroma
+
         _vector_store = Chroma(
             collection_name="janseva_knowledge",
             embedding_function=get_embeddings(),

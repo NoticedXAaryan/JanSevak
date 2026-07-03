@@ -2,8 +2,8 @@
 Central configuration module.
 Reads all settings from environment variables (.env file).
 """
-from pydantic_settings import BaseSettings
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -29,9 +29,20 @@ class Settings(BaseSettings):
     google_api_key: str = Field("", description="Google Gemini API key")
     openrouter_api_key: str = Field("", description="OpenRouter API key")
     groq_api_key: str = Field("", description="Groq API key")
-    llm_provider: str = Field("gemini", description="LLM provider: 'gemini', 'ollama', or 'openrouter'")
+    llm_provider: str = Field(
+        "gemini",
+        description="LLM provider: 'gemini', 'ollama', or 'openrouter'",
+    )
     llm_model: str = Field("gemini-2.0-flash", description="LLM model name")
     ollama_base_url: str = Field("http://localhost:11434")
+    embedding_provider: str = Field(
+        "gemini",
+        description="Embedding provider: 'gemini' or 'ollama'. OpenRouter is chat-only here.",
+    )
+    embedding_model: str = Field(
+        "",
+        description="Embedding model override. Defaults depend on EMBEDDING_PROVIDER.",
+    )
 
     # --- Security ---
     admin_jwt_secret: str = Field("change-me", description="JWT secret for admin auth")

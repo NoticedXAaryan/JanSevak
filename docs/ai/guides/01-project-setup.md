@@ -311,7 +311,8 @@ dependencies = [
     
     # --- Voice Processing ---
     "pydub>=0.25,<1",
-    "openai-whisper>=20240930",            # Base Whisper (IndicWhisper wraps this)
+    # Do not add openai-whisper/PyTorch to default deps for CPU-only VPS deploys.
+    # Use a cloud STT API or an optional local-voice extra when voice is implemented.
     
     # --- Security ---
     "cryptography>=43,<44",                # Report encryption
@@ -921,6 +922,9 @@ uv run alembic upgrade head
 | Alembic can't connect to DB | Ensure PostgreSQL container is running (`docker compose up -d postgres`), check the URL in `alembic.ini` matches your Docker config |
 | `ModuleNotFoundError: janseva` | Make sure you're running commands from the `GoogleXParul` directory and that `src/janseva/__init__.py` exists |
 | Port 5432 already in use | Another PostgreSQL is running. Stop it or change the port in `docker-compose.yml` |
+| Docker/Dokploy cannot reach Postgres or Redis | Inside containers, use service hostnames like `postgres` and `redis`, not `localhost` |
+| VPS runs out of disk during Docker build | Keep PyTorch, Whisper, CUDA, `.venv/`, and `.chromadb/` out of the production image and build context |
+| Bot deploys but no website opens | The current app is a Telegram polling worker, not an HTTP web service |
 
 ---
 

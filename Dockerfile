@@ -1,6 +1,12 @@
 FROM python:3.11-slim
 
-# Install system dependencies (needed for psycopg2, sentence-transformers, etc.)
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app/src \
+    UV_NO_CACHE=1 \
+    UV_LINK_MODE=copy
+
+# Install system dependencies needed by database and vector-store wheels.
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -12,7 +18,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Set working directory
 WORKDIR /app
-ENV PYTHONPATH=/app/src
 
 # Copy the lockfile and pyproject.toml
 COPY pyproject.toml uv.lock ./

@@ -42,6 +42,26 @@ Telegram / WhatsApp → Channel Normalizer → LangGraph AI Agents → Response
 
 ## Quick Start
 
+### Docker / Dokploy
+
+```bash
+# 1. Copy and configure environment
+cp .env.example .env
+# Fill TELEGRAM_BOT_TOKEN and GOOGLE_API_KEY.
+# Compose derives container-safe DATABASE_URL/REDIS_URL values from
+# POSTGRES_* and REDIS_HOST, so it will not use localhost by accident.
+
+# 2. Build and start the full stack
+docker compose up -d --build
+
+# 3. View logs
+docker compose logs -f bot
+```
+
+For a CPU-only VPS, use cloud LLM/embedding APIs and do not add PyTorch, Whisper, CUDA, or local model dependencies to the default Docker image. See [Deployment](docs/deployment.md) for the Dokploy checklist.
+
+### Local Development
+
 ```bash
 # 1. Clone and enter the project
 cd GoogleXParul
@@ -52,6 +72,8 @@ uv sync
 # 3. Copy and configure environment
 cp .env.example .env
 # Edit .env with your TELEGRAM_BOT_TOKEN and GOOGLE_API_KEY
+# If running the bot directly on your host, change postgres/redis hostnames
+# in DATABASE_URL, DATABASE_URL_SYNC, and REDIS_URL to localhost.
 
 # 4. Start database services
 docker compose up -d
@@ -76,6 +98,7 @@ All documentation lives in `docs/ai/`:
 | [Architecture](docs/ai/01-architecture.md) | Tech stack, data model, design decisions |
 | [Active Context](docs/ai/02-active-context.md) | Current state and next steps |
 | [Master Guide](docs/ai/03-implementation-master.md) | **Start here** — Complete implementation roadmap |
+| [Deployment](docs/deployment.md) | CPU-only VPS and Dokploy deployment checklist |
 
 ### Implementation Guides (in order)
 

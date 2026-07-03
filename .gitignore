@@ -30,6 +30,7 @@ Thumbs.db
 # Docker volumes
 pgdata/
 redisdata/
+.chromadb/
 
 # Models (large files)
 models/
