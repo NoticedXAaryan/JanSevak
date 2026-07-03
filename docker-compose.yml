@@ -1,71 +1,45 @@
 # docker-compose.yml
-# Runs JanSeva, PostgreSQL, and Redis for local Docker or Dokploy Compose deploys.
-# Usage: copy .env.example to .env, fill secrets, then run: docker compose up -d
+# Runs JanSeva Bot only.
+# Connects to an external managed PostgreSQL instance.
+# Usage: Set environment variables in Dokploy, then deploy.
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: janseva-postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-janseva}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-janseva_dev}
-      POSTGRES_DB: ${POSTGRES_DB:-janseva}
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U janseva"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    container_name: janseva-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   bot:
     build: .
     container_name: janseva-bot
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
+      # --- Critical Connections ---
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:?Set TELEGRAM_BOT_TOKEN in Dokploy or .env}
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-janseva}:${POSTGRES_PASSWORD:-janseva_dev}@${POSTGRES_HOST:-postgres}:5432/${POSTGRES_DB:-janseva}
-      DATABASE_URL_SYNC: postgresql://${POSTGRES_USER:-janseva}:${POSTGRES_PASSWORD:-janseva_dev}@${POSTGRES_HOST:-postgres}:5432/${POSTGRES_DB:-janseva}
-      REDIS_URL: redis://${REDIS_HOST:-redis}:6379/0
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL (asyncpg) to your external Postgres}
+      DATABASE_URL_SYNC: ${DATABASE_URL_SYNC:?Set DATABASE_URL_SYNC to your external Postgres}
+      
+      # --- API Keys ---
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
+      
+      # --- Provider Config ---
       LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
       LLM_MODEL: ${LLM_MODEL:-gemini-2.0-flash}
       EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-gemini}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-models/embedding-001}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://localhost:11434}
+      
+      # --- Security & Settings ---
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-change-this-to-a-random-64-char-string}
       REPORT_ENCRYPTION_KEY: ${REPORT_ENCRYPTION_KEY:-change-this-to-a-fernet-key}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-this-in-production}
       ENV: ${ENV:-production}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      
+      # --- Startup Behaviors ---
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
       SEED_KNOWLEDGE_BASE: ${SEED_KNOWLEDGE_BASE:-true}
+      
     volumes:
+      # Persistent storage for ChromaDB (local vector store)
       - chromadata:/app/.chromadb
 
 volumes:
-  pgdata:
-  redisdata:
   chromadata:
