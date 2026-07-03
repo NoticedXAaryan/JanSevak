@@ -19,7 +19,7 @@ __pycache__/
 htmlcov/
 
 .chromadb/
-models/
+/models/
 logs/
 *.log
 
