@@ -16,6 +16,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     district: Mapped[str | None] = mapped_column(String(255), nullable=True)
     state: Mapped[str | None] = mapped_column(String(255), nullable=True)
     interests: Mapped[list[str] | None] = mapped_column(ARRAY(Text), nullable=True)
+    notifications_enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
     # Relationships

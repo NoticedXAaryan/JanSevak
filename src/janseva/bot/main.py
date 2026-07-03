@@ -48,6 +48,10 @@ async def main() -> None:
     dp.include_router(voice_router)   # Voice messages (before text, so voice isn't caught by text handler)
     dp.include_router(text_router)    # Text messages (catch-all)
 
+    # Start background scheduler
+    from janseva.notifications.scheduler import start_scheduler
+    start_scheduler(bot)
+
     # Start polling
     logger.info("bot_started", bot_username=(await bot.me()).username)
     try:

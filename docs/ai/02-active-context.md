@@ -4,18 +4,19 @@
 **Phase 1: Deployment & Stabilization**
 
 ## Last Session (2026-07-03)
-- Built the **Admin Dashboard** (Guide 07):
-  - Created a FastAPI sub-app with JWT cookie auth.
-  - Built a public landing page (`index.html`) linking to Telegram.
-  - Implemented HTMX-powered dashboard routes for viewing stats, user queries, and managing anonymous reports.
-  - Updated `start.sh` to spin up the web server alongside the Telegram bot.
+- Built **Notifications & Interest Profiling** (Guide 11):
+  - Created `profiler.py` using Gemini to extract interests and integrated into voice/text handlers as background tasks.
+  - Added `notifications_enabled` to `User` DB model.
+  - Built `engine.py` to broadcast scheme alerts to relevant users.
+  - Created an asyncio `scheduler.py` loop (replacing ARQ/Redis) to periodically check for new alerts.
+  - Added `/notifications on|off` command to the bot.
 
 ## Current Focus
-Integrating the Admin Dashboard. The web server now runs on port 8000 alongside the bot.
+Validating notifications functionality.
 
 ## Next Steps
 1. Push changes to Dokploy.
-2. Build Profile Notifications (Guide 11) or WhatsApp Integration (Guide 12).
+2. Build WhatsApp Integration (Guide 12) or Scaling/Performance optimizations (Guide 13).
 
 ## Key Decisions Made
 - **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.

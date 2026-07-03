@@ -38,11 +38,17 @@ async def handle_text_message(message: Message) -> None:
     # Show "typing" indicator while AI processes
     await message.chat.do(action="typing")
 
+    from janseva.notifications.profiler import update_user_interests
+    import asyncio
+    
     # Process through AI agent pipeline
     response = await process_message(
         telegram_id=telegram_id,
         user_text=user_text,
     )
+    
+    # Fire and forget updating interests
+    asyncio.create_task(update_user_interests(telegram_id, user_text))
 
     # Send response (split if too long for Telegram's 4096 char limit)
     if len(response) <= 4096:

@@ -54,12 +54,18 @@ async def handle_voice_message(message: Message) -> None:
             await message.answer("मुझे आपकी आवाज़ समझ नहीं आई। कृपया दोबारा कोशिश करें।\nI couldn't understand your voice. Please try again.")
             return
 
+        from janseva.notifications.profiler import update_user_interests
+        import asyncio
+        
         # 4. Process transcribed text via AI Agent
         await message.chat.do(action="typing")
         response = await process_message(
             telegram_id=telegram_id,
             user_text=user_text,
         )
+        
+        # Fire and forget updating interests
+        asyncio.create_task(update_user_interests(telegram_id, user_text))
 
         # 5. Send response
         if len(response) <= 4096:

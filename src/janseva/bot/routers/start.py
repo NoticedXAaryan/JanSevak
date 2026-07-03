@@ -83,7 +83,8 @@ async def handle_help(message: Message) -> None:
         "/help — Show this help message\n"
         "/report — Submit an anonymous report (गुमनाम शिकायत)\n"
         "/language — Change your preferred language\n"
-        "/status — Check the status of your reports or queries\n\n"
+        "/status — Check the status of your reports or queries\n"
+        "/notifications [on/off] — Toggle targeted scheme alerts\n\n"
         "<b>How to Use:</b>\n"
         "• Just type your question in Hindi or English\n"
         "• Send a voice note 🎙️ in any Indian language\n"
@@ -96,3 +97,32 @@ async def handle_help(message: Message) -> None:
         "<i>आपकी सभी बातचीत सुरक्षित है। गुमनाम रिपोर्ट में आपकी पहचान कभी साझा नहीं की जाती।</i>"
     )
     await message.answer(help_text)
+
+@start_router.message(Command("notifications"))
+async def handle_notifications_toggle(message: Message) -> None:
+    """Handle /notifications on|off."""
+    if not message.from_user:
+        return
+    
+    telegram_id = message.from_user.id
+    text = message.text.lower() if message.text else ""
+    
+    if "on" in text:
+        enabled = True
+    elif "off" in text:
+        enabled = False
+    else:
+        await message.answer("Usage: /notifications on OR /notifications off")
+        return
+        
+    async with async_session_factory() as session:
+        result = await session.execute(select(User).where(User.telegram_id == telegram_id))
+        user = result.scalar_one_or_none()
+        if user:
+            user.notifications_enabled = enabled
+            await session.commit()
+            
+            if enabled:
+                await message.answer("✅ Notifications turned ON. We will send you relevant scheme alerts.")
+            else:
+                await message.answer("🔕 Notifications turned OFF. You will no longer receive proactive alerts.")
