@@ -17,6 +17,7 @@ from janseva.agents.state import AgentState
 from janseva.agents.llm import get_llm
 from janseva.agents.specialists.service_navigator import handle_service_query
 from janseva.agents.specialists.escalation import handle_escalation
+from janseva.agents.specialists.anonymous_reporter import handle_anonymous_report
 
 logger = structlog.get_logger()
 
@@ -195,7 +196,7 @@ def route_by_intent(state: AgentState) -> str:
     
     route_map = {
         "service_query": "service_navigator",
-        "anonymous_report": "placeholder",      # TODO: Guide 05
+        "anonymous_report": "anonymous_report_node",
         "healthcare": "placeholder",             # TODO: Guide 09
         "farmer": "placeholder",                 # TODO: Guide 10
         "general": "general_chat",
@@ -221,6 +222,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("service_navigator", handle_service_query)
     graph.add_node("general_chat", handle_general_chat)
     graph.add_node("escalation", handle_escalation)
+    graph.add_node("anonymous_report_node", handle_anonymous_report)
     graph.add_node("placeholder", handle_placeholder)
     
     # Set entry point
@@ -232,6 +234,7 @@ def build_agent_graph() -> StateGraph:
         route_by_intent,
         {
             "service_navigator": "service_navigator",
+            "anonymous_report_node": "anonymous_report_node",
             "general_chat": "general_chat",
             "escalation": "escalation",
             "placeholder": "placeholder",
@@ -240,6 +243,7 @@ def build_agent_graph() -> StateGraph:
     
     # All specialist nodes lead to END
     graph.add_edge("service_navigator", END)
+    graph.add_edge("anonymous_report_node", END)
     graph.add_edge("general_chat", END)
     graph.add_edge("escalation", END)
     graph.add_edge("placeholder", END)
