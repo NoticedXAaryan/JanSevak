@@ -44,7 +44,7 @@ async def test_handle_text_message_success(
     # Mock thinking and processing
     thinking_msg = MagicMock(spec=Message)
     mock_thinking.return_value = thinking_msg
-    mock_process.return_value = "This is a response"
+    mock_process.return_value = ("This is a response", [])
     
     await handle_text_message(mock_message)
     
@@ -54,7 +54,7 @@ async def test_handle_text_message_success(
         telegram_id=123456789,
         user_text="Hello JanSeva"
     )
-    mock_update.assert_called_once_with(mock_message, thinking_msg, "This is a response")
+    mock_update.assert_called_once_with(mock_message, thinking_msg, "This is a response", reply_markup=None)
 
 @pytest.mark.asyncio
 @patch("janseva.bot.routers.text.async_session_factory")

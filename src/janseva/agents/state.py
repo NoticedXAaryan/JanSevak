@@ -33,5 +33,6 @@ class AgentState(TypedDict):
     user_telegram_id: int
     intent: str
     response: str
+    interactive_options: list[dict]
     needs_escalation: bool
     escalation_reason: str

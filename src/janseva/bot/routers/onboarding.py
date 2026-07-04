@@ -13,9 +13,11 @@ logger = structlog.get_logger()
 
 onboarding_router = Router(name="onboarding")
 
+from janseva.bot.helpers.constants import INDIA_DISTRICTS
+
 @onboarding_router.callback_query(F.data.startswith("lang_"))
 async def handle_language_selection(callback: CallbackQuery):
-    """Save selected language and prompt for district."""
+    """Save selected language and prompt for state selection."""
     if not callback.message or not callback.from_user:
         return
 
@@ -24,11 +26,15 @@ async def handle_language_selection(callback: CallbackQuery):
     
     # Text in both languages since we just selected one
     msg_texts = {
-        "hi": ("आपने हिंदी चुनी है। ✅\n\nअब कृपया अपना जिला (District) चुनें:", "कृपया चुनें / Please select"),
-        "en": ("You have selected English. ✅\n\nNow please select your District:", "Please select / कृपया चुनें")
+        "hi": ("आपने हिंदी चुनी है। ✅\n\nअब कृपया अपना राज्य (State) चुनें:", "कृपया चुनें / Please select"),
+        "en": ("You have selected English. ✅\n\nNow please select your State:", "Please select / कृपया चुनें")
     }
     
-    text, prompt = msg_texts.get(lang_code, msg_texts["hi"])
+    # Fallback for other languages (using English structure with localized names from DB ideally, but here we keep it simple)
+    text = msg_texts.get(lang_code, msg_texts["en"])[0]
+    
+    if lang_code not in msg_texts and lang_code != "en":
+        text = f"Language selected. ✅\n\nNow please select your State (राज्य चुनें):"
 
     async with async_session_factory() as session:
         result = await session.execute(select(User).where(User.telegram_id == telegram_id))
@@ -38,18 +44,51 @@ async def handle_language_selection(callback: CallbackQuery):
             user.language = lang_code
             await session.commit()
             
-    # Show district keyboard (hardcoded common ones for now, ideally fetched from DB)
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Indore (इंदौर)", callback_data="dist_indore"),
-            InlineKeyboardButton(text="Bhopal (भोपाल)", callback_data="dist_bhopal")
-        ],
-        [
-            InlineKeyboardButton(text="Ujjain (उज्जैन)", callback_data="dist_ujjain"),
-            InlineKeyboardButton(text="Other (अन्य)", callback_data="dist_other")
-        ]
-    ])
+    # Show state keyboard (2 per row)
+    buttons = []
+    current_row = []
+    for state_name in INDIA_DISTRICTS.keys():
+        # Truncate if too long, though they are mostly fine
+        btn_text = state_name[:20] 
+        current_row.append(InlineKeyboardButton(text=btn_text, callback_data=f"state_{state_name}"))
+        if len(current_row) == 2:
+            buttons.append(current_row)
+            current_row = []
+    if current_row:
+        buttons.append(current_row)
+        
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     
+    await callback.message.edit_text(text, reply_markup=keyboard)
+    await callback.answer()
+
+
+@onboarding_router.callback_query(F.data.startswith("state_"))
+async def handle_state_selection(callback: CallbackQuery):
+    """Show districts for the selected state."""
+    if not callback.message or not callback.from_user:
+        return
+
+    state_name = callback.data.split("_", 1)[1]
+    
+    # Show district keyboard for this state
+    districts = INDIA_DISTRICTS.get(state_name, ["Other"])
+    buttons = []
+    current_row = []
+    for dist in districts:
+        current_row.append(InlineKeyboardButton(text=dist, callback_data=f"dist_{dist}"))
+        if len(current_row) == 2:
+            buttons.append(current_row)
+            current_row = []
+    if current_row:
+        buttons.append(current_row)
+        
+    # Add a back button
+    buttons.append([InlineKeyboardButton(text="⬅️ Back to States", callback_data="lang_en")]) # hack to just reload states in EN
+        
+    keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+    
+    text = f"State: {state_name} ✅\n\nNow please select your District (जिला चुनें):"
     await callback.message.edit_text(text, reply_markup=keyboard)
     await callback.answer()
 
@@ -60,7 +99,7 @@ async def handle_district_selection(callback: CallbackQuery):
     if not callback.message or not callback.from_user:
         return
 
-    district = callback.data.split("_")[1]
+    district = callback.data.split("_", 1)[1]
     telegram_id = callback.from_user.id
     
     async with async_session_factory() as session:

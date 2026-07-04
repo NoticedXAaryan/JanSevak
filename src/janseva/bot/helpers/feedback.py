@@ -72,7 +72,12 @@ async def send_thinking(message: Message) -> Message | None:
         logger.error("error_sending_thinking_msg", error=str(e), telegram_id=message.from_user.id if message.from_user else None)
         return None
 
-async def update_with_response(original_message: Message, thinking_message: Message | None, response_text: str) -> None:
+async def update_with_response(
+    original_message: Message, 
+    thinking_message: Message | None, 
+    response_text: str,
+    reply_markup=None
+) -> None:
     """
     Replace the 'thinking' message with the actual AI response.
     Converts Markdown to Telegram HTML before sending.
@@ -83,30 +88,32 @@ async def update_with_response(original_message: Message, thinking_message: Mess
 
     if not thinking_message:
         # Fallback to just sending a new message if thinking_message wasn't created
-        await original_message.answer(response_text)
+        await original_message.answer(response_text, reply_markup=reply_markup)
         return
 
     try:
         # If response is too long, we might need to send it in chunks.
         # Telegram limit is 4096. Let's be safe and chunk at 4000.
         if len(response_text) <= 4000:
-            await thinking_message.edit_text(response_text)
+            await thinking_message.edit_text(response_text, reply_markup=reply_markup)
         else:
             # Edit the first chunk, then send the rest as new messages
             chunks = _split_html_safe(response_text, 4000)
             await thinking_message.edit_text(chunks[0])
-            for chunk in chunks[1:]:
-                await original_message.answer(chunk)
+            for i, chunk in enumerate(chunks[1:]):
+                # Only attach markup to the final chunk
+                markup = reply_markup if i == len(chunks) - 2 else None
+                await original_message.answer(chunk, reply_markup=markup)
                 
     except TelegramBadRequest as e:
         logger.warning("failed_to_edit_thinking_msg", error=str(e))
         # If we can't edit it, just send a new message
         try:
-            await original_message.answer(response_text)
+            await original_message.answer(response_text, reply_markup=reply_markup)
         except TelegramBadRequest:
             # If HTML is malformed, strip all tags and try plain text
             clean = re.sub(r'<[^>]+>', '', response_text)
-            await original_message.answer(clean)
+            await original_message.answer(clean, reply_markup=reply_markup)
         
         # Try to delete the old thinking message if possible
         try:
@@ -115,7 +122,7 @@ async def update_with_response(original_message: Message, thinking_message: Mess
             pass
     except Exception as e:
         logger.error("error_updating_response", error=str(e))
-        await original_message.answer(response_text)
+        await original_message.answer(response_text, reply_markup=reply_markup)
 
 
 def _split_html_safe(text: str, max_len: int) -> list[str]:

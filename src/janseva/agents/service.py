@@ -115,9 +115,10 @@ async def process_message(
             )
             session.add(assistant_message)
             await session.commit()
-            return cached_response
+            return cached_response, []
         
         # 5. Run the agent graph
+        interactive_options = []
         try:
             initial_state = {
                 "messages": langchain_messages,
@@ -126,12 +127,14 @@ async def process_message(
                 "user_telegram_id": telegram_id,
                 "intent": "",
                 "response": "",
+                "interactive_options": [],
                 "needs_escalation": False,
                 "escalation_reason": "",
             }
             
             result_state = agent_graph.invoke(initial_state)
             response_text = result_state.get("response", "")
+            interactive_options = result_state.get("interactive_options", [])
             
             if not response_text:
                 response_text = (
@@ -164,6 +167,7 @@ async def process_message(
             telegram_id=telegram_id,
             intent=result_state.get("intent", "unknown") if 'result_state' in locals() else "error",
             response_length=len(response_text),
+            options_count=len(interactive_options)
         )
         
-        return response_text
+        return response_text, interactive_options

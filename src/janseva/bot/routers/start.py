@@ -18,6 +18,27 @@ logger = structlog.get_logger()
 start_router = Router(name="start")
 
 
+from janseva.bot.helpers.constants import LANGUAGES
+
+def _get_language_keyboard() -> InlineKeyboardMarkup:
+    """Generate a dynamic inline keyboard with all supported languages (3 per row)."""
+    buttons = []
+    current_row = []
+    
+    for code, (en_name, native_name) in LANGUAGES.items():
+        text = f"{native_name}" if en_name == native_name else f"{native_name} ({en_name})"
+        current_row.append(InlineKeyboardButton(text=text, callback_data=f"lang_{code}"))
+        
+        if len(current_row) == 3:
+            buttons.append(current_row)
+            current_row = []
+            
+    if current_row:
+        buttons.append(current_row)
+        
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
 @start_router.message(CommandStart())
 async def handle_start(message: Message) -> None:
     """
@@ -58,17 +79,7 @@ async def handle_start(message: Message) -> None:
             await session.commit()
             logger.info("returning_user_restarted", telegram_id=telegram_id, name=full_name)
 
-        # Show language selection keyboard
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(text="हिंदी", callback_data="lang_hi"),
-                InlineKeyboardButton(text="English", callback_data="lang_en")
-            ],
-            [
-                InlineKeyboardButton(text="मराठी", callback_data="lang_mr"),
-                InlineKeyboardButton(text="தமிழ்", callback_data="lang_ta")
-            ]
-        ])
+        keyboard = _get_language_keyboard()
         
         welcome_text = (
             f"🙏 <b>नमस्ते {full_name}! / Welcome!</b>\n\n"
@@ -82,16 +93,7 @@ async def handle_start(message: Message) -> None:
 @start_router.message(Command("language"))
 async def handle_language_command(message: Message) -> None:
     """Handle /language command to change language."""
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="हिंदी", callback_data="lang_hi"),
-            InlineKeyboardButton(text="English", callback_data="lang_en")
-        ],
-        [
-            InlineKeyboardButton(text="मराठी", callback_data="lang_mr"),
-            InlineKeyboardButton(text="தமிழ்", callback_data="lang_ta")
-        ]
-    ])
+    keyboard = _get_language_keyboard()
     await message.answer("कृपया अपनी नई भाषा चुनें / Please select your new language:", reply_markup=keyboard)
 
 

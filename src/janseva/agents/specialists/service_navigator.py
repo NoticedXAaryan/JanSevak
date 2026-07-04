@@ -25,10 +25,13 @@ RULES:
 5. NEVER fabricate specific addresses, phone numbers, or fees not in the context.
 6. Format with bullet points and numbered lists for clarity.
 7. Include both Hindi and English names when available in the context.
+8. INTERACTIVE OPTIONS: If you suggest specific schemes or services the user should explore further, append them at the VERY END of your response in this exact format, one per line: 
+[OPTION: Short Scheme Name]
 
 User's language: {user_language}
 User's district: {user_district}"""
 
+import re
 
 def handle_service_query(state: dict) -> dict:
     """
@@ -37,6 +40,7 @@ def handle_service_query(state: dict) -> dict:
     1. Search the knowledge base for relevant information
     2. Augment the LLM prompt with retrieved context
     3. Generate a response grounded in the knowledge base
+    4. Extract interactive options (buttons) if generated
     """
     llm = get_llm()
     user_language = state.get("user_language", "hi")
@@ -60,5 +64,25 @@ def handle_service_query(state: dict) -> dict:
     all_messages = [system_msg] + recent_messages
     
     response = llm.invoke(all_messages)
+    content = response.content
     
-    return {"response": response.content}
+    # Extract interactive options: [OPTION: Scheme Name]
+    options = []
+    option_pattern = r'\[OPTION:\s*(.+?)\]'
+    
+    for match in re.finditer(option_pattern, content):
+        scheme_name = match.group(1).strip()
+        # Create callback data (truncate to 64 chars max for Telegram limits)
+        callback_data = f"query_{scheme_name}"[:64]
+        options.append({
+            "text": scheme_name,
+            "callback_data": callback_data
+        })
+        
+    # Strip the options from the text response
+    clean_content = re.sub(option_pattern, '', content).strip()
+    
+    return {
+        "response": clean_content,
+        "interactive_options": options
+    }
