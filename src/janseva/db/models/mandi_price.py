@@ -11,6 +11,8 @@ class MandiPrice(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     crop_name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     crop_name_hi: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    variety: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    grade: Mapped[str | None] = mapped_column(String(100), nullable=True)
     
     state: Mapped[str] = mapped_column(String(255), nullable=False)
     district: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
@@ -24,3 +26,4 @@ class MandiPrice(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
     source_api: Mapped[str | None] = mapped_column(String(255), default="agmarknet")
     last_synced_at: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True)
+
