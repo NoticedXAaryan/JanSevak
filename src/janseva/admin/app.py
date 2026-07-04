@@ -71,8 +71,9 @@ async def index(request: Request):
     """Public landing page."""
     admin = get_current_admin_optional(request)
     return templates.TemplateResponse(
-        "index.html", 
-        {"request": request, "admin": admin}
+        request=request,
+        name="index.html", 
+        context={"request": request, "admin": admin}
     )
 
 @admin_app.get("/api/public/stats")
@@ -110,11 +111,15 @@ async def login_page(request: Request):
     elif error == "unauthorized":
         error_msg = "Your Google account is not authorized to access this dashboard."
         
-    return templates.TemplateResponse("login.html", {
-        "request": request, 
-        "error_msg": error_msg,
-        "google_enabled": bool(settings.google_client_id)
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html", 
+        context={
+            "request": request, 
+            "error_msg": error_msg,
+            "google_enabled": bool(settings.google_client_id)
+        }
+    )
 
 @admin_app.post("/admin/login")
 async def login_post(username: str = Form(...), password: str = Form(...)):
