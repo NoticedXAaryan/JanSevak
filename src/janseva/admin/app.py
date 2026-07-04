@@ -149,4 +149,4 @@ async def logout():
     return response
 
 if __name__ == "__main__":
-    uvicorn.run("janseva.admin.app:admin_app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("janseva.admin.app:admin_app", host="0.0.0.0", port=3000, reload=True)

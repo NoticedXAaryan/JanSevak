@@ -41,11 +41,11 @@ services:
       # Persistent storage for ChromaDB (local vector store)
       - chromadata:/app/.chromadb
     expose:
-      - "8000"
+      - "3000"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.janseva.rule=Host(`${DOMAIN:-janseva.local}`)"
-      - "traefik.http.services.janseva.loadbalancer.server.port=8000"
+      - "traefik.http.services.janseva.loadbalancer.server.port=3000"
       - "traefik.http.routers.janseva.entrypoints=websecure"
       - "traefik.http.routers.janseva.tls.certresolver=letsencrypt"
     networks:

@@ -26,7 +26,7 @@ else
 fi
 
 echo "Starting Admin Web Server..."
-"$VENV_BIN/uvicorn" janseva.admin.app:admin_app --host 0.0.0.0 --port 8000 &
+"$VENV_BIN/uvicorn" janseva.admin.app:admin_app --host 0.0.0.0 --port 3000 &
 
 echo "Starting Telegram bot..."
 exec "$VENV_BIN/python" -m janseva.bot
