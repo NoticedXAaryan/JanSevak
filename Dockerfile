@@ -5,11 +5,12 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app/src \
     UV_LINK_MODE=copy
 
-# Install system dependencies needed by database and vector-store wheels.
+# Install system dependencies needed by database, vector-store wheels, and voice processing.
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     curl \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
