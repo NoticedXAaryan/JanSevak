@@ -28,6 +28,7 @@ dependencies = [
     # --- Vector Store (RAG) ---
     "chromadb>=0.5,<1",
     # --- Voice Processing ---
+    "torch",                               # Added explicitly to force CPU index override
     "pydub>=0.25,<1",
     "openai-whisper>=20231117",
     # --- Security ---
