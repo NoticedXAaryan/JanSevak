@@ -20,7 +20,9 @@ config = context.config
 import os
 db_url = os.environ.get("DATABASE_URL_SYNC")
 if db_url:
-    config.set_main_option("sqlalchemy.url", db_url)
+    # Escape % to %% because configparser treats % as string interpolation
+    escaped_url = db_url.replace("%", "%%")
+    config.set_main_option("sqlalchemy.url", escaped_url)
 
 # Set up logging
 if config.config_file_name is not None:
