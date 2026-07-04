@@ -7,128 +7,77 @@
     /* ===== Hero Section ===== */
     .hero {
         position: relative;
-        padding: 6rem 0 8rem;
+        padding: 8rem 0;
         text-align: center;
         overflow: hidden;
     }
-    .hero-bg {
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        z-index: -1;
-        background: radial-gradient(circle at top, rgba(255, 107, 53, 0.15), transparent 50%),
-                    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.1), transparent 50%);
-    }
-    .hero h1 { margin-bottom: 1.5rem; letter-spacing: -0.02em; }
-    .hero p { font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem; }
+    .hero h1 { margin-bottom: 1.5rem; }
+    .hero p { font-size: 1.25rem; color: var(--text-secondary); max-width: 650px; margin: 0 auto 3rem; }
     
     .hero-ctas { display: flex; justify-content: center; gap: 1rem; margin-bottom: 4rem; }
-    @media (max-width: 600px) {
-        .hero-ctas { flex-direction: column; }
-    }
+    @media (max-width: 600px) { .hero-ctas { flex-direction: column; } }
 
-    /* ===== Live Stats ===== */
-    .stats-container {
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        padding: 2rem;
-        background: var(--bg-glass);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--border-subtle);
-        border-radius: var(--radius-xl);
-        max-width: 800px;
-        margin: 0 auto;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    /* ===== Live Stats Glass Board ===== */
+    .stats-board {
+        display: flex; justify-content: center; gap: 3rem;
+        max-width: 800px; margin: 0 auto;
     }
-    .stat-item { text-align: center; }
-    @media (max-width: 600px) {
-        .stats-container { flex-direction: column; gap: 2rem; }
-    }
+    @media (max-width: 600px) { .stats-board { flex-direction: column; gap: 2rem; } }
 
-    /* ===== Features Section ===== */
-    .section-title { text-align: center; margin-bottom: 3rem; }
-    .section-title span { color: var(--accent-saffron); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; display: block; margin-bottom: 0.5rem; }
+    /* ===== Features Grid ===== */
+    .section-header { text-align: center; margin-bottom: 4rem; }
+    .section-header h2 { margin-bottom: 1rem; }
     
     .feature-card {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        display: flex; flex-direction: column; align-items: flex-start;
         height: 100%;
+        background: var(--bg-glass);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-glass);
+        padding: 2rem; border-radius: var(--radius-xl);
+        transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+    }
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-primary);
     }
     .feature-icon {
-        width: 48px; height: 48px;
-        border-radius: var(--radius-md);
-        background: var(--bg-surface);
-        border: 1px solid var(--border-subtle);
+        width: 56px; height: 56px; border-radius: var(--radius-lg);
+        background: rgba(249, 115, 22, 0.1); color: var(--accent-primary);
         display: flex; align-items: center; justify-content: center;
-        margin-bottom: 1.5rem;
-        color: var(--accent-saffron);
-        transition: all var(--transition-fast);
+        margin-bottom: 1.5rem; transition: all var(--transition-smooth);
     }
     .feature-card:hover .feature-icon {
-        background: var(--accent-gradient);
-        color: #fff;
-        transform: scale(1.1);
+        background: var(--accent-gradient); color: white;
+        transform: scale(1.1) rotate(5deg); box-shadow: var(--shadow-glow);
     }
-    .feature-card h3 { margin-bottom: 0.75rem; }
-    .feature-card p { color: var(--text-secondary); font-size: 0.95rem; }
-
-    /* ===== How It Works ===== */
-    .steps-container {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        position: relative;
-        margin-top: 4rem;
+    .feature-card h3 { margin-bottom: 1rem; font-size: 1.3rem; }
+    
+    /* ===== Workflow Section ===== */
+    .workflow-container { display: flex; justify-content: space-between; gap: 2rem; position: relative; }
+    .workflow-step {
+        flex: 1; text-align: center; position: relative; z-index: 2;
+        padding: 2rem; background: var(--bg-surface); border-radius: var(--radius-xl);
+        border: 1px solid var(--border-default);
     }
-    .steps-line {
-        position: absolute;
-        top: 24px; left: 10%; right: 10%;
-        height: 2px;
-        background: var(--border-subtle);
-        z-index: 0;
-    }
-    .step {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        width: 30%;
-    }
-    .step-number {
-        width: 48px; height: 48px;
-        border-radius: 50%;
-        background: var(--bg-base);
-        border: 2px solid var(--accent-saffron);
+    .workflow-step-num {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: var(--bg-base); border: 2px solid var(--accent-primary);
+        color: var(--accent-primary); font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
         display: flex; align-items: center; justify-content: center;
-        font-family: var(--font-mono); font-weight: 700; font-size: 1.2rem;
-        color: var(--text-primary);
-        margin-bottom: 1rem;
-        box-shadow: 0 0 0 8px var(--bg-base);
+        margin: 0 auto 1.5rem; box-shadow: 0 0 0 8px var(--bg-surface);
     }
-    @media (max-width: 768px) {
-        .steps-container { flex-direction: column; gap: 3rem; }
-        .steps-line { display: none; }
-        .step { width: 100%; }
-    }
+    @media (max-width: 768px) { .workflow-container { flex-direction: column; gap: 2rem; } }
 
     /* ===== Authority CTA ===== */
     .auth-cta {
-        background: var(--bg-surface);
-        border: 1px solid var(--border-default);
-        border-radius: var(--radius-xl);
-        padding: 4rem 2rem;
-        text-align: center;
-        margin-top: 6rem;
-        position: relative;
-        overflow: hidden;
+        background: var(--bg-surface); border: 1px solid var(--border-default);
+        border-radius: var(--radius-xl); padding: 5rem 2rem;
+        text-align: center; position: relative; overflow: hidden;
     }
     .auth-cta::before {
-        content: '';
-        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
         background: var(--accent-gradient);
     }
 </style>
@@ -138,8 +87,7 @@
 
 <!-- Hero Section -->
 <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="container">
+    <div class="container animate-fade-up">
         <h1>India's Public Services.<br><span class="text-gradient">Reimagined.</span></h1>
         <p>AI-powered. Multilingual. Instant. Navigate government schemes, report local issues safely, and access essential data without the red tape.</p>
         
@@ -152,41 +100,40 @@
             </a>
         </div>
 
-        <!-- Live Stats (HTMX polling) -->
-        <div class="stats-container" hx-get="/api/public/stats" hx-trigger="load, every 30s">
-            <!-- Skeleton while loading -->
-            <div class="stat-item"><div class="skeleton" style="width:100px; height:40px; margin:0 auto 8px;"></div><div class="stat-label">Citizens Helped</div></div>
-            <div class="stat-item"><div class="skeleton" style="width:100px; height:40px; margin:0 auto 8px;"></div><div class="stat-label">Queries Answered</div></div>
-            <div class="stat-item"><div class="skeleton" style="width:100px; height:40px; margin:0 auto 8px;"></div><div class="stat-label">Reports Processed</div></div>
+        <!-- Live Stats Glass Board (HTMX polling) -->
+        <div class="glass-panel stats-board animate-fade-up delay-200" hx-get="/api/public/stats" hx-trigger="load, every 30s">
+            <div class="text-center"><h3 class="text-muted">Citizens Helped</h3><div class="stat-value">...</div></div>
+            <div class="text-center"><h3 class="text-muted">Queries Answered</h3><div class="stat-value">...</div></div>
+            <div class="text-center"><h3 class="text-muted">Reports Processed</h3><div class="stat-value">...</div></div>
         </div>
     </div>
 </section>
 
 <!-- Features Section -->
-<section class="py-20" style="background: var(--bg-base);">
+<section class="py-20" style="background: rgba(0,0,0,0.02);">
     <div class="container">
-        <div class="section-title">
-            <span>Capabilities</span>
+        <div class="section-header animate-fade-up">
+            <span class="badge badge-accent mb-4">Capabilities</span>
             <h2>What JanSeva can do for you</h2>
         </div>
         
-        <div class="grid grid-4 gap-6">
-            <div class="card feature-card">
+        <div class="grid grid-4 gap-6 animate-fade-up delay-200">
+            <div class="feature-card">
                 <div class="feature-icon"><i data-lucide="file-text"></i></div>
                 <h3>Service Navigation</h3>
                 <p>Don't know what documents you need for an Income Certificate? Ask in Hindi or English, get exact requirements instantly.</p>
             </div>
-            <div class="card feature-card">
+            <div class="feature-card">
                 <div class="feature-icon"><i data-lucide="shield-alert"></i></div>
                 <h3>Anonymous Reporting</h3>
                 <p>Report corruption, illegal activities, or civic issues securely. We strip metadata and route it to higher authorities.</p>
             </div>
-            <div class="card feature-card">
+            <div class="feature-card">
                 <div class="feature-icon"><i data-lucide="hospital"></i></div>
                 <h3>Healthcare Access</h3>
                 <p>Live integration with ABDM Registry. Find nearby public hospitals, check bed availability, and navigate health schemes.</p>
             </div>
-            <div class="card feature-card">
+            <div class="feature-card">
                 <div class="feature-icon"><i data-lucide="tractor"></i></div>
                 <h3>Farmer Intelligence</h3>
                 <p>Direct hook into Agmarknet (CEDA). Check daily mandi prices, crop trends, and PM-Kisan subsidy eligibility.</p>
@@ -196,45 +143,44 @@
 </section>
 
 <!-- How It Works -->
-<section class="py-20" style="background: var(--bg-surface);">
+<section class="py-20">
     <div class="container">
-        <div class="section-title">
-            <span>Simple Process</span>
+        <div class="section-header animate-fade-up">
+            <span class="badge badge-info mb-4">Simple Process</span>
             <h2>No apps. No passwords. No friction.</h2>
         </div>
 
-        <div class="steps-container">
-            <div class="steps-line"></div>
-            <div class="step">
-                <div class="step-number">1</div>
+        <div class="workflow-container animate-fade-up delay-200">
+            <div class="workflow-step">
+                <div class="workflow-step-num">1</div>
                 <h3>Open the Bot</h3>
-                <p class="text-secondary mt-2">Just send a message on Telegram or WhatsApp. No need to download another government app.</p>
+                <p class="mt-2">Just send a message on Telegram or WhatsApp. No need to download another government app.</p>
             </div>
-            <div class="step">
-                <div class="step-number">2</div>
+            <div class="workflow-step">
+                <div class="workflow-step-num">2</div>
                 <h3>Ask in Your Language</h3>
-                <p class="text-secondary mt-2">Type or send a Voice Note in Hindi, English, Marathi, or Tamil. Our AI understands you.</p>
+                <p class="mt-2">Type or send a Voice Note in Hindi, English, Marathi, or Tamil. Our AI understands you.</p>
             </div>
-            <div class="step">
-                <div class="step-number">3</div>
+            <div class="workflow-step">
+                <div class="workflow-step-num">3</div>
                 <h3>Get Instant Answers</h3>
-                <p class="text-secondary mt-2">Get accurate, verified data fetched directly from live government APIs.</p>
+                <p class="mt-2">Get accurate, verified data fetched directly from live government APIs.</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Authority CTA -->
-<section class="py-12">
-    <div class="container">
+<section class="py-20" style="background: rgba(0,0,0,0.02);">
+    <div class="container animate-fade-up">
         <div class="auth-cta">
             <h2 class="mb-4">Are you a Government Authority?</h2>
-            <p class="text-secondary mb-8 max-w-xl mx-auto" style="font-size: 1.1rem; max-width: 600px;">
+            <p class="text-secondary mb-8 max-w-xl mx-auto" style="font-size: 1.15rem;">
                 Hospitals, Police Stations, District Collectors, and Panchayats get a dedicated dashboard to view analytics, manage escalations, and handle anonymous reports securely.
             </p>
             <div class="flex items-center justify-center gap-4">
-                <a href="/admin/login" class="btn btn-secondary btn-lg">Admin Login</a>
-                <a href="mailto:onboarding@janseva.gov.in" class="btn btn-ghost">Request Organization Setup <i data-lucide="arrow-right" style="width:16px;"></i></a>
+                <a href="/admin/login" class="btn btn-primary btn-lg">Admin Login</a>
+                <a href="mailto:onboarding@janseva.gov.in" class="btn btn-secondary btn-lg">Request Organization Setup</a>
             </div>
         </div>
     </div>

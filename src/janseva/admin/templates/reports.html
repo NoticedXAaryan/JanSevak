@@ -1,68 +1,89 @@
 {% extends "base.html" %}
 
+{% block title %}Anonymous Reports - JanSeva{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-list { list-style: none; padding: 0; margin: 0; }
+    .report-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-default);
+        transition: background var(--transition-fast);
+    }
+    .report-item:last-child { border-bottom: none; }
+    .report-item:hover { background: rgba(0, 0, 0, 0.02); }
+    html.dark .report-item:hover { background: rgba(255, 255, 255, 0.02); }
+    
+    .report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+    .report-id { font-size: 0.85rem; font-family: var(--font-mono); color: var(--accent-primary); font-weight: 600; }
+    .report-text { font-size: 1.05rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .report-meta { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; }
+    
+    .status-form {
+        display: flex; align-items: center; gap: 0.75rem; margin-top: 1.25rem;
+        padding-top: 1.25rem; border-top: 1px dashed var(--border-default);
+    }
+    .status-select {
+        padding: 0.4rem 0.75rem; background: var(--bg-surface); border: 1px solid var(--border-default);
+        border-radius: var(--radius-sm); color: var(--text-primary); font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8 flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Anonymous Reports</h1>
+<div class="container py-12 animate-fade-up">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2>Anonymous Reports</h2>
+            <p class="mt-2">View and manage citizen-reported issues securely.</p>
+        </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md border border-gray-100 dark:border-gray-700">
-        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+    <div class="glass-panel" style="padding: 0; overflow: hidden;">
+        <ul class="report-list">
             {% for report in reports %}
-            <li>
-                <div class="px-4 py-4 sm:px-6">
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-primary-600 dark:text-primary-400 truncate">
-                            Report ID: {{ report.id }}
-                        </p>
-                        <div class="ml-2 flex-shrink-0 flex items-center space-x-2">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                {% if report.status == 'pending' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
-                                {% elif report.status == 'investigating' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
-                                {% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
-                                {{ report.status | upper }}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mt-2 sm:flex sm:justify-between">
-                        <div class="sm:flex">
-                            <p class="flex items-center text-sm text-gray-700 dark:text-gray-300">
-                                {% if report.department_guess %}
-                                <strong>Dept:</strong> &nbsp;{{ report.department_guess }}<br>
-                                {% endif %}
-                                <strong>Subject:</strong> &nbsp;{{ report.subject_guess }}
-                            </p>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
-                            <p>
-                                {{ report.created_at.strftime('%Y-%m-%d %H:%M') }}
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <form class="flex items-center space-x-2" 
-                              hx-post="/admin/reports/{{ report.id }}/status" 
-                              hx-target="#status-result-{{ report.id }}">
-                            <select name="status" class="block w-full pl-3 pr-10 py-1 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
-                                <option value="pending" {% if report.status == 'pending' %}selected{% endif %}>Pending</option>
-                                <option value="investigating" {% if report.status == 'investigating' %}selected{% endif %}>Investigating</option>
-                                <option value="resolved" {% if report.status == 'resolved' %}selected{% endif %}>Resolved</option>
-                                <option value="rejected" {% if report.status == 'rejected' %}selected{% endif %}>Rejected</option>
-                            </select>
-                            <button type="submit" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none">
-                                Update
-                            </button>
-                            <span id="status-result-{{ report.id }}"></span>
-                        </form>
-                    </div>
+            <li class="report-item">
+                <div class="report-header">
+                    <span class="report-id">Report ID: {{ report.id }}</span>
+                    {% if report.status == 'pending' %}
+                        <span class="badge badge-warning">Pending</span>
+                    {% elif report.status == 'investigating' %}
+                        <span class="badge badge-info">Investigating</span>
+                    {% elif report.status == 'resolved' %}
+                        <span class="badge badge-success">Resolved</span>
+                    {% else %}
+                        <span class="badge" style="background: var(--bg-surface); border: 1px solid var(--border-default);">{{ report.status | title }}</span>
+                    {% endif %}
                 </div>
+                <div class="report-text">
+                    {% if report.department_guess %}
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+                        <strong>Department:</strong> {{ report.department_guess }}
+                    </div>
+                    {% endif %}
+                    <div><strong>Subject:</strong> {{ report.subject_guess }}</div>
+                </div>
+                <div class="report-meta">
+                    <span style="display: flex; align-items: center; gap: 0.25rem;">
+                        <i data-lucide="clock" style="width:14px;height:14px;"></i> {{ report.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </span>
+                </div>
+                
+                <form class="status-form" hx-post="/admin/reports/{{ report.id }}/status" hx-target="#status-result-{{ report.id }}">
+                    <select name="status" class="status-select">
+                        <option value="pending" {% if report.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="investigating" {% if report.status == 'investigating' %}selected{% endif %}>Investigating</option>
+                        <option value="resolved" {% if report.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="rejected" {% if report.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm" style="padding: 0.4rem 1rem;">Update</button>
+                    <span id="status-result-{{ report.id }}" style="font-size: 0.85rem; color: var(--success); font-weight: 500;"></span>
+                </form>
             </li>
             {% else %}
-            <li>
-                <div class="px-4 py-4 sm:px-6 text-center text-gray-500 dark:text-gray-400">
-                    No anonymous reports found.
-                </div>
+            <li class="report-item" style="text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+                <i data-lucide="shield-alert" style="width:48px;height:48px;opacity:0.5; margin: 0 auto 1rem;"></i>
+                <p>No anonymous reports found.</p>
             </li>
             {% endfor %}
         </ul>

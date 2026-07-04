@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-12">
+<div class="container py-12 animate-fade-up">
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 style="color: var(--text-primary); font-weight: 800; font-size: 2.25rem;">Admin Dashboard</h1>
-            <p class="text-secondary mt-2">Overview of JanSeva system metrics</p>
+            <h2>Admin Dashboard</h2>
+            <p class="mt-2">Overview of JanSeva system metrics</p>
         </div>
         <span class="badge badge-success">
             <i data-lucide="check-circle" style="width:14px;height:14px;"></i> System Online
@@ -13,30 +13,30 @@
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-4 gap-6">
+    <div class="grid grid-3 gap-6 animate-fade-up delay-100">
         
         {% if admin.get('role') == 'super_admin' %}
         <!-- Stat: Users -->
-        <div class="card">
-            <div class="flex items-center gap-4">
-                <div style="background: rgba(3, 105, 161, 0.1); padding: 0.75rem; border-radius: 0.75rem;">
-                    <i data-lucide="users" style="color: var(--info); width:24px;height:24px;"></i>
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="flex items-center gap-6">
+                <div class="stat-icon" style="background: rgba(59, 130, 246, 0.15); color: var(--info);">
+                    <i data-lucide="users" style="width:28px;height:28px;"></i>
                 </div>
                 <div>
-                    <div class="stat-value">{{ stats.users }}</div>
+                    <div class="stat-value text-gradient" style="background: linear-gradient(135deg, #3B82F6, #60A5FA); -webkit-background-clip: text;">{{ stats.users }}</div>
                     <div class="stat-label">Total Users</div>
                 </div>
             </div>
         </div>
 
         <!-- Stat: Conversations -->
-        <div class="card">
-            <div class="flex items-center gap-4">
-                <div style="background: rgba(243, 112, 33, 0.1); padding: 0.75rem; border-radius: 0.75rem;">
-                    <i data-lucide="message-circle" style="color: var(--accent-saffron); width:24px;height:24px;"></i>
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="flex items-center gap-6">
+                <div class="stat-icon" style="background: rgba(249, 115, 22, 0.15); color: var(--accent-primary);">
+                    <i data-lucide="message-circle" style="width:28px;height:28px;"></i>
                 </div>
                 <div>
-                    <div class="stat-value">{{ stats.conversations }}</div>
+                    <div class="stat-value text-gradient">{{ stats.conversations }}</div>
                     <div class="stat-label">Conversations</div>
                 </div>
             </div>
@@ -44,39 +44,39 @@
         {% endif %}
 
         <!-- Stat: Escalations -->
-        <div class="card">
-            <div class="flex items-center gap-4">
-                <div style="background: rgba(180, 83, 9, 0.1); padding: 0.75rem; border-radius: 0.75rem;">
-                    <i data-lucide="alert-triangle" style="color: var(--warning); width:24px;height:24px;"></i>
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div class="flex items-center gap-6">
+                <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--warning);">
+                    <i data-lucide="alert-triangle" style="width:28px;height:28px;"></i>
                 </div>
                 <div>
-                    <div class="stat-value">{{ stats.escalations }}</div>
+                    <div class="stat-value text-gradient" style="background: linear-gradient(135deg, #F59E0B, #FBBF24); -webkit-background-clip: text;">{{ stats.escalations }}</div>
                     <div class="stat-label">Active Escalations</div>
                 </div>
             </div>
             {% if admin.get('role') == 'super_admin' %}
-            <div class="mt-4 pt-4" style="border-top: 1px solid var(--border-subtle);">
-                <a href="/admin/queries" style="color: var(--primary-navy); font-size: 0.875rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
-                    View all <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+            <div class="mt-4 pt-4" style="border-top: 1px solid var(--border-glass);">
+                <a href="/admin/queries" style="color: var(--warning); font-size: 0.9rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: gap var(--transition-fast);">
+                    View all <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
                 </a>
             </div>
             {% endif %}
         </div>
 
         <!-- Stat: Pending Reports -->
-        <div class="card" style="border-color: var(--danger);">
-            <div class="flex items-center gap-4">
-                <div style="background: rgba(185, 28, 28, 0.1); padding: 0.75rem; border-radius: 0.75rem;">
-                    <i data-lucide="shield-alert" style="color: var(--danger); width:24px;height:24px;"></i>
+        <div class="glass-panel" style="padding: 1.5rem; border-color: rgba(239, 68, 68, 0.3);">
+            <div class="flex items-center gap-6">
+                <div class="stat-icon" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);">
+                    <i data-lucide="shield-alert" style="width:28px;height:28px;"></i>
                 </div>
                 <div>
                     <div class="stat-value" style="color: var(--danger);">{{ stats.pending_reports }}</div>
                     <div class="stat-label">Pending Reports</div>
                 </div>
             </div>
-            <div class="mt-4 pt-4" style="border-top: 1px solid rgba(185, 28, 28, 0.2);">
-                <a href="/admin/reports" style="color: var(--danger); font-size: 0.875rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
-                    View reports <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+            <div class="mt-4 pt-4" style="border-top: 1px solid rgba(239, 68, 68, 0.2);">
+                <a href="/admin/reports" style="color: var(--danger); font-size: 0.9rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; transition: gap var(--transition-fast);">
+                    View reports <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
                 </a>
             </div>
         </div>

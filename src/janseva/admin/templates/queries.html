@@ -1,45 +1,56 @@
 {% extends "base.html" %}
 
+{% block title %}Recent Queries - JanSeva{% endblock %}
+
+{% block extra_css %}
+<style>
+    .query-list { list-style: none; padding: 0; margin: 0; }
+    .query-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-default);
+        transition: background var(--transition-fast);
+    }
+    .query-item:last-child { border-bottom: none; }
+    .query-item:hover { background: rgba(0, 0, 0, 0.02); }
+    html.dark .query-item:hover { background: rgba(255, 255, 255, 0.02); }
+    
+    .query-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+    .query-id { font-size: 0.85rem; font-family: var(--font-mono); color: var(--accent-primary); font-weight: 600; }
+    .query-text { font-size: 1.05rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .query-meta { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8 flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Recent User Queries</h1>
+<div class="container py-12 animate-fade-up">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h2>Recent User Queries</h2>
+            <p class="mt-2">Live stream of questions asked to the AI assistant</p>
+        </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md border border-gray-100 dark:border-gray-700">
-        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+    <div class="glass-panel" style="padding: 0; overflow: hidden;">
+        <ul class="query-list">
             {% for query in queries %}
-            <li>
-                <div class="px-4 py-4 sm:px-6">
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-primary-600 dark:text-primary-400 truncate">
-                            Conversation ID: {{ query.conversation_id }}
-                        </p>
-                        <div class="ml-2 flex-shrink-0 flex">
-                            <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                {{ query.language | upper }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="mt-2 sm:flex sm:justify-between">
-                        <div class="sm:flex">
-                            <p class="flex items-center text-sm text-gray-700 dark:text-gray-300">
-                                "{{ query.content }}"
-                            </p>
-                        </div>
-                        <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
-                            <p>
-                                {{ query.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
-                            </p>
-                        </div>
-                    </div>
+            <li class="query-item">
+                <div class="query-header">
+                    <span class="query-id">Conversation ID: {{ query.conversation_id }}</span>
+                    <span class="badge badge-info">{{ query.language | upper }}</span>
+                </div>
+                <div class="query-text">
+                    "{{ query.content }}"
+                </div>
+                <div class="query-meta">
+                    <span style="display: flex; align-items: center; gap: 0.25rem;">
+                        <i data-lucide="clock" style="width:14px;height:14px;"></i> {{ query.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </span>
                 </div>
             </li>
             {% else %}
-            <li>
-                <div class="px-4 py-4 sm:px-6 text-center text-gray-500 dark:text-gray-400">
-                    No queries found.
-                </div>
+            <li class="query-item" style="text-align: center; padding: 4rem 2rem; color: var(--text-muted);">
+                <i data-lucide="message-square" style="width:48px;height:48px;opacity:0.5; margin: 0 auto 1rem;"></i>
+                <p>No queries found.</p>
             </li>
             {% endfor %}
         </ul>

@@ -3,36 +3,36 @@
 {% block title %}Organizations - JanSeva{% endblock %}
 
 {% block content %}
-<div class="container py-12">
+<div class="container py-12 animate-fade-up">
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 class="text-3xl font-extrabold text-white">Authorities & Organizations</h1>
-            <p class="text-secondary mt-2">Manage government entities on JanSeva</p>
+            <h2>Authorities & Organizations</h2>
+            <p class="mt-2">Manage government entities on JanSeva</p>
         </div>
-        <button onclick="document.getElementById('create-modal').classList.remove('hidden')" class="btn btn-primary">
-            <i data-lucide="plus"></i> Add Organization
+        <button onclick="document.getElementById('create-modal').classList.remove('hidden'); document.getElementById('create-modal').classList.add('active');" class="btn btn-primary">
+            <i data-lucide="plus" style="width:18px;height:18px;"></i> Add Organization
         </button>
     </div>
 
-    <div class="table-wrapper bg-gray-800 border-gray-700">
-        <table class="w-full">
-            <thead class="bg-gray-900 border-gray-700">
+    <div class="table-wrapper animate-fade-up delay-100">
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <th class="text-gray-400">Name</th>
-                    <th class="text-gray-400">Type</th>
-                    <th class="text-gray-400">State</th>
-                    <th class="text-gray-400">District</th>
-                    <th class="text-gray-400">Status</th>
-                    <th class="text-gray-400 text-right">Added</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>State</th>
+                    <th>District</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Added</th>
                 </tr>
             </thead>
             <tbody>
                 {% for org in organizations %}
-                <tr class="border-b border-gray-700 hover:bg-gray-700/50">
-                    <td class="font-medium text-white">{{ org.name }}</td>
-                    <td class="text-gray-300 capitalize">{{ org.org_type.replace('_', ' ') }}</td>
-                    <td class="text-gray-300">{{ org.jurisdiction_state }}</td>
-                    <td class="text-gray-300">{{ org.jurisdiction_district }}</td>
+                <tr>
+                    <td style="font-weight: 600; color: var(--text-primary);">{{ org.name }}</td>
+                    <td style="text-transform: capitalize;">{{ org.org_type.replace('_', ' ') }}</td>
+                    <td>{{ org.jurisdiction_state }}</td>
+                    <td>{{ org.jurisdiction_district }}</td>
                     <td>
                         {% if org.is_active %}
                             <span class="badge badge-success">Active</span>
@@ -40,12 +40,12 @@
                             <span class="badge badge-danger">Inactive</span>
                         {% endif %}
                     </td>
-                    <td class="text-gray-400 text-sm text-right">{{ org.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td style="color: var(--text-muted); text-align: right; font-size: 0.85rem;">{{ org.created_at.strftime('%Y-%m-%d') }}</td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center py-12 text-gray-400">
-                        <i data-lucide="building-2" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                    <td colspan="6" class="text-center py-12" style="color: var(--text-muted);">
+                        <i data-lucide="building-2" style="width:48px;height:48px;opacity:0.5; margin: 0 auto 1rem;"></i>
                         <p>No organizations found.</p>
                     </td>
                 </tr>
@@ -56,24 +56,24 @@
 </div>
 
 <!-- Create Modal -->
-<div id="create-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
-    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+<div id="create-modal" class="modal-overlay hidden" style="align-items: center;">
+    <div class="modal-content">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-white">New Organization</h2>
-            <button onclick="document.getElementById('create-modal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+            <h3>New Organization</h3>
+            <button onclick="document.getElementById('create-modal').classList.remove('active'); setTimeout(() => document.getElementById('create-modal').classList.add('hidden'), 300);" style="background:none;border:none;color:var(--text-muted);cursor:pointer; transition: color 0.2s;">
                 <i data-lucide="x"></i>
             </button>
         </div>
         
-        <form method="POST" action="/admin/organizations/create" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Organization Name</label>
-                <input type="text" name="name" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+        <form method="POST" action="/admin/organizations/create">
+            <div class="form-group">
+                <label class="form-label">Organization Name</label>
+                <input type="text" name="name" required class="input-field" placeholder="e.g. City General Hospital">
             </div>
             
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Type</label>
-                <select name="org_type" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <select name="org_type" required class="input-field">
                     <option value="hospital">Hospital / PHC</option>
                     <option value="police_station">Police Station</option>
                     <option value="fire_station">Fire Station</option>
@@ -82,20 +82,20 @@
                 </select>
             </div>
             
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-2 gap-4 mb-8">
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">State</label>
-                    <input type="text" name="state" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                    <label class="form-label">State</label>
+                    <input type="text" name="state" required class="input-field" placeholder="Maharashtra">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-1">District</label>
-                    <input type="text" name="district" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                    <label class="form-label">District</label>
+                    <input type="text" name="district" required class="input-field" placeholder="Pune">
                 </div>
             </div>
             
-            <div class="pt-4 flex justify-end gap-3">
-                <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="btn bg-gray-700 hover:bg-gray-600 text-white">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create Organization</button>
+            <div class="flex gap-4">
+                <button type="button" onclick="document.getElementById('create-modal').classList.remove('active'); setTimeout(() => document.getElementById('create-modal').classList.add('hidden'), 300);" class="btn btn-secondary w-full">Cancel</button>
+                <button type="submit" class="btn btn-primary w-full">Create Organization</button>
             </div>
         </form>
     </div>

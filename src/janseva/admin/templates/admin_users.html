@@ -3,19 +3,19 @@
 {% block title %}Admin Users - JanSeva{% endblock %}
 
 {% block content %}
-<div class="container py-12">
+<div class="container py-12 animate-fade-up">
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h1 style="color: var(--text-primary); font-weight: 800; font-size: 2.25rem;">Admin Users</h1>
-            <p class="text-secondary mt-2">Manage authority personnel access</p>
+            <h2>Admin Users</h2>
+            <p class="mt-2">Manage authority personnel access</p>
         </div>
-        <button onclick="document.getElementById('create-modal').classList.remove('hidden')" class="btn btn-primary">
-            <i data-lucide="user-plus"></i> Add User
+        <button onclick="document.getElementById('create-modal').classList.remove('hidden'); document.getElementById('create-modal').classList.add('active');" class="btn btn-primary">
+            <i data-lucide="user-plus" style="width:18px;height:18px;"></i> Add User
         </button>
     </div>
 
-    <div class="table-wrapper">
-        <table class="w-full">
+    <div class="table-wrapper animate-fade-up delay-100">
+        <table class="data-table">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -23,7 +23,7 @@
                     <th>Role</th>
                     <th>Organization</th>
                     <th>Status</th>
-                    <th class="text-right">Added</th>
+                    <th style="text-align: right;">Added</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,12 +52,12 @@
                             <span class="badge badge-danger">Inactive</span>
                         {% endif %}
                     </td>
-                    <td class="text-sm text-right" style="color: var(--text-muted);">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td style="color: var(--text-muted); text-align: right; font-size: 0.85rem;">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
                 </tr>
                 {% else %}
                 <tr>
                     <td colspan="6" class="text-center py-12" style="color: var(--text-muted);">
-                        <i data-lucide="users" class="mx-auto mb-4" style="width:48px;height:48px;opacity:0.5;"></i>
+                        <i data-lucide="users" style="width:48px;height:48px;opacity:0.5; margin: 0 auto 1rem;"></i>
                         <p>No admin users found.</p>
                     </td>
                 </tr>
@@ -68,40 +68,40 @@
 </div>
 
 <!-- Create Modal -->
-<div id="create-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
-    <div class="card w-full max-w-md" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+<div id="create-modal" class="modal-overlay hidden" style="align-items: center;">
+    <div class="modal-content">
         <div class="flex justify-between items-center mb-6">
-            <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">Provision Admin User</h2>
-            <button onclick="document.getElementById('create-modal').classList.add('hidden')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">
+            <h3>Provision Admin</h3>
+            <button onclick="document.getElementById('create-modal').classList.remove('active'); setTimeout(() => document.getElementById('create-modal').classList.add('hidden'), 300);" style="background:none;border:none;color:var(--text-muted);cursor:pointer; transition: color 0.2s;">
                 <i data-lucide="x"></i>
             </button>
         </div>
         
-        <p class="text-sm mb-6" style="color: var(--text-secondary);">Users will log in via Google OAuth using the email address provided below.</p>
+        <p class="mb-6" style="font-size: 0.9rem;">Users will log in via Google OAuth using the email address provided below.</p>
         
-        <form method="POST" action="/admin/users/create" class="flex flex-col gap-4">
-            <div>
-                <label>Full Name</label>
-                <input type="text" name="full_name" required class="input">
+        <form method="POST" action="/admin/users/create">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="full_name" required class="input-field" placeholder="John Doe">
             </div>
             
-            <div>
-                <label>Google Email Address</label>
-                <input type="email" name="email" required class="input">
+            <div class="form-group">
+                <label class="form-label">Google Email Address</label>
+                <input type="email" name="email" required class="input-field" placeholder="user@gmail.com">
             </div>
             
-            <div>
-                <label>Role</label>
-                <select name="role" required class="input">
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <select name="role" required class="input-field">
                     <option value="org_admin">Organization Admin</option>
                     <option value="org_staff">Organization Staff</option>
                     <option value="super_admin">Super Admin (System-wide)</option>
                 </select>
             </div>
             
-            <div>
-                <label>Organization Assignment (Optional)</label>
-                <select name="org_id" class="input">
+            <div class="form-group mb-8">
+                <label class="form-label">Organization Assignment (Optional)</label>
+                <select name="org_id" class="input-field">
                     <option value="">-- No Organization (Global) --</option>
                     {% for org in organizations %}
                         <option value="{{ org.id }}">{{ org.name }} ({{ org.jurisdiction_district }})</option>
@@ -109,9 +109,9 @@
                 </select>
             </div>
             
-            <div class="mt-4 flex justify-between gap-3">
-                <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="btn btn-ghost w-full">Cancel</button>
-                <button type="submit" class="btn btn-primary w-full" style="justify-content:center;">Provision User</button>
+            <div class="flex gap-4">
+                <button type="button" onclick="document.getElementById('create-modal').classList.remove('active'); setTimeout(() => document.getElementById('create-modal').classList.add('hidden'), 300);" class="btn btn-secondary w-full">Cancel</button>
+                <button type="submit" class="btn btn-primary w-full">Provision User</button>
             </div>
         </form>
     </div>
