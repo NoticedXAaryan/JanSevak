@@ -1,0 +1,7 @@
+# Caddyfile
+# Used for standalone hosting without Dokploy.
+# Replace yourdomain.com with your actual domain name.
+
+{$DOMAIN:localhost} {
+    reverse_proxy bot:8000
+}

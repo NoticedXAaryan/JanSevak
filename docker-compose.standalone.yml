@@ -1,0 +1,25 @@
+# docker-compose.standalone.yml
+# Use this for hosting on a raw VPS (DigitalOcean, AWS, Hetzner, etc) without Dokploy.
+# It automatically provides SSL/HTTPS using Caddy.
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.standalone.yml up -d
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - dokploy-network
+    depends_on:
+      - bot
+
+volumes:
+  caddy_data:
+  caddy_config:
