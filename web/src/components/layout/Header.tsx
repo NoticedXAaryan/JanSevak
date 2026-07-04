@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell, Menu, Search, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -24,11 +24,9 @@ export function Header({ role = "citizen" }: HeaderProps) {
     <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center gap-4 border-b bg-background px-4 md:px-6">
       {/* Mobile Sidebar Trigger */}
       <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
+        <SheetTrigger className={buttonVariants({ variant: "outline", size: "icon" }) + " md:hidden"}>
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle menu</span>
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-64">
           <Sidebar role={role} className="border-none" />
@@ -56,16 +54,14 @@ export function Header({ role = "citizen" }: HeaderProps) {
 
         {/* User Profile */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="" alt="User" />
-                <AvatarFallback>
-                  <User className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-              <span className="sr-only">Toggle user menu</span>
-            </Button>
+          <DropdownMenuTrigger className={buttonVariants({ variant: "secondary", size: "icon" }) + " rounded-full"}>
+            <Avatar className="h-8 w-8">
+              <AvatarImage src="" alt="User" />
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <span className="sr-only">Toggle user menu</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
