@@ -5,12 +5,19 @@ import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
 import Link from "next/link";
 
+type Message = {
+  id: string;
+  role: "assistant" | "user";
+  content: string;
+  timestamp: string;
+};
+
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      role: "assistant" as const,
+      role: "assistant",
       content: "Hi! Need help finding a service or tracking a grievance?",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
