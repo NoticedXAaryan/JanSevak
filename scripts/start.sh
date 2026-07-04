@@ -15,7 +15,12 @@ fi
 
 if [[ "${SEED_KNOWLEDGE_BASE:-true}" != "false" ]]; then
     echo "Seeding knowledge base if needed..."
-    "$VENV_BIN/python" scripts/seed_knowledge_base.py --skip-if-populated
+    if "$VENV_BIN/python" scripts/seed_knowledge_base.py --skip-if-populated; then
+        echo "Knowledge base seeding completed."
+    else
+        echo "WARNING: Knowledge base seeding failed. Bot will start without RAG data."
+        echo "Set SEED_KNOWLEDGE_BASE=false to skip, or provide a valid GOOGLE_API_KEY for embeddings."
+    fi
 else
     echo "Skipping knowledge base seed because SEED_KNOWLEDGE_BASE=false"
 fi

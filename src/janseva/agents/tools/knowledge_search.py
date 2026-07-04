@@ -1,6 +1,9 @@
 """
 Knowledge search tool — used by agents to query the knowledge base.
 """
+import structlog
+
+logger = structlog.get_logger()
 
 
 def search_services(query: str) -> str:
@@ -13,9 +16,17 @@ def search_services(query: str) -> str:
     Returns:
         A formatted string with relevant knowledge base entries
     """
-    from janseva.knowledge.vector_store import search_knowledge
+    try:
+        from janseva.knowledge.vector_store import search_knowledge
 
-    results = search_knowledge(query, k=3)
+        results = search_knowledge(query, k=3)
+    except Exception as e:
+        logger.warning(
+            "knowledge_search_unavailable",
+            error=str(e),
+            query_preview=query[:50],
+        )
+        return "Knowledge base is not available. Please answer based on your general knowledge."
 
     if not results:
         return "No relevant information found in the knowledge base."
@@ -33,3 +44,4 @@ def search_services(query: str) -> str:
         return "No sufficiently relevant information found."
 
     return "\n\n".join(context_parts)
+
