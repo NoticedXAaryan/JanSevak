@@ -1,41 +1,47 @@
 """Interest Profiler for User Queries."""
 import logging
 from typing import List
-from pydantic import BaseModel, Field
 
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.messages import SystemMessage, HumanMessage
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from janseva.config import settings
+from janseva.agents.llm import get_llm
 from janseva.db.engine import async_session_factory
 from janseva.db.models.user import User
 
 logger = logging.getLogger(__name__)
 
-class ExtractedInterests(BaseModel):
-    topics: List[str] = Field(description="A list of 1-3 broad topics related to the user's query. Examples: 'agriculture', 'healthcare', 'education', 'subsidies', 'documents'. Use lowercase.")
+INTEREST_EXTRACTION_PROMPT = """You are an assistant that analyzes user queries to government service bots and extracts broad interest categories. Return ONLY a comma-separated list of 1 to 3 relevant topics in lowercase. Do not include any other text.
 
-prompt_template = ChatPromptTemplate.from_messages([
-    ("system", "You are an assistant that analyzes user queries to government service bots and extracts broad interest categories. Return a list of 1 to 3 relevant topics in lowercase. Do not extract highly specific terms; use broad categories like 'agriculture', 'healthcare', 'education', 'employment', 'subsidies', 'pensions', 'documents'."),
-    ("human", "{query}")
-])
+Valid topics: agriculture, healthcare, education, employment, subsidies, pensions, documents, housing, women_welfare, farmer, banking, legal, transport, business, disability, senior_citizen
+
+Example input: "How to apply for PM-KISAN?"
+Example output: agriculture, subsidies, farmer
+
+Query: {query}"""
+
 
 async def extract_interests(query: str) -> List[str]:
-    """Use Gemini to extract interests from a query string."""
+    """Use the configured LLM to extract interests from a query string."""
     try:
-        llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            google_api_key=settings.google_api_key,
-            temperature=0
-        )
-        structured_llm = llm.with_structured_output(ExtractedInterests)
-        chain = prompt_template | structured_llm
+        llm = get_llm()
         
-        result = await chain.ainvoke({"query": query})
-        if result and isinstance(result, ExtractedInterests):
-            return result.topics
+        messages = [
+            SystemMessage(content="You extract broad topic categories from user queries. Return ONLY a comma-separated list of 1-3 topics. No other text."),
+            HumanMessage(content=INTEREST_EXTRACTION_PROMPT.format(query=query)),
+        ]
+        
+        result = await llm.ainvoke(messages)
+        if result and result.content:
+            # Parse comma-separated topics
+            topics = [t.strip().lower() for t in result.content.split(",") if t.strip()]
+            # Filter to valid topics only
+            valid = {"agriculture", "healthcare", "education", "employment", "subsidies",
+                     "pensions", "documents", "housing", "women_welfare", "farmer",
+                     "banking", "legal", "transport", "business", "disability", "senior_citizen"}
+            return [t for t in topics if t in valid][:3]
     except Exception as e:
         logger.error(f"Error extracting interests: {e}")
     return []
@@ -67,3 +73,4 @@ async def update_user_interests(telegram_id: int, query: str):
             )
             await session.commit()
             logger.info(f"Updated interests for user {telegram_id}: {updated_list}")
+

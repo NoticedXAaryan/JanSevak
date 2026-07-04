@@ -1,12 +1,60 @@
 """
 Helper functions for standardizing bot UX feedback.
-Includes typing indicators, thinking messages, and error handling.
+Includes typing indicators, thinking messages, error handling,
+and Markdown → Telegram HTML conversion.
 """
+import re
 import structlog
 from aiogram.types import Message
 from aiogram.exceptions import TelegramBadRequest
 
 logger = structlog.get_logger()
+
+
+def markdown_to_telegram_html(text: str) -> str:
+    """
+    Convert common Markdown formatting to Telegram-compatible HTML.
+    
+    Telegram supports: <b>, <i>, <code>, <pre>, <a>, <s>, <u>
+    Telegram does NOT support: headings, horizontal rules, tables, images
+    """
+    if not text:
+        return text
+
+    # Remove horizontal rules
+    text = re.sub(r'^---+\s*$', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^___+\s*$', '', text, flags=re.MULTILINE)
+    text = re.sub(r'^\*\*\*+\s*$', '', text, flags=re.MULTILINE)
+
+    # Convert headings (### heading → <b>heading</b> with newline)
+    text = re.sub(r'^#{1,6}\s+(.+)$', r'<b>\1</b>', text, flags=re.MULTILINE)
+
+    # Convert bold: **text** or __text__
+    text = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
+    text = re.sub(r'__(.+?)__', r'<b>\1</b>', text)
+
+    # Convert italic: *text* or _text_ (but not inside words like file_name)
+    # Only match when surrounded by spaces or at start/end of line
+    text = re.sub(r'(?<!\w)\*([^*\n]+?)\*(?!\w)', r'<i>\1</i>', text)
+    text = re.sub(r'(?<!\w)_([^_\n]+?)_(?!\w)', r'<i>\1</i>', text)
+
+    # Convert inline code: `code`
+    text = re.sub(r'`([^`\n]+?)`', r'<code>\1</code>', text)
+
+    # Convert code blocks: ```lang\ncode\n``` → <pre>code</pre>
+    text = re.sub(r'```\w*\n(.*?)```', r'<pre>\1</pre>', text, flags=re.DOTALL)
+
+    # Convert strikethrough: ~~text~~
+    text = re.sub(r'~~(.+?)~~', r'<s>\1</s>', text)
+
+    # Convert links: [text](url) → <a href="url">text</a>
+    text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', text)
+
+    # Clean up excessive blank lines (max 2 in a row)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+
+    return text.strip()
+
 
 async def send_thinking(message: Message) -> Message | None:
     """
@@ -27,8 +75,12 @@ async def send_thinking(message: Message) -> Message | None:
 async def update_with_response(original_message: Message, thinking_message: Message | None, response_text: str) -> None:
     """
     Replace the 'thinking' message with the actual AI response.
+    Converts Markdown to Telegram HTML before sending.
     If editing fails (e.g., message was deleted), send it as a new message.
     """
+    # Convert LLM Markdown output to Telegram HTML
+    response_text = markdown_to_telegram_html(response_text)
+
     if not thinking_message:
         # Fallback to just sending a new message if thinking_message wasn't created
         await original_message.answer(response_text)
@@ -41,7 +93,7 @@ async def update_with_response(original_message: Message, thinking_message: Mess
             await thinking_message.edit_text(response_text)
         else:
             # Edit the first chunk, then send the rest as new messages
-            chunks = [response_text[i:i + 4000] for i in range(0, len(response_text), 4000)]
+            chunks = _split_html_safe(response_text, 4000)
             await thinking_message.edit_text(chunks[0])
             for chunk in chunks[1:]:
                 await original_message.answer(chunk)
@@ -49,7 +101,12 @@ async def update_with_response(original_message: Message, thinking_message: Mess
     except TelegramBadRequest as e:
         logger.warning("failed_to_edit_thinking_msg", error=str(e))
         # If we can't edit it, just send a new message
-        await original_message.answer(response_text)
+        try:
+            await original_message.answer(response_text)
+        except TelegramBadRequest:
+            # If HTML is malformed, strip all tags and try plain text
+            clean = re.sub(r'<[^>]+>', '', response_text)
+            await original_message.answer(clean)
         
         # Try to delete the old thinking message if possible
         try:
@@ -60,6 +117,22 @@ async def update_with_response(original_message: Message, thinking_message: Mess
         logger.error("error_updating_response", error=str(e))
         await original_message.answer(response_text)
 
+
+def _split_html_safe(text: str, max_len: int) -> list[str]:
+    """Split text into chunks at line boundaries to avoid breaking HTML tags."""
+    chunks = []
+    current = ""
+    for line in text.split("\n"):
+        if len(current) + len(line) + 1 > max_len and current:
+            chunks.append(current)
+            current = line
+        else:
+            current = current + "\n" + line if current else line
+    if current:
+        chunks.append(current)
+    return chunks if chunks else [text]
+
+
 async def send_error(message: Message, language: str = "hi") -> None:
     """Send a standardized error message based on the user's language."""
     if language == "en":
@@ -68,3 +141,4 @@ async def send_error(message: Message, language: str = "hi") -> None:
         error_text = "⚠️ कुछ गड़बड़ हो गई। कृपया थोड़ी देर बाद दोबारा कोशिश करें।"
         
     await message.answer(error_text)
+

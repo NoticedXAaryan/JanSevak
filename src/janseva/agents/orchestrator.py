@@ -27,28 +27,30 @@ logger = structlog.get_logger()
 
 INTENT_CLASSIFIER_PROMPT = """You are JanSeva (जनसेवा), an AI assistant that helps Indian citizens interact with government services.
 
-Your job is to classify the user's message into one of these intents:
+Your job is to classify the user's LATEST message into one of these intents.
+IMPORTANT: You will also see recent conversation history. Use it to understand context.
+If the latest message is a follow-up to a previous topic (e.g., "But I need the government one", "tell me more", "what about the fees?"), classify it based on the ORIGINAL topic, not as "clarify" or "general".
 
-1. "service_query" — Questions about government services, documents, certificates, requirements, applications, forms
-   Examples: "आय प्रमाण पत्र कैसे बनाएं?", "What documents for caste certificate?", "land record kaise dekhe?"
+1. "service_query" — Questions about government services, documents, certificates, requirements, applications, forms, government schemes, loans, subsidies
+   Examples: "आय प्रमाण पत्र कैसे बनाएं?", "What documents for caste certificate?", "But I need the government scheme", "tell me more about that"
 
 2. "anonymous_report" — User wants to report corruption, misconduct, or wrongdoing anonymously
-   Examples: "मुझे एक शिकायत दर्ज करनी है", "I want to report a corrupt officer", "hamare area mein galat kaam ho raha hai"
+   Examples: "मुझे एक शिकायत दर्ज करनी है", "I want to report a corrupt officer"
 
 3. "healthcare" — Questions about hospitals, doctors, appointments, medical facilities
-   Examples: "नजदीकी अस्पताल कौन सा है?", "I need an eye checkup", "hospital mein jagah hai?"
+   Examples: "नजदीकी अस्पताल कौन सा है?", "I need an eye checkup"
 
 4. "farmer" — Questions about farming subsidies, wholesale markets (mandi), crop prices, agricultural schemes
-   Examples: "किसान सम्मान निधि के लिए क्या करना होगा?", "mandi bhav kya hai?", "PM Kisan scheme eligibility"
+   Examples: "किसान सम्मान निधि के लिए क्या करना होगा?", "mandi bhav kya hai?"
 
-5. "general" — Greetings, general conversation, follow-up questions that don't fit above categories
-   Examples: "hello", "thank you", "what can you do?", "aap kaun ho?"
+5. "general" — ONLY greetings, thanks, or asking what the bot can do. NOT follow-ups to previous topics.
+   Examples: "hello", "thank you", "what can you do?"
 
 6. "escalate" — The user's question is too specific, complex, or about something you genuinely don't know
-   Examples: Questions about very specific local regulations, ongoing legal cases, specific officer contact info
+   Examples: Questions about very specific local regulations, ongoing legal cases
 
-7. "clarify" — The user's message is too vague, incomplete, or ambiguous to understand what they need
-   Examples: "help", "mujhe form chahiye" (which form?), "hospital" (what about it?)
+7. "clarify" — The user's message is genuinely too vague AND there is no prior context to infer meaning from
+   Examples: "help" (with no prior messages), single word with no context
 
 Respond with ONLY the intent label. Nothing else. No explanation.
 
@@ -114,7 +116,7 @@ User's language: {user_language}"""
 def classify_intent(state: AgentState) -> dict:
     """
     Node: Classify the user's intent.
-    Reads the latest message and determines which specialist should handle it.
+    Reads the latest message AND recent history for context-aware classification.
     """
     llm = get_llm()
     messages = state["messages"]
@@ -123,12 +125,20 @@ def classify_intent(state: AgentState) -> dict:
     user_language = state.get("user_language", "hi")
     user_district = state.get("user_district", "unknown")
 
+    # Build context: include last 3 messages so follow-ups have context
+    # e.g., "education loan" -> "But I needed Govt one" stays as service_query
+    recent_messages = messages[-3:] if len(messages) >= 3 else messages
+    context_text = "\n".join(
+        f"{'User' if hasattr(m, 'type') and m.type == 'human' else 'Assistant'}: {m.content}"
+        for m in recent_messages
+    )
+
     classification_messages = [
         SystemMessage(content=INTENT_CLASSIFIER_PROMPT.format(
             user_language=user_language,
             user_district=user_district,
         )),
-        HumanMessage(content=latest_message),
+        HumanMessage(content=f"Recent conversation:\n{context_text}\n\nClassify the LATEST message."),
     ]
     
     response = llm.invoke(classification_messages)
@@ -164,17 +174,21 @@ def handle_general_chat(state: AgentState) -> dict:
 
 
 def handle_clarification(state: AgentState) -> dict:
-    """Node: Ask the user a clarifying question."""
+    """Node: Ask the user a clarifying question, using conversation history."""
     llm = get_llm()
     user_language = state.get("user_language", "hi")
     
     prompt = (
         f"You are JanSeva. The user's message was too vague or short. "
-        f"Respond in {user_language}. Ask a short, polite follow-up question to clarify what government service, hospital, or report they need help with."
+        f"Respond in {user_language}. Look at the conversation history for context. "
+        f"Ask a short, polite follow-up question to clarify what government service, "
+        f"hospital, or report they need help with."
     )
     
     system_msg = SystemMessage(content=prompt)
-    messages = [system_msg, state["messages"][-1]]
+    # Include recent history so clarification is context-aware
+    recent_messages = list(state["messages"][-4:])
+    messages = [system_msg] + recent_messages
     
     response = llm.invoke(messages)
     return {"response": response.content}
