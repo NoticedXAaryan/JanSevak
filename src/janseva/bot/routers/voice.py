@@ -59,7 +59,7 @@ async def handle_voice_message(message: Message) -> None:
         
         # 4. Process transcribed text via AI Agent
         await message.chat.do(action="typing")
-        response = await process_message(
+        response_text, interactive_options = await process_message(
             telegram_id=telegram_id,
             user_text=user_text,
         )
@@ -67,12 +67,25 @@ async def handle_voice_message(message: Message) -> None:
         # Fire and forget updating interests
         asyncio.create_task(update_user_interests(telegram_id, user_text))
 
+        # Build inline keyboard if we have interactive options
+        reply_markup = None
+        if interactive_options:
+            from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+            buttons = [
+                [InlineKeyboardButton(text=opt["text"], callback_data=opt["callback_data"])]
+                for opt in interactive_options
+            ]
+            reply_markup = InlineKeyboardMarkup(inline_keyboard=buttons)
+
         # 5. Send response
-        if len(response) <= 4096:
-            await message.answer(response)
+        if len(response_text) <= 4096:
+            await message.answer(response_text, reply_markup=reply_markup)
         else:
-            for i in range(0, len(response), 4096):
-                await message.answer(response[i:i + 4096])
+            for i in range(0, len(response_text), 4096):
+                if i + 4096 >= len(response_text):
+                    await message.answer(response_text[i:i + 4096], reply_markup=reply_markup)
+                else:
+                    await message.answer(response_text[i:i + 4096])
 
     except Exception as e:
         logger.error("voice_processing_failed", error=str(e))
