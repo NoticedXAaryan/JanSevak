@@ -2,9 +2,10 @@
 
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, FileText, AlertTriangle, ShieldAlert, BarChart3, TrendingUp, TrendingDown } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Users, FileText, AlertTriangle, ShieldAlert, BarChart3, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function DeptDashboard() {
   return (
@@ -87,9 +88,7 @@ export default function DeptDashboard() {
                   <CardTitle>Recent Complaints</CardTitle>
                   <CardDescription>Latest civic issues assigned to your department.</CardDescription>
                 </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/dept/complaints">View All</Link>
-                </Button>
+                <Link href="/dept/complaints" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>View All</Link>
               </div>
             </CardHeader>
             <CardContent>
@@ -143,9 +142,7 @@ export default function DeptDashboard() {
                     <AlertTriangle className="w-4 h-4 mr-2" /> Policy Gap
                   </h4>
                   <p className="text-sm">Many citizens are asking the AI about "Solar Subsidy" but your local policy data is outdated.</p>
-                  <Button variant="link" className="px-0 h-auto text-amber-600 dark:text-amber-500" asChild>
-                    <Link href="/dept/policies">Update Policy Now →</Link>
-                  </Button>
+                  <Link href="/dept/policies" className={cn(buttonVariants({ variant: "link" }), "px-0 h-auto text-amber-600 dark:text-amber-500")}>Update Policy Now <ArrowRight className="w-3 h-3 ml-1" /></Link>
                 </div>
               </CardContent>
             </Card>

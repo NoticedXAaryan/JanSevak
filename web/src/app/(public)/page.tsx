@@ -2,9 +2,10 @@
 
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { FileText, AlertTriangle, ShieldAlert, MessageSquare, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function CitizenDashboard() {
   return (
@@ -28,9 +29,7 @@ export default function CitizenDashboard() {
               <p className="text-xs text-muted-foreground mb-4">
                 Chat with our AI to find services or schemes
               </p>
-              <Button size="sm" className="w-full" asChild>
-                <Link href="/chat">Chat Now</Link>
-              </Button>
+              <Link href="/chat" className={cn(buttonVariants({ size: "sm" }), "w-full")}>Chat Now</Link>
             </CardContent>
           </Card>
           
@@ -43,9 +42,7 @@ export default function CitizenDashboard() {
               <p className="text-xs text-muted-foreground mb-4">
                 File a civic complaint with your local authority
               </p>
-              <Button size="sm" variant="outline" className="w-full" asChild>
-                <Link href="/complaints/new">File Report</Link>
-              </Button>
+              <Link href="/complaints/new" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full")}>File Report</Link>
             </CardContent>
           </Card>
 
@@ -58,9 +55,7 @@ export default function CitizenDashboard() {
               <p className="text-xs text-muted-foreground mb-4">
                 Submit a sealed anonymous report securely
               </p>
-              <Button size="sm" variant="outline" className="w-full" asChild>
-                <Link href="/report/anonymous">Submit Securely</Link>
-              </Button>
+              <Link href="/report/anonymous" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full")}>Submit Securely</Link>
             </CardContent>
           </Card>
 
@@ -73,9 +68,7 @@ export default function CitizenDashboard() {
               <p className="text-xs text-muted-foreground mb-4">
                 View your saved certificates and applications
               </p>
-              <Button size="sm" variant="outline" className="w-full" asChild>
-                <Link href="/documents">View Files</Link>
-              </Button>
+              <Link href="/documents" className={cn(buttonVariants({ size: "sm", variant: "outline" }), "w-full")}>View Files</Link>
             </CardContent>
           </Card>
         </div>
@@ -110,12 +103,10 @@ export default function CitizenDashboard() {
                   <div className="text-sm text-muted-foreground">5d ago</div>
                 </div>
               </div>
-              <Button variant="ghost" className="w-full mt-4 justify-between" asChild>
-                <Link href="/history">
+              <Link href="/history" className={cn(buttonVariants({ variant: "ghost" }), "w-full mt-4 justify-between")}>
                   View full history
                   <ArrowRight className="h-4 w-4 ml-2" />
-                </Link>
-              </Button>
+              </Link>
             </CardContent>
           </Card>
 
