@@ -27,11 +27,8 @@ async def list_queries(
         # Queries are global right now, non-super admins shouldn't see them
         queries = []
 
-    return templates.TemplateResponse(
-        "queries.html",
-        {
+    return templates.TemplateResponse(request=request, name="queries.html", context={
             "request": request,
             "admin": admin_user,
             "queries": queries,
-        }
-    )
+        })

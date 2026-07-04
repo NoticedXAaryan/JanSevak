@@ -32,15 +32,12 @@ async def list_admin_users(
     orgs_result = await session.execute(orgs_stmt)
     orgs = orgs_result.scalars().all()
 
-    return templates.TemplateResponse(
-        "admin_users.html",
-        {
+    return templates.TemplateResponse(request=request, name="admin_users.html", context={
             "request": request,
             "admin": admin_user,
             "users": users,
             "organizations": orgs,
-        }
-    )
+        })
 
 @router.post("/create")
 async def create_admin_user(

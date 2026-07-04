@@ -40,9 +40,7 @@ async def dashboard_home(
             
     reports_count = await session.scalar(reports_query) if reports_query is not None else 0
 
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {
+    return templates.TemplateResponse(request=request, name="dashboard.html", context={
             "request": request,
             "admin": admin_user,
             "stats": {
@@ -51,5 +49,4 @@ async def dashboard_home(
                 "escalations": escalations_count,
                 "pending_reports": reports_count or 0,
             }
-        }
-    )
+        })

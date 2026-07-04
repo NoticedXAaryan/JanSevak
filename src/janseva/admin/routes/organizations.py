@@ -25,14 +25,11 @@ async def list_organizations(
     result = await session.execute(stmt)
     orgs = result.scalars().all()
 
-    return templates.TemplateResponse(
-        "organizations.html",
-        {
+    return templates.TemplateResponse(request=request, name="organizations.html", context={
             "request": request,
             "admin": admin_user,
             "organizations": orgs,
-        }
-    )
+        })
 
 @router.post("/create")
 async def create_organization(

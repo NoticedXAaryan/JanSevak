@@ -25,10 +25,7 @@ async def list_reports(
         # Fallback to empty if no org_id assigned
         org_id = admin_user.get("org_id")
         if not org_id:
-            return templates.TemplateResponse(
-                "reports.html",
-                {"request": request, "admin": admin_user, "reports": []}
-            )
+            return templates.TemplateResponse(request=request, name="reports.html", context={"request": request, "admin": admin_user, "reports": []})
         
         stmt = select(AnonymousReport).where(
             AnonymousReport.organization_id == org_id
@@ -37,14 +34,11 @@ async def list_reports(
     result = await session.execute(stmt)
     reports = result.scalars().all()
 
-    return templates.TemplateResponse(
-        "reports.html",
-        {
+    return templates.TemplateResponse(request=request, name="reports.html", context={
             "request": request,
             "admin": admin_user,
             "reports": reports,
-        }
-    )
+        })
 
 @router.post("/{report_id}/status")
 async def update_report_status(
