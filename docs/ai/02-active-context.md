@@ -1,34 +1,44 @@
-# JanSeva — Active Context
+# JanSevak — Active Context
 
 ## Current Phase
-**Phase 1: Deployment & Stabilization**
+**Phase: V2 Redesign — Multi-Institution Platform**
 
-## Last Session (2026-07-03)
-- Built **Scaling & Performance Optimizations** (Guide 13):
-  - Tuned `engine.py` for increased DB connection pooling and recycling.
-  - Added Alembic migration for critical DB indexes across users, conversations, messages, and reports.
-  - Implemented an in-memory `AsyncTTLCache` to cache frequent identical AI queries (avoiding Redis dependency).
-  - Added a `/health` endpoint to the FastAPI admin app.
-  - Created a Locust load testing script.
+## Last Session (2026-07-04)
+- Conducted full codebase audit of web frontend, backend, models, agents, knowledge base
+- Identified that the Next.js frontend is a single page (landing only) — no routing, no dashboards, no chatbot UI
+- Researched 20 Indian government institution types across 8 sectors
+- Created comprehensive implementation plan for v2: 45+ pages, 20 institution dashboards, AI chatbot UI, citizen portal
+- Plan awaiting user review and approval before execution
 
 ## Current Focus
-🚀 **PROJECT COMPLETED** 🚀
-All 13 implementation guides have been successfully developed, integrated, and pushed to GitHub. The platform is ready for the Hackathon showcase!
+🏗️ **V2 MULTI-INSTITUTION REBUILD** — Transforming JanSevak from a single landing page into a complete government services platform with:
+- 20 tailored institution dashboards (healthcare, police, education, revenue, civic, welfare, agriculture, representatives)
+- Full citizen portal (services directory, schemes explorer, institution finder, grievance tracker)
+- Web-based AI chatbot (not just Telegram wrapper)
+- Role-based auth for citizens, institution admins, and elected representatives
+- Complete public-facing website (about, contact, FAQ, privacy, terms, accessibility)
 
-## Next Steps
-- Dokploy will automatically build and deploy the latest commit from the `main` branch.
-- Prepare the presentation and pitch deck!
+## Key Decisions Pending
+- Auth strategy: Phone+OTP vs Email+Password vs both
+- Data: Real vs demo data for dashboards
+- Chat transport: WebSocket vs SSE
+- Dashboard depth: Mock data breadth vs real forms depth
+- Execution priority ordering
 
-## Key Decisions Made
-- **Deployment Architecture**: Bot-only container with an external Managed PostgreSQL database. No local Redis or Postgres containers to preserve VPS disk space.
-- **Telegram framework**: aiogram 3.x (async-native, modern architecture)
-- **Agent framework**: LangGraph (stateful workflows, checkpointing, explicit control flow)
-- **Voice STT**: AI4Bharat IndicWhisper (best open-source for Indian languages)
-- **Database**: PostgreSQL + pgvector (single service for relational + vector data)
-- **Task queue**: ARQ (async-native, simpler than Celery for our stack)
-- **Admin panel**: Custom FastAPI + HTMX (lightweight, no SPA overhead)
+## What Already Exists (Backend — Reusable)
+- FastAPI admin with JWT auth, Google OAuth
+- Organization model with multi-type support
+- AdminUser model with roles (super_admin, org_admin, org_viewer)
+- AI agents: Orchestrator, ServiceNavigator, HealthcareAgent, FarmerAgent, AnonymousReporter, Escalation
+- Knowledge base with YAML data for schemes, services, subsidies, healthcare
+- Telegram bot with LangGraph integration
+- PostgreSQL + ChromaDB data layer
 
-## Open Questions
-- Which specific districts/states to target for initial knowledge base data?
-- Self-host voice models or use Bhashini API for transcription?
-- LLM provider: Gemini API key availability and budget for production?
+## What Needs to Be Built (Frontend)
+- 45+ Next.js pages (currently: 1)
+- 22+ reusable components (currently: 1)
+- 3 layout shells (public, dashboard, auth)
+- Design system overhaul
+- API client layer
+- Chat UI with streaming
+- Dashboard with charts, tables, forms, maps

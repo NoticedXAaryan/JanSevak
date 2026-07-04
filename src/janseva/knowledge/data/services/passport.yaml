@@ -1,0 +1,23 @@
+service_id: passport
+name_en: Passport
+name_hi: पासपोर्ट
+department: Ministry of External Affairs
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: Passport is an essential document issued by the Ministry of External
+  Affairs.
+description_hi: पासपोर्ट एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- passport
+- certificate

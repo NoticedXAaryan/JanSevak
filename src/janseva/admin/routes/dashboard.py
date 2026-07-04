@@ -4,7 +4,11 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from janseva.admin.auth import get_current_admin
-from janseva.admin.app import templates
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
+
+TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 from janseva.db.engine import get_session
 from janseva.db.models.user import User
 from janseva.db.models.conversation import Conversation

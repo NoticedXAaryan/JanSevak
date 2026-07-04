@@ -1,0 +1,23 @@
+service_id: electricity_connection
+name_en: Electricity Connection
+name_hi: बिजली कनेक्शन
+department: Power Corporation
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: Electricity Connection is an essential document issued by the Power
+  Corporation.
+description_hi: बिजली कनेक्शन एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- electricity connection
+- certificate

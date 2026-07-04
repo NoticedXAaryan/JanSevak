@@ -1,0 +1,23 @@
+service_id: domicile_certificate
+name_en: Domicile Certificate
+name_hi: मूल निवास प्रमाण पत्र
+department: Revenue Department
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: Domicile Certificate is an essential document issued by the Revenue
+  Department.
+description_hi: मूल निवास प्रमाण पत्र एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- domicile certificate
+- certificate

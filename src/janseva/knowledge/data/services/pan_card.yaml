@@ -1,0 +1,22 @@
+service_id: pan_card
+name_en: PAN Card
+name_hi: पैन कार्ड
+department: Income Tax Department
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: PAN Card is an essential document issued by the Income Tax Department.
+description_hi: पैन कार्ड एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- pan card
+- certificate

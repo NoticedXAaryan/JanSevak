@@ -29,7 +29,8 @@ RULES:
 [OPTION: Short Scheme Name]
 
 User's language: {user_language}
-User's district: {user_district}"""
+User's district: {user_district}
+Location context: {location_context}"""
 
 import re
 
@@ -45,6 +46,7 @@ def handle_service_query(state: dict) -> dict:
     llm = get_llm()
     user_language = state.get("user_language", "hi")
     user_district = state.get("user_district", "unknown")
+    location_context = state.get("location_context", "")
     
     # Get the latest user message
     latest_message = state["messages"][-1].content if state["messages"] else ""
@@ -57,6 +59,7 @@ def handle_service_query(state: dict) -> dict:
         knowledge_context=knowledge_context,
         user_language=user_language,
         user_district=user_district,
+        location_context=location_context,
     ))
     
     # Include recent conversation for context

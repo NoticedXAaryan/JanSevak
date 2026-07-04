@@ -55,7 +55,8 @@ If the latest message is a follow-up to a previous topic (e.g., "But I need the 
 Respond with ONLY the intent label. Nothing else. No explanation.
 
 User's language: {user_language}
-User's district: {user_district}"""
+User's district: {user_district}
+Location context: {location_context}"""
 
 
 SERVICE_NAVIGATOR_PROMPT = """You are JanSeva (जनसेवा), an expert AI assistant for Indian government services.
@@ -113,6 +114,24 @@ User's language: {user_language}"""
 
 # --- Node Functions ---
 
+def load_location_context(state: AgentState) -> dict:
+    """
+    Node: Load specific context based on the user's location.
+    Queries the knowledge base or departments table to inject state/district specific rules
+    before the agent processes the request.
+    """
+    user_district = state.get("user_district", "unknown")
+    
+    # In a full implementation, this would query the DB for Department policies in this district.
+    # For now, we stub it out with generic regional knowledge if we recognize the region.
+    context = ""
+    if user_district.lower() in ["lucknow", "kanpur", "varanasi", "agra"]:
+        context = "User is in Uttar Pradesh. Use UP specific e-district portal (edistrict.up.gov.in) for revenue services."
+    elif user_district.lower() in ["bhopal", "indore", "gwalior"]:
+        context = "User is in Madhya Pradesh. Use MP e-district portal (mpedistrict.gov.in)."
+    
+    return {"location_context": context}
+
 def classify_intent(state: AgentState) -> dict:
     """
     Node: Classify the user's intent.
@@ -124,6 +143,7 @@ def classify_intent(state: AgentState) -> dict:
     
     user_language = state.get("user_language", "hi")
     user_district = state.get("user_district", "unknown")
+    location_context = state.get("location_context", "")
 
     # Build context: include last 3 messages so follow-ups have context
     # e.g., "education loan" -> "But I needed Govt one" stays as service_query
@@ -137,6 +157,7 @@ def classify_intent(state: AgentState) -> dict:
         SystemMessage(content=INTENT_CLASSIFIER_PROMPT.format(
             user_language=user_language,
             user_district=user_district,
+            location_context=location_context,
         )),
         HumanMessage(content=f"Recent conversation:\n{context_text}\n\nClassify the LATEST message."),
     ]
@@ -245,6 +266,7 @@ def build_agent_graph() -> StateGraph:
     graph = StateGraph(AgentState)
     
     # Add nodes
+    graph.add_node("load_location_context", load_location_context)
     graph.add_node("classify_intent", classify_intent)
     graph.add_node("service_navigator", handle_service_query)
     graph.add_node("general_chat", handle_general_chat)
@@ -256,7 +278,8 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("placeholder", handle_placeholder)
     
     # Set entry point
-    graph.set_entry_point("classify_intent")
+    graph.set_entry_point("load_location_context")
+    graph.add_edge("load_location_context", "classify_intent")
     
     # Add conditional routing from intent classifier
     graph.add_conditional_edges(

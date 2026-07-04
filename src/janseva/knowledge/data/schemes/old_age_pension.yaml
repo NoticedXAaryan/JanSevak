@@ -1,0 +1,13 @@
+scheme_id: old_age_pension
+name_en: Old Age Pension
+name_hi: वृद्धावस्था पेंशन
+ministry: Social Welfare Department
+benefit: Financial assistance or specific benefits as per scheme guidelines
+eligibility:
+- Eligibility criteria apply as per official notifications.
+required_documents:
+- Aadhaar Card
+- Bank account details (linked to Aadhaar)
+application_process:
+- Visit the official portal or nearest CSC center.
+helpline: '1076'

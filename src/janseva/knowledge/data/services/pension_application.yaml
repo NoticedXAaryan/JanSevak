@@ -1,0 +1,23 @@
+service_id: pension_application
+name_en: Pension Application
+name_hi: पेंशन आवेदन
+department: Social Welfare Department
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: Pension Application is an essential document issued by the Social
+  Welfare Department.
+description_hi: पेंशन आवेदन एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- pension application
+- certificate

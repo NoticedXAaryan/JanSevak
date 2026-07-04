@@ -1,0 +1,22 @@
+service_id: building_permit
+name_en: Building Permit
+name_hi: भवन निर्माण अनुमति
+department: Municipal Corporation
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: Building Permit is an essential document issued by the Municipal Corporation.
+description_hi: भवन निर्माण अनुमति एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- building permit
+- certificate

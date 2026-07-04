@@ -32,6 +32,7 @@ class AgentState(TypedDict):
     user_district: str
     user_telegram_id: int
     intent: str
+    location_context: str
     response: str
     interactive_options: list[dict]
     needs_escalation: bool

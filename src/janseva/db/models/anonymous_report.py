@@ -4,6 +4,7 @@ CRITICAL: This table has NO foreign key to the users table.
 The reporter's identity is never stored.
 """
 from sqlalchemy import Integer, String, Text, ForeignKey
+import sqlalchemy
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -35,15 +36,24 @@ class AnonymousReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     # Routing
     target_authority_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     routed_to_level: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
-    routed_to_department: Mapped[str | None] = mapped_column(String(255), nullable=True)
-
-    # Organization link
-    organization_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="SET NULL"), nullable=True, index=True
+    
+    # Department link
+    department_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("departments.id", ondelete="SET NULL"), nullable=True, index=True
     )
+    
+    # Sealed Envelope Identity (Accountability Mechanism)
+    # Encrypted with a dual-key system. Cannot be decrypted by a single admin.
+    identity_envelope_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_flagged_fake: Mapped[bool] = mapped_column(default=False, nullable=False)
+    fake_flag_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    decryption_authorized_by: Mapped[list[str] | None] = mapped_column(sqlalchemy.JSON, nullable=True)
+
+    # Evidence
+    evidence_image_urls: Mapped[list[str] | None] = mapped_column(sqlalchemy.ARRAY(String), nullable=True)
 
     # Relationships
-    organization = relationship("Organization")
+    department = relationship("Department")
 
     # Status tracking
     status: Mapped[str] = mapped_column(

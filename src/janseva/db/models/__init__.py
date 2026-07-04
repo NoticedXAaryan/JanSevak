@@ -10,5 +10,14 @@ from janseva.db.models.mandi_price import MandiPrice
 from janseva.db.models.organization import Organization
 from janseva.db.models.admin_user import AdminUser
 from janseva.db.models.data_sync_log import DataSyncLog
+from janseva.db.models.department import Department
+from janseva.db.models.department_user import DepartmentUser
+from janseva.db.models.public_complaint import PublicComplaint
+from janseva.db.models.audit_log import AuditLog
 
-__all__ = ["Base", "User", "Conversation", "Message", "Authority", "AnonymousReport", "HealthcareFacility", "MandiPrice", "Organization", "AdminUser", "DataSyncLog"]
+__all__ = [
+    "Base", "User", "Conversation", "Message", "Authority", 
+    "AnonymousReport", "HealthcareFacility", "MandiPrice", 
+    "Organization", "AdminUser", "DataSyncLog",
+    "Department", "DepartmentUser", "PublicComplaint", "AuditLog"
+]

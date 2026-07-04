@@ -1,0 +1,13 @@
+scheme_id: mudra_loan
+name_en: Mudra Loan
+name_hi: मुद्रा लोन
+ministry: Ministry of Finance
+benefit: Financial assistance or specific benefits as per scheme guidelines
+eligibility:
+- Eligibility criteria apply as per official notifications.
+required_documents:
+- Aadhaar Card
+- Bank account details (linked to Aadhaar)
+application_process:
+- Visit the official portal or nearest CSC center.
+helpline: '1076'

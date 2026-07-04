@@ -1,0 +1,23 @@
+service_id: land_records
+name_en: Land Records (Bhulekh)
+name_hi: भूलेख
+department: Revenue Department
+issuing_authority: Relevant State Authority
+applicable_states:
+- all
+description_en: Land Records (Bhulekh) is an essential document issued by the Revenue
+  Department.
+description_hi: भूलेख एक आवश्यक दस्तावेज़ है।
+required_documents:
+- name_en: Aadhaar Card
+  name_hi: आधार कार्ड
+  mandatory: true
+process_steps:
+- step: 1
+  en: Visit the official portal
+  hi: आधिकारिक पोर्टल पर जाएं
+estimated_timeline: 15-30 days
+approximate_fee: INR 50
+tags:
+- land records
+- certificate

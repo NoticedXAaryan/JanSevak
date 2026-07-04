@@ -20,7 +20,18 @@ async def lifespan(app: FastAPI):
     # Stop the scheduler on shutdown
     await scheduler.stop()
 
+from fastapi.middleware.cors import CORSMiddleware
+
 admin_app = FastAPI(title="JanSeva Web", docs_url="/admin/docs", lifespan=lifespan)
+
+# Add CORS middleware to allow Next.js frontend (port 3000) to communicate with this backend (port 8000)
+admin_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Startup time for uptime calculation
 START_TIME = time.time()
@@ -62,6 +73,23 @@ admin_app.include_router(admin_users_router, prefix="/admin/users")
 from janseva.api.whatsapp import router as whatsapp_router
 admin_app.include_router(whatsapp_router, prefix="/api")
 
+# Mount Chat API
+from janseva.api.chat import router as chat_router
+admin_app.include_router(chat_router, prefix="/api/v1/chat")
+
+# Mount new v2 APIs
+from janseva.api.auth import router as auth_router
+from janseva.api.complaints import router as complaints_router
+from janseva.api.departments import router as dept_router
+from janseva.api.reports import router as public_reports_router
+from janseva.api.uploads import router as uploads_router
+
+admin_app.include_router(auth_router)
+admin_app.include_router(complaints_router)
+admin_app.include_router(dept_router)
+admin_app.include_router(public_reports_router)
+admin_app.include_router(uploads_router)
+
 # Mount OAuth router
 from janseva.admin.oauth import router as oauth_router
 admin_app.include_router(oauth_router)
@@ -90,11 +118,13 @@ async def public_stats():
         conversations_count = await session.scalar(select(func.count()).select_from(Conversation)) or 0
         reports_count = await session.scalar(select(func.count()).select_from(AnonymousReport)) or 0
         
-    return HTMLResponse(content=f"""
-        <div class="stat-item"><div class="stat-value animate-in">{users_count}</div><div class="stat-label">Citizens Helped</div></div>
-        <div class="stat-item"><div class="stat-value animate-in" style="animation-delay: 100ms">{conversations_count}</div><div class="stat-label">Queries Answered</div></div>
-        <div class="stat-item"><div class="stat-value animate-in" style="animation-delay: 200ms">{reports_count}</div><div class="stat-label">Reports Processed</div></div>
-    """)
+    from fastapi.responses import JSONResponse
+    return JSONResponse(content={
+        "citizens_served": users_count,
+        "queries_resolved": conversations_count,
+        "active_institutions": 0,
+        "schemes_indexed": 0
+    })
 
 @admin_app.get("/admin/login", response_class=HTMLResponse)
 async def login_page(request: Request):
@@ -154,4 +184,4 @@ async def logout():
     return response
 
 if __name__ == "__main__":
-    uvicorn.run("janseva.admin.app:admin_app", host="0.0.0.0", port=3000, reload=True)
+    uvicorn.run("janseva.admin.app:admin_app", host="0.0.0.0", port=8000, reload=True)

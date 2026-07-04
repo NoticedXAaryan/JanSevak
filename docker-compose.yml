@@ -41,15 +41,35 @@ services:
       # Persistent storage for ChromaDB (local vector store)
       - chromadata:/app/.chromadb
     expose:
+      - "8000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.janseva-api.rule=Host(`${DOMAIN:-janseva.local}`) && PathPrefix(`/api`)"
+      - "traefik.http.services.janseva-api.loadbalancer.server.port=8000"
+      - "traefik.http.routers.janseva-api.entrypoints=websecure"
+      - "traefik.http.routers.janseva-api.tls.certresolver=letsencrypt"
+    networks:
+      - dokploy-network
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: janseva-web
+    environment:
+      NEXT_PUBLIC_API_URL: https://${DOMAIN:-janseva.local}/api
+    expose:
       - "3000"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.janseva.rule=Host(`${DOMAIN:-janseva.local}`)"
-      - "traefik.http.services.janseva.loadbalancer.server.port=3000"
-      - "traefik.http.routers.janseva.entrypoints=websecure"
-      - "traefik.http.routers.janseva.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.janseva-web.rule=Host(`${DOMAIN:-janseva.local}`)"
+      - "traefik.http.services.janseva-web.loadbalancer.server.port=3000"
+      - "traefik.http.routers.janseva-web.entrypoints=websecure"
+      - "traefik.http.routers.janseva-web.tls.certresolver=letsencrypt"
     networks:
       - dokploy-network
+    depends_on:
+      - bot
 
 volumes:
   chromadata:
