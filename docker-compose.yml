@@ -40,6 +40,12 @@ services:
     volumes:
       # Persistent storage for ChromaDB (local vector store)
       - chromadata:/app/.chromadb
+    networks:
+      - dokploy-network
 
 volumes:
   chromadata:
+
+networks:
+  dokploy-network:
+    external: true
