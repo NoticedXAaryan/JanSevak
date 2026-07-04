@@ -6,7 +6,7 @@ Handles /start and /help commands.
 import structlog
 from aiogram import Router
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from janseva.db.engine import async_session_factory
 from janseva.db.models.user import User
@@ -45,32 +45,54 @@ async def handle_start(message: Message) -> None:
                 telegram_id=telegram_id,
                 telegram_username=username,
                 full_name=full_name,
-                language="hi",  # Default to Hindi
+                language="hi",  # Default until they choose
+                onboarding_complete=False
             )
             session.add(user)
             await session.commit()
             logger.info("new_user_registered", telegram_id=telegram_id, name=full_name)
-
-            welcome_text = (
-                f"🙏 <b>नमस्ते {full_name}!</b>\n\n"
-                "मैं <b>जनसेवा (JanSeva)</b> हूँ — आपका AI सहायक।\n\n"
-                "मैं इन सेवाओं में आपकी मदद कर सकता/सकती हूँ:\n\n"
-                "📋 <b>सरकारी सेवाएं</b> — आय प्रमाण पत्र, जाति प्रमाण पत्र, भूमि रिकॉर्ड\n"
-                "🚨 <b>गुमनाम शिकायत</b> — भ्रष्टाचार या गलत काम की सुरक्षित रिपोर्ट\n"
-                "🏥 <b>स्वास्थ्य सेवाएं</b> — अस्पताल खोजें, अपॉइंटमेंट बुक करें\n"
-                "🌾 <b>किसान सेवाएं</b> — सब्सिडी, मंडी भाव, लॉजिस्टिक्स\n\n"
-                "बस अपना सवाल हिंदी या अंग्रेजी में लिखें, या वॉइस मैसेज भेजें! 🎙️\n\n"
-                "<i>Type /help for English instructions.</i>"
-            )
         else:
-            logger.info("returning_user", telegram_id=telegram_id, name=full_name)
-            welcome_text = (
-                f"🙏 <b>वापसी पर स्वागत है, {full_name}!</b>\n\n"
-                "आप कैसे हैं? आज मैं आपकी क्या मदद कर सकता/सकती हूँ?\n\n"
-                "<i>Type /help to see available commands.</i>"
-            )
+            # Reset onboarding if they restart
+            user.onboarding_complete = False
+            session.add(user)
+            await session.commit()
+            logger.info("returning_user_restarted", telegram_id=telegram_id, name=full_name)
 
-    await message.answer(welcome_text)
+        # Show language selection keyboard
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text="हिंदी", callback_data="lang_hi"),
+                InlineKeyboardButton(text="English", callback_data="lang_en")
+            ],
+            [
+                InlineKeyboardButton(text="मराठी", callback_data="lang_mr"),
+                InlineKeyboardButton(text="தமிழ்", callback_data="lang_ta")
+            ]
+        ])
+        
+        welcome_text = (
+            f"🙏 <b>नमस्ते {full_name}! / Welcome!</b>\n\n"
+            "मैं <b>जनसेवा (JanSeva)</b> हूँ — आपका AI सहायक। / I am JanSeva — your AI assistant.\n\n"
+            "कृपया अपनी भाषा चुनें / Please select your language:"
+        )
+
+    await message.answer(welcome_text, reply_markup=keyboard)
+
+
+@start_router.message(Command("language"))
+async def handle_language_command(message: Message) -> None:
+    """Handle /language command to change language."""
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="हिंदी", callback_data="lang_hi"),
+            InlineKeyboardButton(text="English", callback_data="lang_en")
+        ],
+        [
+            InlineKeyboardButton(text="मराठी", callback_data="lang_mr"),
+            InlineKeyboardButton(text="தமிழ்", callback_data="lang_ta")
+        ]
+    ])
+    await message.answer("कृपया अपनी नई भाषा चुनें / Please select your new language:", reply_markup=keyboard)
 
 
 @start_router.message(Command("help"))

@@ -6,7 +6,7 @@ import uuid
 
 from janseva.admin.auth import get_current_admin
 from janseva.admin.app import templates
-from janseva.db.engine import get_async_session
+from janseva.db.engine import get_session
 from janseva.db.models.anonymous_report import AnonymousReport
 
 router = APIRouter()
@@ -14,11 +14,26 @@ router = APIRouter()
 @router.get("/", response_class=HTMLResponse)
 async def list_reports(
     request: Request,
-    admin_username: str = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_async_session)
+    admin_user: dict = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session)
 ):
     """List anonymous reports."""
-    stmt = select(AnonymousReport).order_by(AnonymousReport.created_at.desc())
+    # Scope reports to organization unless super_admin
+    if admin_user["role"] == "super_admin":
+        stmt = select(AnonymousReport).order_by(AnonymousReport.created_at.desc())
+    else:
+        # Fallback to empty if no org_id assigned
+        org_id = admin_user.get("org_id")
+        if not org_id:
+            return templates.TemplateResponse(
+                "reports.html",
+                {"request": request, "admin": admin_user, "reports": []}
+            )
+        
+        stmt = select(AnonymousReport).where(
+            AnonymousReport.organization_id == org_id
+        ).order_by(AnonymousReport.created_at.desc())
+        
     result = await session.execute(stmt)
     reports = result.scalars().all()
 
@@ -26,7 +41,7 @@ async def list_reports(
         "reports.html",
         {
             "request": request,
-            "admin": admin_username,
+            "admin": admin_user,
             "reports": reports,
         }
     )
@@ -35,13 +50,23 @@ async def list_reports(
 async def update_report_status(
     report_id: str,
     status: str = Form(...),
-    admin_username: str = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_async_session)
+    admin_user: dict = Depends(get_current_admin),
+    session: AsyncSession = Depends(get_session)
 ):
     """Update report status."""
+    # Build base update statement
     stmt = update(AnonymousReport).where(
         AnonymousReport.id == uuid.UUID(report_id)
-    ).values(status=status)
+    )
+    
+    # Enforce org scope for non-super admins
+    if admin_user["role"] != "super_admin":
+        org_id = admin_user.get("org_id")
+        if not org_id:
+            return HTMLResponse(content="<span class='text-red-500'>Unauthorized</span>", status_code=403)
+        stmt = stmt.where(AnonymousReport.organization_id == org_id)
+        
+    stmt = stmt.values(status=status)
     
     await session.execute(stmt)
     await session.commit()

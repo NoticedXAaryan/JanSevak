@@ -3,8 +3,10 @@ Anonymous report model.
 CRITICAL: This table has NO foreign key to the users table.
 The reporter's identity is never stored.
 """
-from sqlalchemy import Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Integer, String, Text, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 from janseva.db.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -34,6 +36,14 @@ class AnonymousReport(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     target_authority_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     routed_to_level: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
     routed_to_department: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    # Organization link
+    organization_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("organizations.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
+    # Relationships
+    organization = relationship("Organization")
 
     # Status tracking
     status: Mapped[str] = mapped_column(

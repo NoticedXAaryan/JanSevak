@@ -47,6 +47,9 @@ Your job is to classify the user's message into one of these intents:
 6. "escalate" — The user's question is too specific, complex, or about something you genuinely don't know
    Examples: Questions about very specific local regulations, ongoing legal cases, specific officer contact info
 
+7. "clarify" — The user's message is too vague, incomplete, or ambiguous to understand what they need
+   Examples: "help", "mujhe form chahiye" (which form?), "hospital" (what about it?)
+
 Respond with ONLY the intent label. Nothing else. No explanation.
 
 User's language: {user_language}
@@ -132,7 +135,7 @@ def classify_intent(state: AgentState) -> dict:
     intent = response.content.strip().lower().replace('"', '').replace("'", "")
     
     # Validate — default to "general" if classification is unexpected
-    valid_intents = {"service_query", "anonymous_report", "healthcare", "farmer", "general", "escalate"}
+    valid_intents = {"service_query", "anonymous_report", "healthcare", "farmer", "general", "escalate", "clarify"}
     if intent not in valid_intents:
         logger.warning("unexpected_intent_classification", raw=intent, fallback="general")
         intent = "general"
@@ -157,6 +160,23 @@ def handle_general_chat(state: AgentState) -> dict:
     
     response = llm.invoke(all_messages)
     
+    return {"response": response.content}
+
+
+def handle_clarification(state: AgentState) -> dict:
+    """Node: Ask the user a clarifying question."""
+    llm = get_llm()
+    user_language = state.get("user_language", "hi")
+    
+    prompt = (
+        f"You are JanSeva. The user's message was too vague or short. "
+        f"Respond in {user_language}. Ask a short, polite follow-up question to clarify what government service, hospital, or report they need help with."
+    )
+    
+    system_msg = SystemMessage(content=prompt)
+    messages = [system_msg, state["messages"][-1]]
+    
+    response = llm.invoke(messages)
     return {"response": response.content}
 
 
@@ -193,6 +213,7 @@ def route_by_intent(state: AgentState) -> str:
         "farmer": "farmer_agent_node",
         "general": "general_chat",
         "escalate": "escalation",
+        "clarify": "clarification",
     }
     
     return route_map.get(intent, "general_chat")
@@ -217,6 +238,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("anonymous_report_node", handle_anonymous_report)
     graph.add_node("healthcare_agent_node", handle_healthcare_query)
     graph.add_node("farmer_agent_node", handle_farmer_query)
+    graph.add_node("clarification", handle_clarification)
     graph.add_node("placeholder", handle_placeholder)
     
     # Set entry point
@@ -233,6 +255,7 @@ def build_agent_graph() -> StateGraph:
             "farmer_agent_node": "farmer_agent_node",
             "general_chat": "general_chat",
             "escalation": "escalation",
+            "clarification": "clarification",
             "placeholder": "placeholder",
         },
     )
@@ -244,6 +267,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_edge("farmer_agent_node", END)
     graph.add_edge("general_chat", END)
     graph.add_edge("escalation", END)
+    graph.add_edge("clarification", END)
     graph.add_edge("placeholder", END)
     
     return graph.compile()

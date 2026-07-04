@@ -7,6 +7,10 @@ from aiogram import Router, F
 from aiogram.types import Message
 
 from janseva.agents.service import process_message
+from janseva.bot.helpers.feedback import send_thinking, update_with_response, send_error
+from janseva.db.engine import async_session_factory
+from janseva.db.models.user import User
+from sqlalchemy import select
 
 logger = structlog.get_logger()
 
@@ -35,26 +39,36 @@ async def handle_text_message(message: Message) -> None:
         text_length=len(user_text),
     )
 
-    # Show "typing" indicator while AI processes
-    await message.chat.do(action="typing")
+    # 1. Check onboarding status
+    async with async_session_factory() as session:
+        result = await session.execute(select(User).where(User.telegram_id == telegram_id))
+        user = result.scalar_one_or_none()
+        
+        if not user or not user.onboarding_complete:
+            # Send them to the onboarding flow
+            from janseva.bot.routers.start import handle_start
+            await handle_start(message)
+            return
+
+    # Show "thinking" indicator with actual message
+    thinking_msg = await send_thinking(message)
 
     from janseva.notifications.profiler import update_user_interests
     import asyncio
     
     # Process through AI agent pipeline
-    response = await process_message(
-        telegram_id=telegram_id,
-        user_text=user_text,
-    )
-    
-    # Fire and forget updating interests
-    asyncio.create_task(update_user_interests(telegram_id, user_text))
+    try:
+        response = await process_message(
+            telegram_id=telegram_id,
+            user_text=user_text,
+        )
+        
+        # Fire and forget updating interests
+        asyncio.create_task(update_user_interests(telegram_id, user_text))
 
-    # Send response (split if too long for Telegram's 4096 char limit)
-    if len(response) <= 4096:
-        await message.answer(response)
-    else:
-        # Split into chunks
-        for i in range(0, len(response), 4096):
-            chunk = response[i:i + 4096]
-            await message.answer(chunk)
+        # Edit the thinking message with the response
+        await update_with_response(message, thinking_msg, response)
+        
+    except Exception as e:
+        logger.error("error_processing_text", error=str(e), telegram_id=telegram_id)
+        await send_error(message, language=user.language if user else "hi")

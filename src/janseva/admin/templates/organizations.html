@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Organizations - JanSeva{% endblock %}
+
+{% block content %}
+<div class="container py-12">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-white">Authorities & Organizations</h1>
+            <p class="text-secondary mt-2">Manage government entities on JanSeva</p>
+        </div>
+        <button onclick="document.getElementById('create-modal').classList.remove('hidden')" class="btn btn-primary">
+            <i data-lucide="plus"></i> Add Organization
+        </button>
+    </div>
+
+    <div class="table-wrapper bg-gray-800 border-gray-700">
+        <table class="w-full">
+            <thead class="bg-gray-900 border-gray-700">
+                <tr>
+                    <th class="text-gray-400">Name</th>
+                    <th class="text-gray-400">Type</th>
+                    <th class="text-gray-400">State</th>
+                    <th class="text-gray-400">District</th>
+                    <th class="text-gray-400">Status</th>
+                    <th class="text-gray-400 text-right">Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for org in organizations %}
+                <tr class="border-b border-gray-700 hover:bg-gray-700/50">
+                    <td class="font-medium text-white">{{ org.name }}</td>
+                    <td class="text-gray-300 capitalize">{{ org.org_type.replace('_', ' ') }}</td>
+                    <td class="text-gray-300">{{ org.jurisdiction_state }}</td>
+                    <td class="text-gray-300">{{ org.jurisdiction_district }}</td>
+                    <td>
+                        {% if org.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-gray-400 text-sm text-right">{{ org.created_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-12 text-gray-400">
+                        <i data-lucide="building-2" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                        <p>No organizations found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div id="create-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-white">New Organization</h2>
+            <button onclick="document.getElementById('create-modal').classList.add('hidden')" class="text-gray-400 hover:text-white">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        
+        <form method="POST" action="/admin/organizations/create" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Organization Name</label>
+                <input type="text" name="name" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Type</label>
+                <select name="org_type" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                    <option value="hospital">Hospital / PHC</option>
+                    <option value="police_station">Police Station</option>
+                    <option value="fire_station">Fire Station</option>
+                    <option value="panchayat">Gram Panchayat</option>
+                    <option value="district_office">District Office</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">State</label>
+                    <input type="text" name="state" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1">District</label>
+                    <input type="text" name="district" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none">
+                </div>
+            </div>
+            
+            <div class="pt-4 flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="btn bg-gray-700 hover:bg-gray-600 text-white">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Organization</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

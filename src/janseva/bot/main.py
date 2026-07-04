@@ -18,6 +18,7 @@ from janseva.common.logging import setup_logging
 from janseva.bot.routers.start import start_router
 from janseva.bot.routers.text import text_router
 from janseva.bot.routers.voice import voice_router
+from janseva.bot.routers.onboarding import onboarding_router
 from janseva.bot.middlewares.session import DatabaseSessionMiddleware
 from janseva.bot.middlewares.throttle import ThrottleMiddleware
 
@@ -42,9 +43,11 @@ async def main() -> None:
     # Register middlewares (order matters — first registered = first executed)
     dp.message.middleware(ThrottleMiddleware(rate_limit=1.0))  # 1 msg/sec per user
     dp.message.middleware(DatabaseSessionMiddleware())
+    dp.callback_query.middleware(DatabaseSessionMiddleware())
 
     # Register routers (order matters — first match wins)
     dp.include_router(start_router)   # /start, /help commands
+    dp.include_router(onboarding_router) # inline keyboard callbacks
     dp.include_router(voice_router)   # Voice messages (before text, so voice isn't caught by text handler)
     dp.include_router(text_router)    # Text messages (catch-all)
 

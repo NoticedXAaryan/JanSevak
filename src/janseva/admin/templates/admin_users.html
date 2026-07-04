@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Users - JanSeva{% endblock %}
+
+{% block content %}
+<div class="container py-12">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 style="color: var(--text-primary); font-weight: 800; font-size: 2.25rem;">Admin Users</h1>
+            <p class="text-secondary mt-2">Manage authority personnel access</p>
+        </div>
+        <button onclick="document.getElementById('create-modal').classList.remove('hidden')" class="btn btn-primary">
+            <i data-lucide="user-plus"></i> Add User
+        </button>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Organization</th>
+                    <th>Status</th>
+                    <th class="text-right">Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td style="font-weight: 600; color: var(--text-primary);">{{ user.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.role == 'super_admin' %}
+                            <span class="badge badge-accent">Super Admin</span>
+                        {% else %}
+                            <span class="badge badge-info">{{ user.role.replace('_', ' ').title() }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.organization %}
+                            {{ user.organization.name }}
+                        {% else %}
+                            <span style="color: var(--text-muted); font-style: italic;">None</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-sm text-right" style="color: var(--text-muted);">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-12" style="color: var(--text-muted);">
+                        <i data-lucide="users" class="mx-auto mb-4" style="width:48px;height:48px;opacity:0.5;"></i>
+                        <p>No admin users found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div id="create-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+    <div class="card w-full max-w-md" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+        <div class="flex justify-between items-center mb-6">
+            <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">Provision Admin User</h2>
+            <button onclick="document.getElementById('create-modal').classList.add('hidden')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        
+        <p class="text-sm mb-6" style="color: var(--text-secondary);">Users will log in via Google OAuth using the email address provided below.</p>
+        
+        <form method="POST" action="/admin/users/create" class="flex flex-col gap-4">
+            <div>
+                <label>Full Name</label>
+                <input type="text" name="full_name" required class="input">
+            </div>
+            
+            <div>
+                <label>Google Email Address</label>
+                <input type="email" name="email" required class="input">
+            </div>
+            
+            <div>
+                <label>Role</label>
+                <select name="role" required class="input">
+                    <option value="org_admin">Organization Admin</option>
+                    <option value="org_staff">Organization Staff</option>
+                    <option value="super_admin">Super Admin (System-wide)</option>
+                </select>
+            </div>
+            
+            <div>
+                <label>Organization Assignment (Optional)</label>
+                <select name="org_id" class="input">
+                    <option value="">-- No Organization (Global) --</option>
+                    {% for org in organizations %}
+                        <option value="{{ org.id }}">{{ org.name }} ({{ org.jurisdiction_district }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mt-4 flex justify-between gap-3">
+                <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')" class="btn btn-ghost w-full">Cancel</button>
+                <button type="submit" class="btn btn-primary w-full" style="justify-content:center;">Provision User</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

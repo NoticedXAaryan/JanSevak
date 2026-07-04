@@ -40,6 +40,15 @@ Telegram / WhatsApp → Channel Normalizer → LangGraph AI Agents → Response
 | **Task Queue** | ARQ (async, Redis-backed) |
 | **Infra** | Docker Compose |
 
+## Design Philosophy & Compliance
+
+JanSeva is designed to strictly adhere to Indian government cybersecurity and accessibility guidelines. While some developers might consider Server-Side Rendering (Jinja2), vanilla CSS, and HTMX as "outdated" compared to heavy Single Page Application (SPA) frameworks like React or Next.js, this architecture is an intentional, compliance-driven choice:
+
+1. **Zero Third-Party Phone-Homes (Air-Gapped Ready):** Government platforms must often operate on isolated internal networks (VPNs/Intranets). We do not rely on external CDNs (all assets like HTMX and fonts are bundled locally) nor do we use frameworks that silently inject telemetry.
+2. **Maximum Accessibility (a11y) & Low Bandwidth:** Rural citizens and local officials often operate on older devices with 2G/3G connections. SSR HTML guarantees that the initial payload is extremely small and renders immediately without requiring massive JavaScript bundles to parse.
+3. **Progressive Interactivity (HTMX):** We achieve the smooth, reactive feel of a modern web application using HTMX. This gives us SPA-like capabilities (dynamic updates, modals) without the complexity of a massive frontend build pipeline or Node.js runtime on the server.
+4. **Decade-Long Maintainability:** "Boring" and proven technologies like HTML, CSS, and Jinja2 are highly stable. Future government contractors can easily maintain this codebase 10 years from now without wrestling with deprecated NPM packages or broken Webpack configurations.
+
 ## Quick Start
 
 ### Docker / Dokploy

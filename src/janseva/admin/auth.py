@@ -31,9 +31,10 @@ def verify_password(plain_password: str, correct_password: str) -> bool:
     return plain_password == correct_password
 
 
-async def get_current_admin(request: Request) -> str:
+async def get_current_admin(request: Request) -> dict:
     """
     Dependency to get the current admin from the JWT token in cookies.
+    Returns a dict with user details (sub/email, role, org_id).
     """
     token = request.cookies.get("admin_token")
     if not token:
@@ -49,10 +50,15 @@ async def get_current_admin(request: Request) -> str:
     
     try:
         payload = jwt.decode(token, settings.admin_jwt_secret, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None or username != settings.admin_username:
+        email: str = payload.get("sub")
+        if not email:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        return username
+            
+        return {
+            "email": email,
+            "role": payload.get("role", "super_admin" if email == settings.admin_username else "org_viewer"),
+            "org_id": payload.get("org_id")
+        }
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -60,16 +66,20 @@ async def get_current_admin(request: Request) -> str:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-def get_current_admin_optional(request: Request) -> Optional[str]:
+def get_current_admin_optional(request: Request) -> Optional[dict]:
     """Optional auth check, doesn't raise exception if not logged in."""
     token = request.cookies.get("admin_token")
     if not token:
         return None
     try:
         payload = jwt.decode(token, settings.admin_jwt_secret, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username == settings.admin_username:
-            return username
+        email: str = payload.get("sub")
+        if email:
+            return {
+                "email": email,
+                "role": payload.get("role", "super_admin" if email == settings.admin_username else "org_viewer"),
+                "org_id": payload.get("org_id")
+            }
     except JWTError:
         pass
     return None

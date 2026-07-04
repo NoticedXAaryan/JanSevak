@@ -1,6 +1,6 @@
 """Mandi (Wholesale Market) Price model."""
 import datetime
-from sqlalchemy import Date, Float, String
+from sqlalchemy import Date, Float, String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 from janseva.db.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -22,3 +22,5 @@ class MandiPrice(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     modal_price: Mapped[float] = mapped_column(Float, nullable=False)
     
     date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
+    source_api: Mapped[str | None] = mapped_column(String(255), default="agmarknet")
+    last_synced_at: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True)

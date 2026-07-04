@@ -48,9 +48,12 @@ class Settings(BaseSettings):
     admin_jwt_secret: str = Field("change-me", description="JWT secret for admin auth")
     report_encryption_key: str = Field("change-me", description="Fernet key for report encryption")
 
-    # --- Admin ---
+    # --- Admin & OAuth ---
     admin_username: str = Field("admin")
     admin_password: str = Field("change-me")
+    google_client_id: str = Field("", description="Google OAuth Client ID")
+    google_client_secret: str = Field("", description="Google OAuth Client Secret")
+    google_redirect_uri: str = Field("http://localhost:8000/admin/auth/google/callback", description="Google OAuth Redirect URI")
 
     # --- Twilio (WhatsApp) Settings ---
     twilio_account_sid: str = Field("", description="Twilio Account SID")

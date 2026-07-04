@@ -1,4 +1,5 @@
 """Healthcare facility model."""
+from datetime import datetime
 from sqlalchemy import Boolean, Float, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column
@@ -29,3 +30,6 @@ class HealthcareFacility(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     
     latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    hfr_id: Mapped[str | None] = mapped_column(unique=True, nullable=True)
+    source_api: Mapped[str | None] = mapped_column(default="abdm_hfr", nullable=True)
+    last_synced_at: Mapped[datetime | None] = mapped_column(nullable=True)

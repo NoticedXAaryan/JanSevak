@@ -7,5 +7,8 @@ from janseva.db.models.authority import Authority
 from janseva.db.models.anonymous_report import AnonymousReport
 from janseva.db.models.healthcare_facility import HealthcareFacility
 from janseva.db.models.mandi_price import MandiPrice
+from janseva.db.models.organization import Organization
+from janseva.db.models.admin_user import AdminUser
+from janseva.db.models.data_sync_log import DataSyncLog
 
-__all__ = ["Base", "User", "Conversation", "Message", "Authority", "AnonymousReport", "HealthcareFacility", "MandiPrice"]
+__all__ = ["Base", "User", "Conversation", "Message", "Authority", "AnonymousReport", "HealthcareFacility", "MandiPrice", "Organization", "AdminUser", "DataSyncLog"]

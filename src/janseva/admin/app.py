@@ -9,8 +9,18 @@ import time
 
 from janseva.admin.auth import get_current_admin_optional, verify_password, create_access_token
 from janseva.config import settings
+from janseva.datasync.scheduler import scheduler
+from contextlib import asynccontextmanager
 
-admin_app = FastAPI(title="JanSeva Web", docs_url="/admin/docs")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start the data sync scheduler in the background (e.g., every 60 seconds for demo)
+    await scheduler.start(interval_seconds=60)
+    yield
+    # Stop the scheduler on shutdown
+    await scheduler.stop()
+
+admin_app = FastAPI(title="JanSeva Web", docs_url="/admin/docs", lifespan=lifespan)
 
 # Startup time for uptime calculation
 START_TIME = time.time()
@@ -36,18 +46,25 @@ async def health_check():
         "database": "connected",
     }
 
-# Import routers later when created
 from janseva.admin.routes.dashboard import router as dashboard_router
 from janseva.admin.routes.queries import router as queries_router
 from janseva.admin.routes.reports import router as reports_router
+from janseva.admin.routes.organizations import router as organizations_router
+from janseva.admin.routes.admin_users import router as admin_users_router
 
 admin_app.include_router(dashboard_router, prefix="/admin")
 admin_app.include_router(queries_router, prefix="/admin/queries")
 admin_app.include_router(reports_router, prefix="/admin/reports")
+admin_app.include_router(organizations_router, prefix="/admin/organizations")
+admin_app.include_router(admin_users_router, prefix="/admin/users")
 
 # Mount WhatsApp Webhook
 from janseva.api.whatsapp import router as whatsapp_router
 admin_app.include_router(whatsapp_router, prefix="/api")
+
+# Mount OAuth router
+from janseva.admin.oauth import router as oauth_router
+admin_app.include_router(oauth_router)
 
 @admin_app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -58,12 +75,46 @@ async def index(request: Request):
         {"request": request, "admin": admin}
     )
 
+@admin_app.get("/api/public/stats")
+async def public_stats():
+    """Public stats endpoint for the landing page (cached in production)."""
+    from sqlalchemy import select, func
+    from janseva.db.engine import async_session_factory
+    from janseva.db.models.user import User
+    from janseva.db.models.conversation import Conversation
+    from janseva.db.models.anonymous_report import AnonymousReport
+    
+    async with async_session_factory() as session:
+        users_count = await session.scalar(select(func.count()).select_from(User)) or 0
+        conversations_count = await session.scalar(select(func.count()).select_from(Conversation)) or 0
+        reports_count = await session.scalar(select(func.count()).select_from(AnonymousReport)) or 0
+        
+    return HTMLResponse(content=f"""
+        <div class="stat-item"><div class="stat-value animate-in">{users_count}</div><div class="stat-label">Citizens Helped</div></div>
+        <div class="stat-item"><div class="stat-value animate-in" style="animation-delay: 100ms">{conversations_count}</div><div class="stat-label">Queries Answered</div></div>
+        <div class="stat-item"><div class="stat-value animate-in" style="animation-delay: 200ms">{reports_count}</div><div class="stat-label">Reports Processed</div></div>
+    """)
+
 @admin_app.get("/admin/login", response_class=HTMLResponse)
 async def login_page(request: Request):
     """Admin login page."""
     if get_current_admin_optional(request):
         return RedirectResponse(url="/admin", status_code=303)
-    return templates.TemplateResponse("login.html", {"request": request})
+        
+    error = request.query_params.get("error")
+    error_msg = None
+    if error == "auth_failed":
+        error_msg = "Google authentication failed. Please try again."
+    elif error == "account_disabled":
+        error_msg = "Your account is disabled. Contact support."
+    elif error == "unauthorized":
+        error_msg = "Your Google account is not authorized to access this dashboard."
+        
+    return templates.TemplateResponse("login.html", {
+        "request": request, 
+        "error_msg": error_msg,
+        "google_enabled": bool(settings.google_client_id)
+    })
 
 @admin_app.post("/admin/login")
 async def login_post(username: str = Form(...), password: str = Form(...)):

@@ -1,92 +1,243 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="relative bg-white dark:bg-gray-900 overflow-hidden h-full flex flex-col justify-center py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center">
-            <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-                <span class="block">AI-Powered Public Services</span>
-                <span class="block text-primary-600 dark:text-primary-400">for Indian Citizens</span>
-            </h1>
-            <p class="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-400 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                JanSeva (जनसेवा) is an intelligent Telegram bot designed to help you navigate government services, find healthcare facilities, check agricultural prices, and safely report local issues.
-            </p>
-            <div class="mt-10 flex justify-center gap-x-6">
-                <a href="https://t.me/jansevak_bot" target="_blank" class="rounded-md bg-primary-600 px-8 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 transition-colors">
-                    Start Chatting on Telegram
-                </a>
-            </div>
-        </div>
-    </div>
+{% block title %}JanSeva — AI Public Services Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ===== Hero Section ===== */
+    .hero {
+        position: relative;
+        padding: 6rem 0 8rem;
+        text-align: center;
+        overflow: hidden;
+    }
+    .hero-bg {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: -1;
+        background: radial-gradient(circle at top, rgba(255, 107, 53, 0.15), transparent 50%),
+                    radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.1), transparent 50%);
+    }
+    .hero h1 { margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+    .hero p { font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto 2.5rem; }
     
-    <!-- Feature Section -->
-    <div class="mt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
-            <!-- Feature 1 -->
-            <div class="pt-6">
-                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
-                    <div class="-mt-6">
-                        <div>
-                            <span class="inline-flex items-center justify-center p-3 bg-primary-500 rounded-md shadow-lg text-2xl text-white">
-                                📄
-                            </span>
-                        </div>
-                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Service Navigation</h3>
-                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
-                            Find exactly what documents you need for income certificates, caste certificates, and more.
-                        </p>
-                    </div>
-                </div>
+    .hero-ctas { display: flex; justify-content: center; gap: 1rem; margin-bottom: 4rem; }
+    @media (max-width: 600px) {
+        .hero-ctas { flex-direction: column; }
+    }
+
+    /* ===== Live Stats ===== */
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        padding: 2rem;
+        background: var(--bg-glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        max-width: 800px;
+        margin: 0 auto;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .stat-item { text-align: center; }
+    @media (max-width: 600px) {
+        .stats-container { flex-direction: column; gap: 2rem; }
+    }
+
+    /* ===== Features Section ===== */
+    .section-title { text-align: center; margin-bottom: 3rem; }
+    .section-title span { color: var(--accent-saffron); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; display: block; margin-bottom: 0.5rem; }
+    
+    .feature-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        height: 100%;
+    }
+    .feature-icon {
+        width: 48px; height: 48px;
+        border-radius: var(--radius-md);
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 1.5rem;
+        color: var(--accent-saffron);
+        transition: all var(--transition-fast);
+    }
+    .feature-card:hover .feature-icon {
+        background: var(--accent-gradient);
+        color: #fff;
+        transform: scale(1.1);
+    }
+    .feature-card h3 { margin-bottom: 0.75rem; }
+    .feature-card p { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* ===== How It Works ===== */
+    .steps-container {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: relative;
+        margin-top: 4rem;
+    }
+    .steps-line {
+        position: absolute;
+        top: 24px; left: 10%; right: 10%;
+        height: 2px;
+        background: var(--border-subtle);
+        z-index: 0;
+    }
+    .step {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 30%;
+    }
+    .step-number {
+        width: 48px; height: 48px;
+        border-radius: 50%;
+        background: var(--bg-base);
+        border: 2px solid var(--accent-saffron);
+        display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-mono); font-weight: 700; font-size: 1.2rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        box-shadow: 0 0 0 8px var(--bg-base);
+    }
+    @media (max-width: 768px) {
+        .steps-container { flex-direction: column; gap: 3rem; }
+        .steps-line { display: none; }
+        .step { width: 100%; }
+    }
+
+    /* ===== Authority CTA ===== */
+    .auth-cta {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-default);
+        border-radius: var(--radius-xl);
+        padding: 4rem 2rem;
+        text-align: center;
+        margin-top: 6rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .auth-cta::before {
+        content: '';
+        position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        background: var(--accent-gradient);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+        <h1>India's Public Services.<br><span class="text-gradient">Reimagined.</span></h1>
+        <p>AI-powered. Multilingual. Instant. Navigate government schemes, report local issues safely, and access essential data without the red tape.</p>
+        
+        <div class="hero-ctas">
+            <a href="https://t.me/JanSevaHackBot" target="_blank" class="btn btn-primary btn-lg">
+                <i data-lucide="send"></i> Start on Telegram
+            </a>
+            <a href="#" class="btn btn-secondary btn-lg" onclick="alert('WhatsApp integration coming in Phase 3!')">
+                <i data-lucide="message-circle"></i> Try WhatsApp
+            </a>
+        </div>
+
+        <!-- Live Stats (HTMX polling) -->
+        <div class="stats-container" hx-get="/api/public/stats" hx-trigger="load, every 30s">
+            <!-- Skeleton while loading -->
+            <div class="stat-item"><div class="skeleton" style="width:100px; height:40px; margin:0 auto 8px;"></div><div class="stat-label">Citizens Helped</div></div>
+            <div class="stat-item"><div class="skeleton" style="width:100px; height:40px; margin:0 auto 8px;"></div><div class="stat-label">Queries Answered</div></div>
+            <div class="stat-item"><div class="skeleton" style="width:100px; height:40px; margin:0 auto 8px;"></div><div class="stat-label">Reports Processed</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-20" style="background: var(--bg-base);">
+    <div class="container">
+        <div class="section-title">
+            <span>Capabilities</span>
+            <h2>What JanSeva can do for you</h2>
+        </div>
+        
+        <div class="grid grid-4 gap-6">
+            <div class="card feature-card">
+                <div class="feature-icon"><i data-lucide="file-text"></i></div>
+                <h3>Service Navigation</h3>
+                <p>Don't know what documents you need for an Income Certificate? Ask in Hindi or English, get exact requirements instantly.</p>
             </div>
-            <!-- Feature 2 -->
-            <div class="pt-6">
-                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
-                    <div class="-mt-6">
-                        <div>
-                            <span class="inline-flex items-center justify-center p-3 bg-red-500 rounded-md shadow-lg text-2xl text-white">
-                                🚨
-                            </span>
-                        </div>
-                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Anonymous Reporting</h3>
-                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
-                            Safely and securely report corruption or local issues. Your metadata is stripped before reaching admins.
-                        </p>
-                    </div>
-                </div>
+            <div class="card feature-card">
+                <div class="feature-icon"><i data-lucide="shield-alert"></i></div>
+                <h3>Anonymous Reporting</h3>
+                <p>Report corruption, illegal activities, or civic issues securely. We strip metadata and route it to higher authorities.</p>
             </div>
-            <!-- Feature 3 -->
-            <div class="pt-6">
-                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
-                    <div class="-mt-6">
-                        <div>
-                            <span class="inline-flex items-center justify-center p-3 bg-green-500 rounded-md shadow-lg text-2xl text-white">
-                                🌾
-                            </span>
-                        </div>
-                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Farmer Services</h3>
-                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
-                            Get real-time Mandi crop prices and understand your eligibility for PM-Kisan subsidies.
-                        </p>
-                    </div>
-                </div>
+            <div class="card feature-card">
+                <div class="feature-icon"><i data-lucide="hospital"></i></div>
+                <h3>Healthcare Access</h3>
+                <p>Live integration with ABDM Registry. Find nearby public hospitals, check bed availability, and navigate health schemes.</p>
             </div>
-            <!-- Feature 4 -->
-            <div class="pt-6">
-                <div class="flow-root bg-gray-50 dark:bg-gray-800 rounded-lg px-6 pb-8 h-full">
-                    <div class="-mt-6">
-                        <div>
-                            <span class="inline-flex items-center justify-center p-3 bg-blue-400 rounded-md shadow-lg text-2xl text-white">
-                                🏥
-                            </span>
-                        </div>
-                        <h3 class="mt-8 text-lg font-medium text-gray-900 dark:text-white tracking-tight">Healthcare Access</h3>
-                        <p class="mt-5 text-base text-gray-500 dark:text-gray-400">
-                            Find nearby government hospitals and dynamically generate queue numbers for appointments.
-                        </p>
-                    </div>
-                </div>
+            <div class="card feature-card">
+                <div class="feature-icon"><i data-lucide="tractor"></i></div>
+                <h3>Farmer Intelligence</h3>
+                <p>Direct hook into Agmarknet (CEDA). Check daily mandi prices, crop trends, and PM-Kisan subsidy eligibility.</p>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- How It Works -->
+<section class="py-20" style="background: var(--bg-surface);">
+    <div class="container">
+        <div class="section-title">
+            <span>Simple Process</span>
+            <h2>No apps. No passwords. No friction.</h2>
+        </div>
+
+        <div class="steps-container">
+            <div class="steps-line"></div>
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Open the Bot</h3>
+                <p class="text-secondary mt-2">Just send a message on Telegram or WhatsApp. No need to download another government app.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Ask in Your Language</h3>
+                <p class="text-secondary mt-2">Type or send a Voice Note in Hindi, English, Marathi, or Tamil. Our AI understands you.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Get Instant Answers</h3>
+                <p class="text-secondary mt-2">Get accurate, verified data fetched directly from live government APIs.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Authority CTA -->
+<section class="py-12">
+    <div class="container">
+        <div class="auth-cta">
+            <h2 class="mb-4">Are you a Government Authority?</h2>
+            <p class="text-secondary mb-8 max-w-xl mx-auto" style="font-size: 1.1rem; max-width: 600px;">
+                Hospitals, Police Stations, District Collectors, and Panchayats get a dedicated dashboard to view analytics, manage escalations, and handle anonymous reports securely.
+            </p>
+            <div class="flex items-center justify-center gap-4">
+                <a href="/admin/login" class="btn btn-secondary btn-lg">Admin Login</a>
+                <a href="mailto:onboarding@janseva.gov.in" class="btn btn-ghost">Request Organization Setup <i data-lucide="arrow-right" style="width:16px;"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
 {% endblock %}
