@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { DotPattern } from "@/components/ui/dot-pattern";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function CitizenLogin() {
   const router = useRouter();
@@ -37,11 +39,15 @@ export default function CitizenLogin() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-2 text-center">
-          <div className="flex justify-center mb-2">
-            <ShieldAlert className="w-10 h-10 text-primary" />
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 relative overflow-hidden">
+      <DotPattern className="absolute inset-0 opacity-40 dark:opacity-20 text-border pointer-events-none" />
+      <Card className="w-full max-w-md liquid-glass border-border shadow-2xl relative z-10 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[2px] tricolor-glow"></div>
+        <CardHeader className="space-y-2 text-center pt-8">
+          <div className="flex justify-center mb-4">
+            <div className="relative w-16 h-16 rounded-xl bg-foreground flex items-center justify-center shadow-lg overflow-hidden border border-border">
+              <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
+            </div>
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">Welcome to JanSevak</CardTitle>
           <CardDescription>Enter your phone number to sign in or create an account</CardDescription>
@@ -52,7 +58,7 @@ export default function CitizenLogin() {
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <div className="flex">
-                  <div className="flex items-center justify-center rounded-l-md border border-r-0 bg-muted px-3 text-sm text-muted-foreground">
+                  <div className="flex items-center justify-center rounded-l-md border border-r-0 border-border bg-muted/20 px-3 text-sm text-muted-foreground">
                     +91
                   </div>
                   <Input
@@ -96,9 +102,9 @@ export default function CitizenLogin() {
             </form>
           )}
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4 border-t px-6 py-4">
+        <CardFooter className="flex flex-col space-y-4 border-t border-border/50 px-6 py-4 bg-muted/10">
           <div className="text-sm text-center text-muted-foreground">
-            Department Official? <Link href="/dept/login" className="text-primary hover:underline">Sign in here</Link>
+            Department Official? <Link href="/dept/login" className="text-foreground hover:underline font-medium">Sign in here</Link>
           </div>
         </CardFooter>
       </Card>

@@ -21,7 +21,7 @@ interface HeaderProps {
 
 export function Header({ role = "citizen" }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center gap-4 border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-30 flex h-16 w-full shrink-0 items-center gap-4 border-b border-border liquid-glass px-4 md:px-6">
       {/* Mobile Sidebar Trigger */}
       <Sheet>
         <SheetTrigger className={buttonVariants({ variant: "outline", size: "icon" }) + " md:hidden"}>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -49,14 +50,16 @@ export function Sidebar({ className, role = "citizen" }: SidebarProps) {
   const routes = role === "admin" ? adminRoutes : role === "department" ? departmentRoutes : citizenRoutes;
 
   return (
-    <div className={cn("pb-12 border-r bg-card h-screen flex flex-col", className)}>
+    <div className={cn("pb-12 border-r border-border liquid-glass h-screen flex flex-col", className)}>
       <div className="space-y-4 py-4 flex-1">
         <div className="px-3 py-2">
-          <div className="flex items-center mb-2 px-4">
-            <ShieldAlert className="w-6 h-6 mr-2 text-primary" />
+          <div className="flex items-center mb-2 px-4 mt-2">
+            <div className="relative w-8 h-8 rounded-lg bg-foreground flex items-center justify-center shadow-lg mr-3 overflow-hidden border border-border">
+              <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
+            </div>
             <h2 className="text-xl font-bold tracking-tight">JanSevak</h2>
           </div>
-          <p className="px-4 text-xs text-muted-foreground mb-4">
+          <p className="px-4 text-xs text-muted-foreground mb-6">
             {role === "citizen" ? "Citizen Portal" : role === "department" ? "Department Portal" : "Admin Portal"}
           </p>
           <div className="space-y-1">
@@ -66,9 +69,10 @@ export function Sidebar({ className, role = "citizen" }: SidebarProps) {
                 href={route.path}
                 className={cn(
                   buttonVariants({
-                    variant: pathname === route.path ? "secondary" : "ghost",
+                    variant: pathname === route.path ? "default" : "ghost",
                   }),
-                  "w-full justify-start"
+                  "w-full justify-start",
+                  pathname === route.path && "bg-foreground text-background hover:bg-foreground/90 shadow-md"
                 )}
               >
                 <route.icon className="mr-2 h-4 w-4" />

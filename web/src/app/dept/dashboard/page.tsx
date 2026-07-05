@@ -6,6 +6,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Users, FileText, AlertTriangle, ShieldAlert, BarChart3, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { MinimalProfessionalCard } from "@/components/ui/minimal-professional-card";
 
 export default function DeptDashboard() {
   return (
@@ -147,6 +148,11 @@ export default function DeptDashboard() {
               </CardContent>
             </Card>
           </div>
+        </div>
+        
+        {/* Advanced 3D Analytics Card from 21st.dev */}
+        <div className="w-full mt-6">
+          <MinimalProfessionalCard />
         </div>
       </div>
     </AppLayout>

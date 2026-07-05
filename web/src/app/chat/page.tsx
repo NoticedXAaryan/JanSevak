@@ -5,9 +5,11 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, User, Bot, Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Send, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 type Message = {
   id: string;
@@ -49,7 +51,6 @@ export default function ChatPage() {
 
     try {
       // In a real app, this connects to our FastAPI backend: /api/v1/chat
-      // For demo purposes if backend isn't running, we mock a delay
       const res = await fetch("http://localhost:8000/api/v1/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,7 +61,6 @@ export default function ChatPage() {
         throw new Error("Failed to connect to AI Server");
       }
 
-      // Handle streaming or JSON response
       const data = await res.json();
       
       const assistantMessage: Message = {
@@ -73,7 +73,6 @@ export default function ChatPage() {
     } catch (error) {
       toast.error("Failed to reach AI. Using fallback response.");
       
-      // Fallback for demo when DB/Backend is down
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: (Date.now() + 1).toString(),
@@ -90,82 +89,97 @@ export default function ChatPage() {
 
   return (
     <AppLayout role="citizen">
-      <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto border rounded-xl bg-background shadow-sm overflow-hidden">
+      <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto relative">
+        
         {/* Chat Header */}
-        <div className="flex items-center p-4 border-b bg-card">
-          <Avatar className="h-10 w-10 border mr-3">
-            <AvatarImage src="/janseva-logo.png" />
-            <AvatarFallback className="bg-primary/10 text-primary"><Bot className="w-5 h-5" /></AvatarFallback>
-          </Avatar>
-          <div>
-            <h2 className="font-semibold text-lg leading-tight">JanSevak AI</h2>
-            <p className="text-xs text-muted-foreground flex items-center">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-              Online and ready to assist
-            </p>
+        <div className="flex flex-col items-center justify-center pt-8 pb-6 mb-4">
+          <div className="relative w-16 h-16 rounded-2xl bg-foreground flex items-center justify-center shadow-2xl mb-4 overflow-hidden border border-border">
+            <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-background animate-pulse z-10"></div>
           </div>
+          <h1 className="text-2xl font-bold tracking-tight">JanSevak AI</h1>
+          <p className="text-sm text-muted-foreground">Your personal assistant for government services</p>
         </div>
 
         {/* Messages Area */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4 pb-4">
-            {messages.map((msg) => (
-              <div 
-                key={msg.id} 
-                className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-              >
-                <Avatar className="h-8 w-8 shrink-0">
-                  {msg.role === "assistant" ? (
-                    <AvatarFallback className="bg-primary text-primary-foreground"><Bot className="w-4 h-4" /></AvatarFallback>
-                  ) : (
-                    <AvatarFallback className="bg-muted text-muted-foreground"><User className="w-4 h-4" /></AvatarFallback>
-                  )}
-                </Avatar>
-                
-                <div className={`rounded-lg px-4 py-3 max-w-[80%] ${
-                  msg.role === "user" 
-                    ? "bg-primary text-primary-foreground" 
-                    : "bg-muted"
-                }`}>
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                </div>
-              </div>
-            ))}
+        <ScrollArea className="flex-1 px-4 md:px-8 mb-24">
+          <div className="space-y-6 pb-12 flex flex-col">
+            <AnimatePresence initial={false}>
+              {messages.map((msg) => (
+                <motion.div 
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className={`flex gap-4 max-w-[85%] ${msg.role === "user" ? "self-end flex-row-reverse" : "self-start"}`}
+                >
+                  <Avatar className="h-10 w-10 shrink-0 shadow-md">
+                    {msg.role === "assistant" ? (
+                      <div className="w-full h-full bg-foreground flex items-center justify-center relative overflow-hidden border border-border">
+                        <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
+                      </div>
+                    ) : (
+                      <AvatarFallback className="bg-muted text-muted-foreground"><User className="w-5 h-5" /></AvatarFallback>
+                    )}
+                  </Avatar>
+                  
+                  <div className={`rounded-2xl px-5 py-4 shadow-sm ${
+                    msg.role === "user" 
+                      ? "bg-foreground text-background" 
+                      : "liquid-glass relative overflow-hidden"
+                  }`}>
+                    {msg.role === "assistant" && (
+                      <div className="absolute top-0 left-0 w-full h-[2px] tricolor-glow"></div>
+                    )}
+                    <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
             
             {isLoading && (
-              <div className="flex gap-3">
-                <Avatar className="h-8 w-8 shrink-0">
-                  <AvatarFallback className="bg-primary text-primary-foreground"><Bot className="w-4 h-4" /></AvatarFallback>
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-4 self-start max-w-[85%]"
+              >
+                <Avatar className="h-10 w-10 shrink-0 shadow-md">
+                  <div className="w-full h-full bg-foreground flex items-center justify-center relative overflow-hidden border border-border">
+                    <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
+                  </div>
                 </Avatar>
-                <div className="rounded-lg px-4 py-3 bg-muted flex items-center gap-2">
+                <div className="rounded-2xl px-5 py-4 liquid-glass flex items-center gap-3">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">JanSevak is typing...</span>
+                  <span className="text-sm text-muted-foreground">JanSevak is thinking...</span>
                 </div>
-              </div>
+              </motion.div>
             )}
-            <div ref={scrollRef} />
+            <div ref={scrollRef} className="h-4" />
           </div>
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="p-4 border-t bg-card">
-          <form onSubmit={handleSend} className="flex gap-2">
-            <Input 
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about PM Kisan, Ayushman Bharat, or local certificates..." 
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
-              <Send className="w-4 h-4 mr-2" />
-              Send
-            </Button>
-          </form>
-          <p className="text-center text-[10px] text-muted-foreground mt-2">
+        {/* Floating Input Area */}
+        <div className="absolute bottom-4 left-0 right-0 px-4">
+          <div className="max-w-3xl mx-auto liquid-glass rounded-full p-2 shadow-2xl relative">
+            <div className="absolute -top-px -left-px -right-px h-px tricolor-glow rounded-t-full opacity-50"></div>
+            <form onSubmit={handleSend} className="flex gap-2 items-center">
+              <Input 
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about certificates, schemes, healthcare..." 
+                className="flex-1 border-0 bg-transparent shadow-none focus-visible:ring-0 text-base px-4 h-12"
+                disabled={isLoading}
+              />
+              <Button type="submit" size="icon" className="h-12 w-12 rounded-full shrink-0 shadow-md" disabled={isLoading || !input.trim()}>
+                <Send className="w-5 h-5 ml-1" />
+              </Button>
+            </form>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-3">
             JanSevak AI can make mistakes. Always verify critical information at official portals.
           </p>
         </div>
+        
       </div>
     </AppLayout>
   );
