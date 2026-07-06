@@ -44,6 +44,7 @@ services:
       - "8000"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.janseva-api.rule=Host(`${DOMAIN:-janseva.local}`) && PathPrefix(`/api`)"
       - "traefik.http.services.janseva-api.loadbalancer.server.port=8000"
       - "traefik.http.routers.janseva-api.entrypoints=websecure"
@@ -62,6 +63,7 @@ services:
       - "3000"
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
       - "traefik.http.routers.janseva-web.rule=Host(`${DOMAIN:-janseva.local}`)"
       - "traefik.http.services.janseva-web.loadbalancer.server.port=3000"
       - "traefik.http.routers.janseva-web.entrypoints=websecure"

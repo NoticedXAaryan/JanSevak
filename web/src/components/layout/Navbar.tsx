@@ -2,20 +2,37 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Menu, X, Bot } from "lucide-react";
+import { Search, Menu, X, Bot, User, Globe } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [lang, setLang] = React.useState("EN");
 
   React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(localStorage.getItem("jansevak_isLoggedIn") === "true");
+      setLang(localStorage.getItem("jansevak_lang") || "EN");
+    }
+    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggleLang = () => {
+    const newLang = lang === "EN" ? "HI" : "EN";
+    setLang(newLang);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("jansevak_lang", newLang);
+      window.dispatchEvent(new Event("languageChange"));
+    }
+  };
 
   return (
     <nav className={cn(
@@ -28,10 +45,7 @@ export default function Navbar() {
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="relative w-10 h-10 rounded-xl bg-foreground flex items-center justify-center shadow-lg overflow-hidden border border-border">
-                <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
-              </div>
-              <span className="font-heading font-bold text-xl text-foreground group-hover:text-primary transition-colors">JanSevak</span>
+              <span className="font-heading font-bold text-2xl tracking-tight text-foreground transition-colors">JanSevak</span>
             </Link>
           </div>
           
@@ -53,12 +67,24 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-3">
-            <button className="p-2.5 text-muted-foreground hover:text-foreground rounded-full transition-colors">
+            <button onClick={toggleLang} className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground liquid-glass rounded-full transition-all">
+              <Globe className="w-4 h-4" />
+              {lang}
+            </button>
+            <button className="p-2.5 text-muted-foreground hover:text-foreground rounded-full transition-colors hidden lg:block">
               <Search className="w-5 h-5" />
             </button>
-            <Link href="/login" className="px-5 py-2.5 text-sm font-medium text-foreground transition-all">
-              Log In
-            </Link>
+            {isLoggedIn ? (
+              <Link href="/chat">
+                <Avatar className="h-9 w-9 border-2 border-border cursor-pointer hover:border-foreground transition-colors">
+                  <AvatarFallback className="bg-foreground text-background font-bold">U</AvatarFallback>
+                </Avatar>
+              </Link>
+            ) : (
+              <Link href="/login" className="px-5 py-2.5 text-sm font-medium text-foreground transition-all">
+                Log In
+              </Link>
+            )}
             <Link href="/chat" className="px-5 py-2.5 text-sm font-bold bg-foreground text-background rounded-full hover:bg-foreground/90 transition-all active:scale-95 flex items-center gap-2 group">
               <Bot className="w-4 h-4 group-hover:animate-bounce" />
               Ask AI
@@ -97,9 +123,15 @@ export default function Navbar() {
             </Link>
           ))}
           <div className="pt-4 mt-4 flex flex-col gap-3 border-t border-border">
-            <Link href="/login" className="block px-4 py-3 text-center text-base font-medium text-foreground border border-border rounded-xl hover:bg-accent transition-colors">
-              Log In
-            </Link>
+            <button onClick={toggleLang} className="flex items-center justify-center gap-2 px-4 py-3 text-center text-base font-medium text-foreground border border-border rounded-xl hover:bg-accent transition-colors">
+              <Globe className="w-5 h-5" />
+              Language: {lang === "EN" ? "English" : "हिंदी"}
+            </button>
+            {!isLoggedIn && (
+              <Link href="/login" className="block px-4 py-3 text-center text-base font-medium text-foreground border border-border rounded-xl hover:bg-accent transition-colors">
+                Log In
+              </Link>
+            )}
             <Link href="/chat" className="flex items-center justify-center gap-2 px-4 py-3 text-center text-base font-bold bg-foreground text-background rounded-xl">
               <Bot className="w-5 h-5" />
               Ask AI

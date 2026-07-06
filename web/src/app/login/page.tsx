@@ -35,7 +35,8 @@ export default function CitizenLogin() {
       return;
     }
     toast.success("Logged in successfully!");
-    router.push("/");
+    localStorage.setItem("jansevak_isLoggedIn", "true");
+    router.push("/chat");
   };
 
   return (
@@ -45,9 +46,7 @@ export default function CitizenLogin() {
         <div className="absolute top-0 left-0 w-full h-[2px] tricolor-glow"></div>
         <CardHeader className="space-y-2 text-center pt-8">
           <div className="flex justify-center mb-4">
-            <div className="relative w-16 h-16 rounded-xl bg-foreground flex items-center justify-center shadow-lg overflow-hidden border border-border">
-              <Image src="/jansevak-logo.png" alt="JanSevak Logo" fill className="object-cover" />
-            </div>
+            <h2 className="text-3xl font-bold tracking-tight">JanSevak</h2>
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">Welcome to JanSevak</CardTitle>
           <CardDescription>Enter your phone number to sign in or create an account</CardDescription>

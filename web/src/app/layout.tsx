@@ -30,7 +30,8 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", inter.variable, outfit.variable, "font-sans", geist.variable)}
     >
-      <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
+      <body className="min-h-full flex flex-col font-sans bg-background text-foreground relative">
+        <div className="fixed top-0 left-0 right-0 h-1 z-[9999] bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"></div>
         {children}
       </body>
     </html>
