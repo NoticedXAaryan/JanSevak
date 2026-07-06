@@ -7,6 +7,14 @@ import uuid
 from janseva.db.engine import async_session_factory
 from janseva.db.models.user import User
 from janseva.db.models.department_user import DepartmentUser
+from janseva.common.cache import query_cache
+from janseva.notifications.engine import send_notification
+from janseva.config import settings
+from aiogram import Bot
+
+# Initialize bot lazily
+def get_bot():
+    return Bot(token=settings.telegram_bot_token)
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -18,9 +26,12 @@ class CitizenRegisterRequest(BaseModel):
     state: str | None = None
     district: str | None = None
 
+class OTPRequest(BaseModel):
+    phone_number: str
+
 class CitizenLoginRequest(BaseModel):
     phone_number: str
-    otp: str  # For demo purposes, any 4 digit OTP works
+    otp: str
 
 class DeptRegisterRequest(BaseModel):
     department_id: uuid.UUID
@@ -56,15 +67,54 @@ async def register_citizen(req: CitizenRegisterRequest):
         await session.commit()
         return {"status": "success", "user_id": str(user.id)}
 
+@router.post("/otp/request")
+async def request_otp(req: OTPRequest):
+    """Generate OTP and send via Telegram to a registered user."""
+    async with async_session_factory() as session:
+        result = await session.execute(select(User).where(User.phone_number == req.phone_number))
+        user = result.scalar_one_or_none()
+        if not user or not user.telegram_id:
+            raise HTTPException(status_code=404, detail="Phone number not registered with JanSevak Telegram Bot")
+            
+        import random
+        # Generate 4 digit OTP
+        otp = str(random.randint(1000, 9999))
+        
+        # Save OTP in cache with 5 minute TTL (300 seconds)
+        await query_cache.set_raw(f"otp:{req.phone_number}", otp, ttl=300)
+        
+        # Send OTP via Telegram
+        bot = get_bot()
+        message = f"🔐 Your JanSevak login OTP is: <b>{otp}</b>\n\nDo not share this with anyone."
+        success = await send_notification(user.telegram_id, message, bot)
+        await bot.session.close()
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to send OTP via Telegram")
+            
+        return {"status": "success", "message": "OTP sent successfully via Telegram"}
+
 @router.post("/login")
 async def login_citizen(req: CitizenLoginRequest):
     """Login a citizen with phone + OTP."""
-    # In a real app, verify OTP here. For hackathon, accept anything.
     async with async_session_factory() as session:
         result = await session.execute(select(User).where(User.phone_number == req.phone_number))
         user = result.scalar_one_or_none()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
+            
+        # Verify OTP
+        cached_otp = await query_cache.get_raw(f"otp:{req.phone_number}")
+        
+        if not cached_otp:
+            raise HTTPException(status_code=400, detail="OTP expired or not found. Please request a new one.")
+            
+        if cached_otp != req.otp:
+            raise HTTPException(status_code=401, detail="Invalid OTP")
+            
+        # Delete OTP after successful use to prevent reuse
+        if f"otp:{req.phone_number}" in query_cache._cache:
+            del query_cache._cache[f"otp:{req.phone_number}"]
             
         # Return a mock JWT token
         return {"access_token": f"mock_token_{user.id}", "token_type": "bearer"}

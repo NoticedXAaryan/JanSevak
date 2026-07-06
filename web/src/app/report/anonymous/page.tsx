@@ -15,18 +15,49 @@ export default function AnonymousReport() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate encryption and API call
-    setTimeout(() => {
-      toast.success("Sealed Report submitted securely. Tracking Token: K7M2-P9X4-R1N6", {
-        duration: 8000,
+    try {
+      // In a real application, encryption happens here before sending
+      const form = e.target as HTMLFormElement;
+      const target = (form.elements.namedItem('target') as HTMLInputElement).value;
+      const desc = (form.elements.namedItem('desc') as HTMLTextAreaElement).value;
+      const isSealed = (form.elements.namedItem('seal') as HTMLInputElement).checked;
+
+      // Mock encryption for demo
+      const payload = {
+        category: target,
+        content_encrypted: btoa(desc), // simple base64 mock
+        identity_envelope_encrypted: isSealed ? btoa("user-identity-data") : "anonymous",
+      };
+
+      const res = await fetch("http://localhost:8000/api/v1/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to submit report");
+      }
+      
+      toast.success(`Sealed Report submitted securely. Tracking Token: ${data.report_token}`, {
+        duration: 10000,
+      });
+      
+      // Delay redirect to let user copy the token
+      setTimeout(() => {
+        router.push("/");
+      }, 5000);
+      
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
       setIsSubmitting(false);
-      router.push("/");
-    }, 2000);
+    }
   };
 
   return (
@@ -58,13 +89,14 @@ export default function AnonymousReport() {
 
               <div className="space-y-2">
                 <Label htmlFor="target">Department / Official Being Reported</Label>
-                <Input id="target" placeholder="e.g. Revenue Dept, Lucknow" required />
+                <Input id="target" name="target" placeholder="e.g. Revenue Dept, Lucknow" required />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="desc">Incident Description</Label>
                 <Textarea 
                   id="desc" 
+                  name="desc"
                   placeholder="Provide specific details, dates, and amounts if applicable..." 
                   className="min-h-[150px]"
                   required

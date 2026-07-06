@@ -28,5 +28,20 @@ class AsyncTTLCache:
             'expires_at': time.time() + self.ttl
         }
 
+    async def get_raw(self, key: str) -> Optional[str]:
+        if key in self._cache:
+            entry = self._cache[key]
+            if time.time() < entry['expires_at']:
+                return entry['response']
+            else:
+                del self._cache[key]
+        return None
+        
+    async def set_raw(self, key: str, response: str, ttl: Optional[int] = None):
+        self._cache[key] = {
+            'response': response,
+            'expires_at': time.time() + (ttl if ttl is not None else self.ttl)
+        }
+
 # Global instance for the app
 query_cache = AsyncTTLCache(ttl_seconds=3600)

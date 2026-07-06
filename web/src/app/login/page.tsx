@@ -18,25 +18,66 @@ export default function CitizenLogin() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length < 10) {
       toast.error("Please enter a valid 10-digit phone number");
       return;
     }
-    toast.success("OTP sent successfully to " + phone);
-    setOtpSent(true);
+    
+    setIsLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/v1/auth/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phone })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Failed to send OTP");
+      }
+      
+      toast.success(data.message || `OTP sent successfully to ${phone} via Telegram`);
+      setOtpSent(true);
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 4) {
       toast.error("Please enter a valid OTP");
       return;
     }
-    toast.success("Logged in successfully!");
-    localStorage.setItem("jansevak_isLoggedIn", "true");
-    router.push("/chat");
+    
+    setIsLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone_number: phone, otp })
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "Invalid OTP");
+      }
+      
+      toast.success("Logged in successfully!");
+      localStorage.setItem("jansevak_isLoggedIn", "true");
+      // Store token if needed: localStorage.setItem("token", data.access_token);
+      router.push("/chat");
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,8 +112,8 @@ export default function CitizenLogin() {
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full">
-                Send OTP
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send OTP"}
               </Button>
             </form>
           ) : (
@@ -89,13 +130,13 @@ export default function CitizenLogin() {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  Hint: You can enter any 4 digits for this demo.
+                  Hint: Check the JanSevak Telegram bot for your OTP.
                 </p>
               </div>
-              <Button type="submit" className="w-full">
-                Verify & Sign In
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Verifying..." : "Verify & Sign In"}
               </Button>
-              <Button variant="ghost" className="w-full" onClick={() => setOtpSent(false)}>
+              <Button variant="ghost" className="w-full" onClick={() => setOtpSent(false)} disabled={isLoading}>
                 Use a different number
               </Button>
             </form>
