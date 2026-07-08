@@ -86,9 +86,9 @@ export default function SchemeDetailsPage({ params }: { params: Promise<{ slug: 
                   <p className="text-sm text-muted-foreground mb-1">Financial Benefit</p>
                   <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{scheme.amount}</p>
                 </div>
-                <Button size="lg" className="w-full text-base font-semibold rounded-xl" asChild>
-                  <Link href="/chat">Check Eligibility via AI</Link>
-                </Button>
+                <Link href="/chat" className="inline-flex items-center justify-center h-9 px-4 py-2 w-full text-base font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 transition-colors">
+                  Check Eligibility via AI
+                </Link>
                 <Button variant="outline" className="w-full rounded-xl">
                   <Share2 className="w-4 h-4 mr-2" /> Share Scheme
                 </Button>
@@ -150,9 +150,9 @@ function GenericSchemeTemplate({ id }: { id: string }) {
       <div className="max-w-5xl mx-auto py-12 px-4 text-center">
         <h1 className="text-3xl font-bold mb-4">Scheme Details: {id}</h1>
         <p className="text-muted-foreground mb-8">This is a dynamic placeholder for government schemes.</p>
-        <Button asChild>
-          <Link href="/schemes">Back to Schemes</Link>
-        </Button>
+        <Link href="/schemes" className="inline-flex items-center justify-center h-9 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/80 rounded-md font-medium text-sm transition-colors">
+          Back to Schemes
+        </Link>
       </div>
     </AppLayout>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import { FlickeringFooter } from "@/components/ui/flickering-footer";
 
 export default function PublicLayout({
   children,
@@ -13,7 +13,7 @@ export default function PublicLayout({
       <main className="flex-1 relative z-10 flex flex-col">
         {children}
       </main>
-      <Footer />
+      <FlickeringFooter />
     </div>
   );
 }

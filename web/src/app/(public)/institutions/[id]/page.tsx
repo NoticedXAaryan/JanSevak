@@ -57,9 +57,9 @@ export default function InstitutionDetailsPage({ params }: { params: Promise<{ i
               <div className="flex flex-wrap gap-3 relative z-10">
                 <Button className="rounded-xl"><MapPin className="w-4 h-4 mr-2"/> Get Directions</Button>
                 <Button variant="outline" className="rounded-xl"><Phone className="w-4 h-4 mr-2"/> Call Now</Button>
-                <Button variant="secondary" className="rounded-xl asChild">
-                  <Link href={`/complaints/new?inst=${resolvedParams.id}`}><ShieldAlert className="w-4 h-4 mr-2 text-amber-500"/> Report Issue</Link>
-                </Button>
+                <Link href={`/complaints/new?inst=${resolvedParams.id}`} className="inline-flex items-center justify-center h-9 px-4 py-2 rounded-xl bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors">
+                  <ShieldAlert className="w-4 h-4 mr-2 text-amber-500"/> Report Issue
+                </Link>
               </div>
             </div>
 
