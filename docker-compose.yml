@@ -56,6 +56,8 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://${DOMAIN:-janseva.local}/api
     container_name: janseva-web
     environment:
       NEXT_PUBLIC_API_URL: https://${DOMAIN:-janseva.local}/api
