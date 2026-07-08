@@ -1,9 +1,13 @@
 """Authentication API for JanSevak v2."""
 
 import uuid
+from datetime import UTC, datetime, timedelta
 
 from aiogram import Bot
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 
@@ -13,6 +17,9 @@ from janseva.db.engine import async_session_factory
 from janseva.db.models.department_user import DepartmentUser
 from janseva.db.models.user import User
 from janseva.notifications.engine import send_notification
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/dept/login")
 
 
 # Initialize bot lazily
@@ -133,15 +140,19 @@ async def login_citizen(req: CitizenLoginRequest):
         if f"otp:{req.phone_number}" in query_cache._cache:
             del query_cache._cache[f"otp:{req.phone_number}"]
 
-        # Return a mock JWT token
-        return {"access_token": f"mock_token_{user.id}", "token_type": "bearer"}
+        # Generate proper JWT token
+        expire = datetime.now(UTC) + timedelta(minutes=1440)  # 24 hours
+        to_encode = {"sub": str(user.id), "type": "citizen", "exp": expire}
+        encoded_jwt = jwt.encode(to_encode, settings.admin_jwt_secret, algorithm="HS256")
+
+        return {"access_token": encoded_jwt, "token_type": "bearer"}
 
 
 @router.post("/dept/register")
 async def register_dept_user(req: DeptRegisterRequest):
     """Register a new department user."""
-    # Hash password in real app
-    password_hash = f"hashed_{req.password}"
+    # Hash password securely
+    password_hash = pwd_context.hash(req.password)
 
     async with async_session_factory() as session:
         result = await session.execute(
@@ -172,15 +183,35 @@ async def login_dept_user(req: DeptLoginRequest):
         )
         user = result.scalar_one_or_none()
 
-        # Simple mock password check
-        if not user or user.password_hash != f"hashed_{req.password}":
+        # Secure password check
+        if not user or not pwd_context.verify(req.password, user.password_hash):
             raise HTTPException(status_code=401, detail="Invalid credentials")
 
-        return {"access_token": f"mock_dept_token_{user.id}", "token_type": "bearer"}
+        # Generate proper JWT token
+        expire = datetime.now(UTC) + timedelta(minutes=1440)  # 24 hours
+        to_encode = {"sub": str(user.id), "type": "dept", "exp": expire}
+        encoded_jwt = jwt.encode(to_encode, settings.admin_jwt_secret, algorithm="HS256")
+
+        return {"access_token": encoded_jwt, "token_type": "bearer"}
 
 
 @router.get("/me")
-async def get_current_user():
-    """Get current logged in user (mock)."""
-    # Requires proper JWT dependency injection
-    return {"status": "not_implemented"}
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    """Get current logged in user."""
+    try:
+        payload = jwt.decode(token, settings.admin_jwt_secret, algorithms=["HS256"])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    async with async_session_factory() as session:
+        result = await session.execute(
+            select(DepartmentUser).where(DepartmentUser.id == user_id)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+
+    return {"status": "success", "user": {"id": str(user.id), "email": user.email, "full_name": user.full_name}}

@@ -12,6 +12,8 @@ def get_fernet() -> Fernet:
     """Get the Fernet encryption instance."""
     key = settings.report_encryption_key
     if key == "change-me":
+        if settings.env == "production":
+            raise ValueError("REPORT_ENCRYPTION_KEY must be set in production to prevent data loss.")
         # Generate a key for development — in production, set a real key
         key = Fernet.generate_key().decode()
     return Fernet(key.encode() if isinstance(key, str) else key)

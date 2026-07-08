@@ -7,9 +7,9 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from sqlalchemy import select
 
+from janseva.bot.helpers.constants import INDIA_DISTRICTS
 from janseva.db.engine import async_session_factory
 from janseva.db.models.user import User
-from janseva.bot.helpers.constants import INDIA_DISTRICTS
 
 logger = structlog.get_logger()
 

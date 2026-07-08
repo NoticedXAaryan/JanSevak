@@ -42,12 +42,18 @@ Telegram / WhatsApp → Channel Normalizer → LangGraph AI Agents → Response
 
 ## Design Philosophy & Compliance
 
-JanSeva is designed to strictly adhere to Indian government cybersecurity and accessibility guidelines. While some developers might consider Server-Side Rendering (Jinja2), vanilla CSS, and HTMX as "outdated" compared to heavy Single Page Application (SPA) frameworks like React or Next.js, this architecture is an intentional, compliance-driven choice:
+JanSeva uses a split frontend architecture to meet the specific needs of citizens vs government officials:
 
-1. **Zero Third-Party Phone-Homes (Air-Gapped Ready):** Government platforms must often operate on isolated internal networks (VPNs/Intranets). We do not rely on external CDNs (all assets like HTMX and fonts are bundled locally) nor do we use frameworks that silently inject telemetry.
-2. **Maximum Accessibility (a11y) & Low Bandwidth:** Rural citizens and local officials often operate on older devices with 2G/3G connections. SSR HTML guarantees that the initial payload is extremely small and renders immediately without requiring massive JavaScript bundles to parse.
-3. **Progressive Interactivity (HTMX):** We achieve the smooth, reactive feel of a modern web application using HTMX. This gives us SPA-like capabilities (dynamic updates, modals) without the complexity of a massive frontend build pipeline or Node.js runtime on the server.
-4. **Decade-Long Maintainability:** "Boring" and proven technologies like HTML, CSS, and Jinja2 are highly stable. Future government contractors can easily maintain this codebase 10 years from now without wrestling with deprecated NPM packages or broken Webpack configurations.
+### 1. Public Facing Landing Page (Next.js)
+The public marketing site (`web/`) is built in Next.js to provide a highly interactive, modern, and trustworthy first impression for citizens discovering the project. It showcases live stats and the platform's capabilities visually.
+
+### 2. Internal Admin Dashboard (Jinja2 + HTMX)
+The actual operational dashboard (`src/janseva/admin/`) strictly adheres to Indian government cybersecurity and accessibility guidelines for internal tools. This air-gapped ready architecture is an intentional, compliance-driven choice:
+
+- **Zero Third-Party Phone-Homes:** Government platforms operate on isolated internal networks. We do not rely on external CDNs (all assets like HTMX and fonts are bundled locally).
+- **Maximum Accessibility & Low Bandwidth:** Rural officials often operate on older devices with 2G/3G connections. SSR HTML guarantees an extremely small initial payload.
+- **Progressive Interactivity:** HTMX provides SPA-like capabilities (dynamic updates, modals) without the complexity of a Node.js runtime on the protected internal server.
+- **Decade-Long Maintainability:** "Boring" and proven technologies like HTML, CSS, and Jinja2 are highly stable. Future government contractors can easily maintain this codebase 10 years from now.
 
 ## Quick Start
 

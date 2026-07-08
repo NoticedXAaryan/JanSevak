@@ -20,6 +20,7 @@ def get_model():
 
 import asyncio
 
+
 async def transcribe(audio_path: str) -> dict:
     """
     Transcribe audio file to text.
@@ -29,14 +30,14 @@ async def transcribe(audio_path: str) -> dict:
         dict with keys: text, language, segments
     """
     model = get_model()
-    
+
     # Run heavy whisper processing in a thread pool
     # faster-whisper returns an iterator of segments and an info object
     def _run_transcription():
         segments, info = model.transcribe(audio_path, beam_size=5)
         text = "".join([segment.text for segment in segments])
         return {"text": text, "language": info.language, "segments": segments}
-        
+
     result = await asyncio.to_thread(_run_transcription)
 
     logger.info(

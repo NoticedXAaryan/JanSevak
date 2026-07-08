@@ -10,10 +10,10 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from sqlalchemy import select, update
 
-from janseva.db.engine import async_session_factory
-from janseva.db.models.user import User
-from janseva.db.models.conversation import Conversation
 from janseva.bot.helpers.constants import LANGUAGES
+from janseva.db.engine import async_session_factory
+from janseva.db.models.conversation import Conversation
+from janseva.db.models.user import User
 
 logger = structlog.get_logger()
 

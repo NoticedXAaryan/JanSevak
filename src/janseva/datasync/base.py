@@ -20,7 +20,7 @@ class DataSource(ABC):
     @abstractmethod
     async def fetch_latest(self) -> list[dict[str, Any]]:
         """Fetch the latest data from the source."""
-        pass
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
     async def sync_to_db(self, session: AsyncSession, data: list[dict[str, Any]]) -> int:
@@ -28,7 +28,7 @@ class DataSource(ABC):
         Upsert fetched data into our database.
         Returns the number of records synced.
         """
-        pass
+        raise NotImplementedError("Subclasses must implement this method.")
 
     async def run_sync(self):
         """Full sync cycle with database logging."""

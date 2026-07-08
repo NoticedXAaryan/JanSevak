@@ -43,7 +43,7 @@ def get_embeddings() -> Any:
 
     if provider == "huggingface":
         from langchain_community.embeddings import HuggingFaceEmbeddings
-        
+
         return HuggingFaceEmbeddings(
             model_name=settings.embedding_model or "sentence-transformers/all-MiniLM-L6-v2"
         )
