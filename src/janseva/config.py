@@ -31,14 +31,14 @@ class Settings(BaseSettings):
     openrouter_api_key: str = Field("", description="OpenRouter API key")
     groq_api_key: str = Field("", description="Groq API key")
     llm_provider: str = Field(
-        "gemini",
+        "openrouter",
         description="LLM provider: 'gemini', 'ollama', or 'openrouter'",
     )
-    llm_model: str = Field("gemini-2.0-flash", description="LLM model name")
+    llm_model: str = Field("openrouter/free", description="LLM model name")
     ollama_base_url: str = Field("http://localhost:11434")
     embedding_provider: str = Field(
-        "gemini",
-        description="Embedding provider: 'gemini' or 'ollama'. OpenRouter is chat-only here.",
+        "huggingface",
+        description="Embedding provider: 'gemini', 'huggingface' or 'ollama'. OpenRouter is chat-only here.",
     )
     embedding_model: str = Field(
         "",

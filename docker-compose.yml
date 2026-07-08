@@ -19,10 +19,10 @@ services:
       GROQ_API_KEY: ${GROQ_API_KEY:-}
       
       # --- Provider Config ---
-      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
-      LLM_MODEL: ${LLM_MODEL:-gemini-2.0-flash}
-      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-gemini}
-      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-models/embedding-001}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      LLM_MODEL: ${LLM_MODEL:-openrouter/free}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-huggingface}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-sentence-transformers/all-MiniLM-L6-v2}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://localhost:11434}
       
       # --- Security & Settings ---
@@ -45,7 +45,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
-      - "traefik.http.routers.janseva-api.rule=Host(`${DOMAIN:-janseva.local}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.janseva-api.rule=Host(`${DOMAIN:-janseva.local}`) && (PathPrefix(`/api`) || PathPrefix(`/admin`) || PathPrefix(`/health`))"
       - "traefik.http.services.janseva-api.loadbalancer.server.port=8000"
       - "traefik.http.routers.janseva-api.entrypoints=websecure"
       - "traefik.http.routers.janseva-api.tls.certresolver=letsencrypt"
