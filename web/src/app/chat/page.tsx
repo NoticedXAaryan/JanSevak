@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Send, User, Loader2, Mic, MicOff } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type Message = {
   id: string;
@@ -154,7 +155,10 @@ function ChatInterface() {
     <div className="flex flex-col h-[calc(100vh-8rem)] max-w-4xl mx-auto relative">
       
       {/* Chat Header */}
-      <div className="flex flex-col items-center justify-center pt-8 pb-6 mb-4">
+      <div className="flex flex-col items-center justify-center pt-8 pb-6 mb-4 relative">
+        <div className="absolute top-8 right-4 md:right-0">
+          <ThemeToggle />
+        </div>
         <h1 className="text-3xl font-bold tracking-tight mb-2">JanSevak AI</h1>
         <p className="text-sm text-muted-foreground">Your personal assistant for government services</p>
       </div>
