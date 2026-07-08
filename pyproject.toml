@@ -36,7 +36,7 @@ dependencies = [
     "python-jose[cryptography]>=3.3,<4",   # JWT for admin auth
     "passlib[bcrypt]>=1.7,<2",             # Password hashing
     # --- Utilities ---
-    "pydantic>=2.9,<3",
+    "pydantic[email]>=2.9,<3",
     "pydantic-settings>=2.6,<3",
     "structlog>=24,<26",
     "httpx>=0.27,<1",
