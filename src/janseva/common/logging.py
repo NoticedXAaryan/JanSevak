@@ -1,5 +1,7 @@
 """Structured logging configuration using structlog."""
+
 import logging
+
 import structlog
 
 from janseva.config import settings

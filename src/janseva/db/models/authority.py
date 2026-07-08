@@ -3,8 +3,10 @@ Authority hierarchy model.
 Represents the chain of command in government bodies.
 Used to route anonymous reports to the correct superior.
 """
+
 import uuid
-from sqlalchemy import ForeignKey, Integer, String, Text
+
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

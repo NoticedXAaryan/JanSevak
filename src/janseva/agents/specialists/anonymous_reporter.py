@@ -10,16 +10,17 @@ This is a multi-step conversational flow:
 
 The entire flow happens WITHOUT storing the user's Telegram ID in the report.
 """
+
 import structlog
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from janseva.agents.llm import get_llm
 from janseva.db.engine import async_session_factory
 from janseva.db.models.anonymous_report import AnonymousReport
 from janseva.reporting.anonymizer import strip_metadata
 from janseva.reporting.encryption import encrypt_content
-from janseva.reporting.tokens import generate_report_token
 from janseva.reporting.router import determine_routing
+from janseva.reporting.tokens import generate_report_token
 
 logger = structlog.get_logger()
 
@@ -40,7 +41,7 @@ User's language: {user_language}"""
 async def handle_anonymous_report(state: dict) -> dict:
     """
     Process an anonymous report submission.
-    
+
     This function is called when the orchestrator detects report intent.
     It processes the user's complaint, anonymizes it, encrypts it,
     routes it to the correct authority, and returns the anonymous token.
@@ -48,13 +49,16 @@ async def handle_anonymous_report(state: dict) -> dict:
     llm = get_llm()
     user_language = state.get("user_language", "hi")
     latest_message = state["messages"][-1].content if state["messages"] else ""
-    
+
     # Step 1: Use LLM to structure the complaint
-    system_msg = SystemMessage(content=REPORT_SYSTEM_PROMPT.format(
-        user_language=user_language,
-    ))
-    
-    structuring_prompt = HumanMessage(content=f"""
+    system_msg = SystemMessage(
+        content=REPORT_SYSTEM_PROMPT.format(
+            user_language=user_language,
+        )
+    )
+
+    structuring_prompt = HumanMessage(
+        content=f"""
 The user wants to submit an anonymous report. Their message is:
 "{latest_message}"
 
@@ -63,21 +67,22 @@ Please:
 2. Summarize what they reported in a clear, structured format
 3. Explain that their identity is fully protected
 4. Provide their anonymous tracking token (will be inserted below)
-""")
-    
+"""
+    )
+
     # Step 2: Anonymize the content
     anonymized_text = strip_metadata(latest_message)
-    
+
     # Step 3: Determine routing
     routing = await determine_routing(
         report_text=anonymized_text,
         district=state.get("user_district"),
     )
-    
+
     # Step 4: Encrypt and store
     encrypted_content = encrypt_content(anonymized_text)
     report_token = generate_report_token()
-    
+
     async with async_session_factory() as session:
         report = AnonymousReport(
             report_token=report_token,
@@ -93,7 +98,7 @@ Please:
         )
         session.add(report)
         await session.commit()
-        
+
         logger.info(
             "anonymous_report_submitted",
             report_token=report_token,
@@ -102,7 +107,7 @@ Please:
             routed_to_level=routing["routed_to_level"],
             # NOTE: No user identifiers logged here
         )
-    
+
     # Step 5: Build response
     level_names = {
         1: "ग्राम स्तर / Village level",
@@ -112,7 +117,7 @@ Please:
         5: "राज्य स्तर / State level",
     }
     routed_level_name = level_names.get(routing["routed_to_level"], "District level")
-    
+
     response = (
         f"🛡️ <b>गुमनाम शिकायत सफलतापूर्वक दर्ज!</b>\n"
         f"<b>Anonymous Report Submitted Successfully!</b>\n\n"
@@ -129,5 +134,5 @@ Please:
         f"कोई भी आपकी शिकायत को आपसे नहीं जोड़ सकता।\n\n"
         f"📌 स्थिति जानने के लिए भेजें: <code>/status {report_token}</code>"
     )
-    
+
     return {"response": response}

@@ -1,11 +1,8 @@
-import time
 from datetime import datetime, timedelta
-from typing import Optional
 
-from fastapi import Request, Depends, HTTPException, status
+from fastapi import HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from janseva.config import settings
 
@@ -40,24 +37,26 @@ async def get_current_admin(request: Request) -> dict:
     if not token:
         # Fallback to header if needed
         token = await oauth2_scheme(request)
-        
+
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     try:
         payload = jwt.decode(token, settings.admin_jwt_secret, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if not email:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-            
+
         return {
             "email": email,
-            "role": payload.get("role", "super_admin" if email == settings.admin_username else "org_viewer"),
-            "org_id": payload.get("org_id")
+            "role": payload.get(
+                "role", "super_admin" if email == settings.admin_username else "org_viewer"
+            ),
+            "org_id": payload.get("org_id"),
         }
     except JWTError:
         raise HTTPException(
@@ -66,7 +65,8 @@ async def get_current_admin(request: Request) -> dict:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-def get_current_admin_optional(request: Request) -> Optional[dict]:
+
+def get_current_admin_optional(request: Request) -> dict | None:
     """Optional auth check, doesn't raise exception if not logged in."""
     token = request.cookies.get("admin_token")
     if not token:
@@ -77,8 +77,10 @@ def get_current_admin_optional(request: Request) -> Optional[dict]:
         if email:
             return {
                 "email": email,
-                "role": payload.get("role", "super_admin" if email == settings.admin_username else "org_viewer"),
-                "org_id": payload.get("org_id")
+                "role": payload.get(
+                    "role", "super_admin" if email == settings.admin_username else "org_viewer"
+                ),
+                "org_id": payload.get("org_id"),
             }
     except JWTError:
         pass

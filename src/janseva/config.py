@@ -2,6 +2,7 @@
 Central configuration module.
 Reads all settings from environment variables (.env file).
 """
+
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -53,12 +54,16 @@ class Settings(BaseSettings):
     admin_password: str = Field("change-me")
     google_client_id: str = Field("", description="Google OAuth Client ID")
     google_client_secret: str = Field("", description="Google OAuth Client Secret")
-    google_redirect_uri: str = Field("http://localhost:8000/admin/auth/google/callback", description="Google OAuth Redirect URI")
+    google_redirect_uri: str = Field(
+        "http://localhost:8000/admin/auth/google/callback", description="Google OAuth Redirect URI"
+    )
 
     # --- Twilio (WhatsApp) Settings ---
     twilio_account_sid: str = Field("", description="Twilio Account SID")
     twilio_auth_token: str = Field("", description="Twilio Auth Token")
-    twilio_whatsapp_number: str = Field("", description="Twilio WhatsApp number (e.g., whatsapp:+1234567890)")
+    twilio_whatsapp_number: str = Field(
+        "", description="Twilio WhatsApp number (e.g., whatsapp:+1234567890)"
+    )
 
     # --- App ---
     env: str = Field("development")

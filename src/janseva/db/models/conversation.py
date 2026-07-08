@@ -1,7 +1,8 @@
 """Conversation model — a session between a user and the AI agent."""
+
 import uuid
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -14,9 +15,7 @@ class Conversation(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
-    agent_type: Mapped[str] = mapped_column(
-        String(50), default="orchestrator", nullable=False
-    )
+    agent_type: Mapped[str] = mapped_column(String(50), default="orchestrator", nullable=False)
     state: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     status: Mapped[str] = mapped_column(
         String(20), default="active", nullable=False

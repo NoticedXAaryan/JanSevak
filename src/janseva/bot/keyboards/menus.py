@@ -1,11 +1,12 @@
 """
 Reusable inline and reply keyboards for the bot.
 """
+
 from aiogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    ReplyKeyboardMarkup,
     KeyboardButton,
+    ReplyKeyboardMarkup,
 )
 
 
@@ -55,7 +56,9 @@ def confirm_report_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="✅ हाँ, भेजें / Yes, submit", callback_data="report:confirm"),
+                InlineKeyboardButton(
+                    text="✅ हाँ, भेजें / Yes, submit", callback_data="report:confirm"
+                ),
                 InlineKeyboardButton(text="❌ रद्द करें / Cancel", callback_data="report:cancel"),
             ],
         ]

@@ -1,7 +1,8 @@
 """Simple in-memory TTL Cache to avoid external dependencies like Redis."""
-import time
+
 import hashlib
-from typing import Optional
+import time
+
 
 class AsyncTTLCache:
     def __init__(self, ttl_seconds: int = 3600):
@@ -11,37 +12,35 @@ class AsyncTTLCache:
     def _hash_query(self, query: str) -> str:
         return hashlib.sha256(query.strip().lower().encode()).hexdigest()
 
-    async def get(self, query: str) -> Optional[str]:
+    async def get(self, query: str) -> str | None:
         key = self._hash_query(query)
         if key in self._cache:
             entry = self._cache[key]
-            if time.time() < entry['expires_at']:
-                return entry['response']
+            if time.time() < entry["expires_at"]:
+                return entry["response"]
             else:
                 del self._cache[key]
         return None
 
     async def set(self, query: str, response: str):
         key = self._hash_query(query)
-        self._cache[key] = {
-            'response': response,
-            'expires_at': time.time() + self.ttl
-        }
+        self._cache[key] = {"response": response, "expires_at": time.time() + self.ttl}
 
-    async def get_raw(self, key: str) -> Optional[str]:
+    async def get_raw(self, key: str) -> str | None:
         if key in self._cache:
             entry = self._cache[key]
-            if time.time() < entry['expires_at']:
-                return entry['response']
+            if time.time() < entry["expires_at"]:
+                return entry["response"]
             else:
                 del self._cache[key]
         return None
-        
-    async def set_raw(self, key: str, response: str, ttl: Optional[int] = None):
+
+    async def set_raw(self, key: str, response: str, ttl: int | None = None):
         self._cache[key] = {
-            'response': response,
-            'expires_at': time.time() + (ttl if ttl is not None else self.ttl)
+            "response": response,
+            "expires_at": time.time() + (ttl if ttl is not None else self.ttl),
         }
+
 
 # Global instance for the app
 query_cache = AsyncTTLCache(ttl_seconds=3600)

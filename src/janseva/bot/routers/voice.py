@@ -2,15 +2,17 @@
 Handles voice messages.
 Uses STT (Whisper) to transcribe, then passes to the AI Agent Pipeline.
 """
+
 import os
 import tempfile
+
 import structlog
-from aiogram import Router, F
+from aiogram import F, Router
 from aiogram.types import Message
 
+from janseva.agents.service import process_message
 from janseva.voice.audio_utils import ogg_to_wav
 from janseva.voice.stt import transcribe
-from janseva.agents.service import process_message
 
 logger = structlog.get_logger()
 
@@ -38,39 +40,43 @@ async def handle_voice_message(message: Message) -> None:
 
     ogg_path = tempfile.mktemp(suffix=".ogg")
     wav_path = None
-    
+
     try:
         # 1. Download voice file
         await message.bot.download(message.voice, destination=ogg_path)
-        
+
         # 2. Convert to WAV for Whisper
         wav_path = ogg_to_wav(ogg_path)
-        
+
         # 3. Transcribe to Text
         stt_result = transcribe(wav_path)
         user_text = stt_result.get("text", "")
-        
+
         if not user_text:
-            await message.answer("मुझे आपकी आवाज़ समझ नहीं आई। कृपया दोबारा कोशिश करें।\nI couldn't understand your voice. Please try again.")
+            await message.answer(
+                "मुझे आपकी आवाज़ समझ नहीं आई। कृपया दोबारा कोशिश करें।\nI couldn't understand your voice. Please try again."
+            )
             return
 
-        from janseva.notifications.profiler import update_user_interests
         import asyncio
-        
+
+        from janseva.notifications.profiler import update_user_interests
+
         # 4. Process transcribed text via AI Agent
         await message.chat.do(action="typing")
         response_text, interactive_options = await process_message(
             telegram_id=telegram_id,
             user_text=user_text,
         )
-        
+
         # Fire and forget updating interests
         asyncio.create_task(update_user_interests(telegram_id, user_text))
 
         # Build inline keyboard if we have interactive options
         reply_markup = None
         if interactive_options:
-            from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+            from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
             buttons = [
                 [InlineKeyboardButton(text=opt["text"], callback_data=opt["callback_data"])]
                 for opt in interactive_options
@@ -83,13 +89,15 @@ async def handle_voice_message(message: Message) -> None:
         else:
             for i in range(0, len(response_text), 4096):
                 if i + 4096 >= len(response_text):
-                    await message.answer(response_text[i:i + 4096], reply_markup=reply_markup)
+                    await message.answer(response_text[i : i + 4096], reply_markup=reply_markup)
                 else:
-                    await message.answer(response_text[i:i + 4096])
+                    await message.answer(response_text[i : i + 4096])
 
     except Exception as e:
         logger.error("voice_processing_failed", error=str(e))
-        await message.answer("आपके वॉइस मैसेज को प्रोसेस करने में कुछ समस्या आई।\nThere was an issue processing your voice message.")
+        await message.answer(
+            "आपके वॉइस मैसेज को प्रोसेस करने में कुछ समस्या आई।\nThere was an issue processing your voice message."
+        )
     finally:
         # Cleanup temp files
         if os.path.exists(ogg_path):

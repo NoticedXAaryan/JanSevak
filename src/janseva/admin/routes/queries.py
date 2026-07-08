@@ -1,12 +1,12 @@
-from fastapi import APIRouter, Request, Depends
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from janseva.admin.auth import get_current_admin
-from fastapi.templating import Jinja2Templates
-from pathlib import Path
 
 TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
@@ -15,24 +15,34 @@ from janseva.db.models.message import Message
 
 router = APIRouter()
 
+
 @router.get("/", response_class=HTMLResponse)
 async def list_queries(
     request: Request,
     admin_user: dict = Depends(get_current_admin),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """List recent user messages/queries."""
     if admin_user["role"] == "super_admin":
         # Fetch latest 20 user messages
-        stmt = select(Message).where(Message.role == "user").order_by(Message.created_at.desc()).limit(20)
+        stmt = (
+            select(Message)
+            .where(Message.role == "user")
+            .order_by(Message.created_at.desc())
+            .limit(20)
+        )
         result = await session.execute(stmt)
         queries = result.scalars().all()
     else:
         # Queries are global right now, non-super admins shouldn't see them
         queries = []
 
-    return templates.TemplateResponse(request=request, name="queries.html", context={
+    return templates.TemplateResponse(
+        request=request,
+        name="queries.html",
+        context={
             "request": request,
             "admin": admin_user,
             "queries": queries,
-        })
+        },
+    )

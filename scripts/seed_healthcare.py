@@ -1,7 +1,9 @@
 """Seed script for Healthcare Facilities."""
+
 import asyncio
 import sys
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from janseva.config import settings
@@ -11,7 +13,7 @@ from janseva.db.models.healthcare_facility import HealthcareFacility
 async def seed_healthcare_facilities():
     engine = create_async_engine(settings.database_url, echo=False)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
+
     facilities = [
         # Bhopal
         HealthcareFacility(
@@ -49,7 +51,7 @@ async def seed_healthcare_facilities():
             address="Saket Nagar, Bhopal",
             specialties=["general", "neurology", "oncology", "cardiology", "nephrology"],
             total_beds=960,
-            available_beds=0, # Fully occupied
+            available_beds=0,  # Fully occupied
             is_accepting_patients=False,
             phone="0755-2672322",
         ),
@@ -90,12 +92,13 @@ async def seed_healthcare_facilities():
             total_beds=2900,
             available_beds=85,
             is_accepting_patients=True,
-        )
+        ),
     ]
-    
+
     async with async_session() as session:
         # Check if already seeded
         from sqlalchemy import select
+
         existing = await session.execute(select(HealthcareFacility).limit(1))
         if existing.scalar_one_or_none():
             print("Healthcare facilities already seeded. Skipping.")
@@ -104,6 +107,7 @@ async def seed_healthcare_facilities():
         session.add_all(facilities)
         await session.commit()
         print(f"Seeded {len(facilities)} healthcare facilities successfully.")
+
 
 if __name__ == "__main__":
     # Ensure event loop handles it

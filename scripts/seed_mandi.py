@@ -1,8 +1,10 @@
 """Seed script for Mandi Prices."""
+
 import asyncio
-import sys
 import datetime
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+import sys
+
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from janseva.config import settings
@@ -12,9 +14,9 @@ from janseva.db.models.mandi_price import MandiPrice
 async def seed_mandi_prices():
     engine = create_async_engine(settings.database_url, echo=False)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
+
     today = datetime.date.today()
-    
+
     prices = [
         # Bhopal - Wheat
         MandiPrice(
@@ -75,13 +77,16 @@ async def seed_mandi_prices():
             max_price=2200.0,
             modal_price=1800.0,
             date=today,
-        )
+        ),
     ]
-    
+
     async with async_session() as session:
         # Check if already seeded
         from sqlalchemy import select
-        existing = await session.execute(select(MandiPrice).where(MandiPrice.date == today).limit(1))
+
+        existing = await session.execute(
+            select(MandiPrice).where(MandiPrice.date == today).limit(1)
+        )
         if existing.scalar_one_or_none():
             print("Mandi prices for today already seeded. Skipping.")
             return
@@ -89,6 +94,7 @@ async def seed_mandi_prices():
         session.add_all(prices)
         await session.commit()
         print(f"Seeded {len(prices)} mandi prices successfully for {today}.")
+
 
 if __name__ == "__main__":
     # Ensure event loop handles it

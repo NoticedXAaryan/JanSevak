@@ -2,8 +2,10 @@
 Simple per-user rate limiting middleware.
 Prevents users from overwhelming the bot with rapid messages.
 """
+
 import time
-from typing import Any, Awaitable, Callable, Dict
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 import structlog
 from aiogram import BaseMiddleware
@@ -21,13 +23,13 @@ class ThrottleMiddleware(BaseMiddleware):
 
     def __init__(self, rate_limit: float = 1.0) -> None:
         self.rate_limit = rate_limit
-        self._user_timestamps: Dict[int, float] = {}
+        self._user_timestamps: dict[int, float] = {}
 
     async def __call__(
         self,
-        handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+        handler: Callable[[Message, dict[str, Any]], Awaitable[Any]],
         event: Message,
-        data: Dict[str, Any],
+        data: dict[str, Any],
     ) -> Any:
         if not event.from_user:
             return await handler(event, data)

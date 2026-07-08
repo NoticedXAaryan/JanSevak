@@ -9,17 +9,18 @@ This is the main LangGraph graph. It:
 The graph looks like:
     classify_intent → route_to_specialist → [specialist_node] → format_response
 """
+
 import structlog
 from langchain_core.messages import HumanMessage, SystemMessage
-from langgraph.graph import StateGraph, END
+from langgraph.graph import END, StateGraph
 
-from janseva.agents.state import AgentState
 from janseva.agents.llm import get_llm
-from janseva.agents.specialists.service_navigator import handle_service_query
-from janseva.agents.specialists.escalation import handle_escalation
 from janseva.agents.specialists.anonymous_reporter import handle_anonymous_report
-from janseva.agents.specialists.healthcare_agent import handle_healthcare_query
+from janseva.agents.specialists.escalation import handle_escalation
 from janseva.agents.specialists.farmer_agent import handle_farmer_query
+from janseva.agents.specialists.healthcare_agent import handle_healthcare_query
+from janseva.agents.specialists.service_navigator import handle_service_query
+from janseva.agents.state import AgentState
 
 logger = structlog.get_logger()
 
@@ -114,6 +115,7 @@ User's language: {user_language}"""
 
 # --- Node Functions ---
 
+
 def load_location_context(state: AgentState) -> dict:
     """
     Node: Load specific context based on the user's location.
@@ -121,7 +123,7 @@ def load_location_context(state: AgentState) -> dict:
     before the agent processes the request.
     """
     user_district = state.get("user_district", "unknown")
-    
+
     # In a full implementation, this would query the DB for Department policies in this district.
     # For now, we stub it out with generic regional knowledge if we recognize the region.
     context = ""
@@ -129,8 +131,9 @@ def load_location_context(state: AgentState) -> dict:
         context = "User is in Uttar Pradesh. Use UP specific e-district portal (edistrict.up.gov.in) for revenue services."
     elif user_district.lower() in ["bhopal", "indore", "gwalior"]:
         context = "User is in Madhya Pradesh. Use MP e-district portal (mpedistrict.gov.in)."
-    
+
     return {"location_context": context}
+
 
 def classify_intent(state: AgentState) -> dict:
     """
@@ -140,7 +143,7 @@ def classify_intent(state: AgentState) -> dict:
     llm = get_llm()
     messages = state["messages"]
     latest_message = messages[-1].content if messages else ""
-    
+
     user_language = state.get("user_language", "hi")
     user_district = state.get("user_district", "unknown")
     location_context = state.get("location_context", "")
@@ -154,25 +157,37 @@ def classify_intent(state: AgentState) -> dict:
     )
 
     classification_messages = [
-        SystemMessage(content=INTENT_CLASSIFIER_PROMPT.format(
-            user_language=user_language,
-            user_district=user_district,
-            location_context=location_context,
-        )),
-        HumanMessage(content=f"Recent conversation:\n{context_text}\n\nClassify the LATEST message."),
+        SystemMessage(
+            content=INTENT_CLASSIFIER_PROMPT.format(
+                user_language=user_language,
+                user_district=user_district,
+                location_context=location_context,
+            )
+        ),
+        HumanMessage(
+            content=f"Recent conversation:\n{context_text}\n\nClassify the LATEST message."
+        ),
     ]
-    
+
     response = llm.invoke(classification_messages)
-    intent = response.content.strip().lower().replace('"', '').replace("'", "")
-    
+    intent = response.content.strip().lower().replace('"', "").replace("'", "")
+
     # Validate — default to "general" if classification is unexpected
-    valid_intents = {"service_query", "anonymous_report", "healthcare", "farmer", "general", "escalate", "clarify"}
+    valid_intents = {
+        "service_query",
+        "anonymous_report",
+        "healthcare",
+        "farmer",
+        "general",
+        "escalate",
+        "clarify",
+    }
     if intent not in valid_intents:
         logger.warning("unexpected_intent_classification", raw=intent, fallback="general")
         intent = "general"
-    
+
     logger.info("intent_classified", intent=intent, message_preview=latest_message[:50])
-    
+
     return {"intent": intent}
 
 
@@ -180,17 +195,19 @@ def handle_general_chat(state: AgentState) -> dict:
     """Node: Handle general conversation (greetings, follow-ups, etc.)."""
     llm = get_llm()
     user_language = state.get("user_language", "hi")
-    
-    system_msg = SystemMessage(content=GENERAL_CHAT_PROMPT.format(
-        user_language=user_language,
-    ))
-    
+
+    system_msg = SystemMessage(
+        content=GENERAL_CHAT_PROMPT.format(
+            user_language=user_language,
+        )
+    )
+
     # Include recent conversation history for context
     recent_messages = list(state["messages"][-6:])  # Last 6 messages for context
     all_messages = [system_msg] + recent_messages
-    
+
     response = llm.invoke(all_messages)
-    
+
     return {"response": response.content}
 
 
@@ -198,19 +215,19 @@ def handle_clarification(state: AgentState) -> dict:
     """Node: Ask the user a clarifying question, using conversation history."""
     llm = get_llm()
     user_language = state.get("user_language", "hi")
-    
+
     prompt = (
         f"You are JanSeva. The user's message was too vague or short. "
         f"Respond in {user_language}. Look at the conversation history for context. "
         f"Ask a short, polite follow-up question to clarify what government service, "
         f"hospital, or report they need help with."
     )
-    
+
     system_msg = SystemMessage(content=prompt)
     # Include recent history so clarification is context-aware
     recent_messages = list(state["messages"][-4:])
     messages = [system_msg] + recent_messages
-    
+
     response = llm.invoke(messages)
     return {"response": response.content}
 
@@ -222,7 +239,7 @@ def handle_placeholder(state: AgentState) -> dict:
     """
     intent = state.get("intent", "unknown")
     user_language = state.get("user_language", "hi")
-    
+
     placeholder_responses = {
         "anonymous_report": (
             "🚨 गुमनाम शिकायत प्रणाली जल्द ही उपलब्ध होगी।\n"
@@ -230,7 +247,7 @@ def handle_placeholder(state: AgentState) -> dict:
             "कृपया /report कमांड का उपयोग करें जब यह तैयार हो।"
         ),
     }
-    
+
     return {"response": placeholder_responses.get(intent, "यह सेवा जल्द उपलब्ध होगी।")}
 
 
@@ -240,7 +257,7 @@ def route_by_intent(state: AgentState) -> str:
     Routes to the appropriate specialist node based on classified intent.
     """
     intent = state.get("intent", "general")
-    
+
     route_map = {
         "service_query": "service_navigator",
         "anonymous_report": "anonymous_report_node",
@@ -250,21 +267,22 @@ def route_by_intent(state: AgentState) -> str:
         "escalate": "escalation",
         "clarify": "clarification",
     }
-    
+
     return route_map.get(intent, "general_chat")
 
 
 # --- Build the Graph ---
 
+
 def build_agent_graph() -> StateGraph:
     """
     Construct the full JanSeva agent graph.
-    
+
     Graph structure:
         START → classify_intent → (conditional routing) → [specialist] → END
     """
     graph = StateGraph(AgentState)
-    
+
     # Add nodes
     graph.add_node("load_location_context", load_location_context)
     graph.add_node("classify_intent", classify_intent)
@@ -276,11 +294,11 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("farmer_agent_node", handle_farmer_query)
     graph.add_node("clarification", handle_clarification)
     graph.add_node("placeholder", handle_placeholder)
-    
+
     # Set entry point
     graph.set_entry_point("load_location_context")
     graph.add_edge("load_location_context", "classify_intent")
-    
+
     # Add conditional routing from intent classifier
     graph.add_conditional_edges(
         "classify_intent",
@@ -296,7 +314,7 @@ def build_agent_graph() -> StateGraph:
             "placeholder": "placeholder",
         },
     )
-    
+
     # All specialist nodes lead to END
     graph.add_edge("service_navigator", END)
     graph.add_edge("anonymous_report_node", END)
@@ -306,7 +324,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_edge("escalation", END)
     graph.add_edge("clarification", END)
     graph.add_edge("placeholder", END)
-    
+
     return graph.compile()
 
 

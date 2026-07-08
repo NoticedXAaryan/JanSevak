@@ -1,6 +1,7 @@
 """
 Knowledge search tool — used by agents to query the knowledge base.
 """
+
 import structlog
 
 logger = structlog.get_logger()
@@ -44,4 +45,3 @@ def search_services(query: str) -> str:
         return "No sufficiently relevant information found."
 
     return "\n\n".join(context_parts)
-

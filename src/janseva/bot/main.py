@@ -6,21 +6,22 @@ sets up middlewares, and starts polling for messages.
 
 Run with: uv run python -m janseva.bot.main
 """
-import asyncio
-import structlog
 
+import asyncio
+
+import structlog
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
-from janseva.config import settings
-from janseva.common.logging import setup_logging
+from janseva.bot.middlewares.session import DatabaseSessionMiddleware
+from janseva.bot.middlewares.throttle import ThrottleMiddleware
+from janseva.bot.routers.onboarding import onboarding_router
 from janseva.bot.routers.start import start_router
 from janseva.bot.routers.text import text_router
 from janseva.bot.routers.voice import voice_router
-from janseva.bot.routers.onboarding import onboarding_router
-from janseva.bot.middlewares.session import DatabaseSessionMiddleware
-from janseva.bot.middlewares.throttle import ThrottleMiddleware
+from janseva.common.logging import setup_logging
+from janseva.config import settings
 
 logger = structlog.get_logger()
 
@@ -46,13 +47,16 @@ async def main() -> None:
     dp.callback_query.middleware(DatabaseSessionMiddleware())
 
     # Register routers (order matters — first match wins)
-    dp.include_router(start_router)   # /start, /help commands
-    dp.include_router(onboarding_router) # inline keyboard callbacks
-    dp.include_router(voice_router)   # Voice messages (before text, so voice isn't caught by text handler)
-    dp.include_router(text_router)    # Text messages (catch-all)
+    dp.include_router(start_router)  # /start, /help commands
+    dp.include_router(onboarding_router)  # inline keyboard callbacks
+    dp.include_router(
+        voice_router
+    )  # Voice messages (before text, so voice isn't caught by text handler)
+    dp.include_router(text_router)  # Text messages (catch-all)
 
     # Start background scheduler
     from janseva.notifications.scheduler import start_scheduler
+
     start_scheduler(bot)
 
     # Start polling

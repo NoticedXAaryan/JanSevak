@@ -1,5 +1,6 @@
 import os
 import shutil
+
 import yaml
 
 base_dir = r"c:\Users\notic\OneDrive\Desktop\Hackathon\GoogleXParul\src\janseva\knowledge\data"
@@ -12,6 +13,7 @@ os.makedirs(schemes_dir, exist_ok=True)
 
 if os.path.exists(subsidies_dir):
     shutil.rmtree(subsidies_dir)
+
 
 # Template for services
 def create_service(id, name_en, name_hi, dept):
@@ -32,10 +34,11 @@ def create_service(id, name_en, name_hi, dept):
         ],
         "estimated_timeline": "15-30 days",
         "approximate_fee": "INR 50",
-        "tags": [id.replace('_', ' '), "certificate"]
+        "tags": [id.replace("_", " "), "certificate"],
     }
-    with open(os.path.join(services_dir, f"{id}.yaml"), 'w', encoding='utf-8') as f:
+    with open(os.path.join(services_dir, f"{id}.yaml"), "w", encoding="utf-8") as f:
         yaml.dump(content, f, allow_unicode=True, sort_keys=False)
+
 
 services = [
     ("domicile_certificate", "Domicile Certificate", "मूल निवास प्रमाण पत्र", "Revenue Department"),
@@ -52,11 +55,12 @@ services = [
     ("building_permit", "Building Permit", "भवन निर्माण अनुमति", "Municipal Corporation"),
     ("water_connection", "Water Connection", "जल कनेक्शन", "Jal Board"),
     ("electricity_connection", "Electricity Connection", "बिजली कनेक्शन", "Power Corporation"),
-    ("pension_application", "Pension Application", "पेंशन आवेदन", "Social Welfare Department")
+    ("pension_application", "Pension Application", "पेंशन आवेदन", "Social Welfare Department"),
 ]
 
 for s in services:
     create_service(*s)
+
 
 # Template for schemes
 def create_scheme(id, name_en, name_hi, ministry):
@@ -66,20 +70,14 @@ def create_scheme(id, name_en, name_hi, ministry):
         "name_hi": name_hi,
         "ministry": ministry,
         "benefit": "Financial assistance or specific benefits as per scheme guidelines",
-        "eligibility": [
-            "Eligibility criteria apply as per official notifications."
-        ],
-        "required_documents": [
-            "Aadhaar Card",
-            "Bank account details (linked to Aadhaar)"
-        ],
-        "application_process": [
-            "Visit the official portal or nearest CSC center."
-        ],
-        "helpline": "1076"
+        "eligibility": ["Eligibility criteria apply as per official notifications."],
+        "required_documents": ["Aadhaar Card", "Bank account details (linked to Aadhaar)"],
+        "application_process": ["Visit the official portal or nearest CSC center."],
+        "helpline": "1076",
     }
-    with open(os.path.join(schemes_dir, f"{id}.yaml"), 'w', encoding='utf-8') as f:
+    with open(os.path.join(schemes_dir, f"{id}.yaml"), "w", encoding="utf-8") as f:
         yaml.dump(content, f, allow_unicode=True, sort_keys=False)
+
 
 schemes = [
     ("ayushman_bharat", "Ayushman Bharat (PMJAY)", "आयुष्मान भारत", "Ministry of Health"),
@@ -87,11 +85,16 @@ schemes = [
     ("pm_ujjwala_yojana", "PM Ujjwala Yojana", "पीएम उज्ज्वला योजना", "Ministry of Petroleum"),
     ("sukanya_samriddhi", "Sukanya Samriddhi Yojana", "सुकन्या समृद्धि योजना", "Ministry of Finance"),
     ("mudra_loan", "Mudra Loan", "मुद्रा लोन", "Ministry of Finance"),
-    ("pmfby", "Pradhan Mantri Fasal Bima Yojana", "प्रधानमंत्री फसल बीमा योजना", "Ministry of Agriculture"),
+    (
+        "pmfby",
+        "Pradhan Mantri Fasal Bima Yojana",
+        "प्रधानमंत्री फसल बीमा योजना",
+        "Ministry of Agriculture",
+    ),
     ("nrega", "MGNREGA", "मनरेगा", "Ministry of Rural Development"),
     ("scholarships_obc_sc_st", "OBC/SC/ST Scholarships", "छात्रवृत्ति", "Ministry of Social Justice"),
     ("old_age_pension", "Old Age Pension", "वृद्धावस्था पेंशन", "Social Welfare Department"),
-    ("widow_pension", "Widow Pension", "विधवा पेंशन", "Social Welfare Department")
+    ("widow_pension", "Widow Pension", "विधवा पेंशन", "Social Welfare Department"),
 ]
 
 for s in schemes:

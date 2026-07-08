@@ -64,5 +64,5 @@ INDIA_DISTRICTS = {
     "West Bengal": ["Kolkata", "Howrah", "Darjeeling", "Siliguri", "Other"],
     "Delhi": ["Central Delhi", "New Delhi", "South Delhi", "Other"],
     "Jammu and Kashmir": ["Srinagar", "Jammu", "Anantnag", "Other"],
-    "Other UTs": ["Chandigarh", "Puducherry", "Andaman", "Lakshadweep", "Ladakh"]
+    "Other UTs": ["Chandigarh", "Puducherry", "Andaman", "Lakshadweep", "Ladakh"],
 }

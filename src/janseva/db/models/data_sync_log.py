@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime
 
-from janseva.db.models.base import Base, UUIDPrimaryKeyMixin, TimestampMixin
+from janseva.db.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+
 
 class DataSyncLog(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "data_sync_logs"
@@ -11,6 +11,6 @@ class DataSyncLog(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     records_synced: Mapped[int] = mapped_column(default=0)
     error_message: Mapped[str | None]
     duration_seconds: Mapped[float]
-    
+
     def __repr__(self) -> str:
         return f"<DataSyncLog {self.source_name} status={self.status}>"

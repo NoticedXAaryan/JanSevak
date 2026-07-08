@@ -3,10 +3,11 @@ Service Navigator Agent — Enhanced with RAG.
 Retrieves relevant knowledge base entries and uses them to provide
 accurate, sourced answers about government services.
 """
+
 from langchain_core.messages import SystemMessage
+
 from janseva.agents.llm import get_llm
 from janseva.agents.tools.knowledge_search import search_services
-
 
 SERVICE_RAG_PROMPT = """You are JanSeva (जनसेवा), an expert AI assistant for Indian government services.
 
@@ -34,10 +35,11 @@ Location context: {location_context}"""
 
 import re
 
+
 def handle_service_query(state: dict) -> dict:
     """
     Process a government service query using RAG.
-    
+
     1. Search the knowledge base for relevant information
     2. Augment the LLM prompt with retrieved context
     3. Generate a response grounded in the knowledge base
@@ -47,45 +49,41 @@ def handle_service_query(state: dict) -> dict:
     user_language = state.get("user_language", "hi")
     user_district = state.get("user_district", "unknown")
     location_context = state.get("location_context", "")
-    
+
     # Get the latest user message
     latest_message = state["messages"][-1].content if state["messages"] else ""
-    
+
     # RAG: Search knowledge base
     knowledge_context = search_services(latest_message)
-    
+
     # Build the prompt with retrieved context
-    system_msg = SystemMessage(content=SERVICE_RAG_PROMPT.format(
-        knowledge_context=knowledge_context,
-        user_language=user_language,
-        user_district=user_district,
-        location_context=location_context,
-    ))
-    
+    system_msg = SystemMessage(
+        content=SERVICE_RAG_PROMPT.format(
+            knowledge_context=knowledge_context,
+            user_language=user_language,
+            user_district=user_district,
+            location_context=location_context,
+        )
+    )
+
     # Include recent conversation for context
     recent_messages = list(state["messages"][-6:])
     all_messages = [system_msg] + recent_messages
-    
+
     response = llm.invoke(all_messages)
     content = response.content
-    
+
     # Extract interactive options: [OPTION: Scheme Name]
     options = []
-    option_pattern = r'\[OPTION:\s*(.+?)\]'
-    
+    option_pattern = r"\[OPTION:\s*(.+?)\]"
+
     for match in re.finditer(option_pattern, content):
         scheme_name = match.group(1).strip()
         # Create callback data (truncate to 64 chars max for Telegram limits)
         callback_data = f"query_{scheme_name}"[:64]
-        options.append({
-            "text": scheme_name,
-            "callback_data": callback_data
-        })
-        
+        options.append({"text": scheme_name, "callback_data": callback_data})
+
     # Strip the options from the text response
-    clean_content = re.sub(option_pattern, '', content).strip()
-    
-    return {
-        "response": clean_content,
-        "interactive_options": options
-    }
+    clean_content = re.sub(option_pattern, "", content).strip()
+
+    return {"response": clean_content, "interactive_options": options}

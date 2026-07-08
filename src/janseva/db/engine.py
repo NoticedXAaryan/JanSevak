@@ -1,6 +1,7 @@
 """
 SQLAlchemy async engine and session factory.
 """
+
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -13,10 +14,10 @@ from janseva.config import settings
 engine = create_async_engine(
     settings.database_url,
     echo=(settings.env == "development"),  # SQL logging in dev
-    pool_size=20,        # Increased for scale
-    max_overflow=40,     # Increased for scale
+    pool_size=20,  # Increased for scale
+    max_overflow=40,  # Increased for scale
     pool_pre_ping=True,  # Verify connections before use
-    pool_recycle=3600,   # Recycle connections every hour
+    pool_recycle=3600,  # Recycle connections every hour
 )
 
 # Session factory — use this to create sessions

@@ -1,12 +1,11 @@
 """Alembic environment configuration for async SQLAlchemy."""
-from logging.config import fileConfig
-
-from alembic import context
-from sqlalchemy import pool
-from sqlalchemy import create_engine
 
 import sys
+from logging.config import fileConfig
 from pathlib import Path
+
+from alembic import context
+from sqlalchemy import create_engine, pool
 
 # Explicitly add src to python path for Docker/uv
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -18,6 +17,7 @@ config = context.config
 
 # Override sqlalchemy.url from env var if available (critical for Docker)
 import os
+
 db_url = os.environ.get("DATABASE_URL_SYNC")
 if db_url:
     # Escape % to %% because configparser treats % as string interpolation

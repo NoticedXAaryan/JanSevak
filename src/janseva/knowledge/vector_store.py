@@ -2,6 +2,7 @@
 Vector store interface for RAG.
 Uses ChromaDB for development. Can be swapped to pgvector for production.
 """
+
 from pathlib import Path
 from typing import Any
 
@@ -67,11 +68,11 @@ def get_vector_store() -> Any:
 def search_knowledge(query: str, k: int = 5) -> list:
     """
     Search the knowledge base for documents relevant to the query.
-    
+
     Args:
         query: The user's question
         k: Number of results to return
-    
+
     Returns:
         List of (Document, score) tuples, most relevant first
     """

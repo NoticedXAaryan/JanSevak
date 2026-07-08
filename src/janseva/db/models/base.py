@@ -2,8 +2,9 @@
 SQLAlchemy declarative base with common mixins.
 Every model inherits from Base and gets id, created_at, updated_at for free.
 """
+
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 
 from sqlalchemy import DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
@@ -12,6 +13,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 class Base(DeclarativeBase):
     """Base class for all ORM models."""
+
     pass
 
 

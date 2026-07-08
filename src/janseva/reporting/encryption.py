@@ -2,7 +2,9 @@
 Encryption for anonymous report content.
 Uses Fernet symmetric encryption (AES-128-CBC).
 """
+
 from cryptography.fernet import Fernet
+
 from janseva.config import settings
 
 

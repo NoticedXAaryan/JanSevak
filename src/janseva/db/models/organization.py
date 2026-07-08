@@ -1,8 +1,7 @@
 """Organization model — represents a government authority entity."""
-import uuid
-from sqlalchemy import String, Float, Boolean, JSON, ForeignKey
+
+from sqlalchemy import JSON, Boolean, Float, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.dialects.postgresql import UUID
 
 from janseva.db.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -11,7 +10,9 @@ class Organization(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "organizations"
 
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-    org_type: Mapped[str] = mapped_column(String(50), nullable=False) # "hospital" | "police_station" | "fire_station" | "panchayat" | "district_office" | "tehsil"
+    org_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # "hospital" | "police_station" | "fire_station" | "panchayat" | "district_office" | "tehsil"
     jurisdiction_state: Mapped[str] = mapped_column(String(255), nullable=False)
     jurisdiction_district: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     jurisdiction_block: Mapped[str | None] = mapped_column(String(255), nullable=True)

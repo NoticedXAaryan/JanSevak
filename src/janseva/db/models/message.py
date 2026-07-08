@@ -1,4 +1,5 @@
 """Message model — individual messages in a conversation."""
+
 import uuid
 
 from sqlalchemy import ForeignKey, String, Text
@@ -14,9 +15,7 @@ class Message(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     conversation_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("conversations.id"), nullable=False, index=True
     )
-    role: Mapped[str] = mapped_column(
-        String(10), nullable=False
-    )  # "user" or "assistant"
+    role: Mapped[str] = mapped_column(String(10), nullable=False)  # "user" or "assistant"
     content: Mapped[str] = mapped_column(Text, nullable=False)
     language: Mapped[str] = mapped_column(String(10), default="hi", nullable=False)
     voice_audio_ref: Mapped[str | None] = mapped_column(String(500), nullable=True)

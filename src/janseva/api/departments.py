@@ -1,19 +1,22 @@
 """Departments API for JanSevak v2."""
-from fastapi import APIRouter, Depends, HTTPException
+
+import uuid
+
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import select
-import uuid
 
 from janseva.db.engine import async_session_factory
 from janseva.db.models.department import Department
 from janseva.db.models.public_complaint import PublicComplaint
-from janseva.db.models.anonymous_report import AnonymousReport
 
 router = APIRouter(prefix="/api/v1/departments", tags=["departments"])
+
 
 # --- Schemas ---
 class PolicyUpdate(BaseModel):
     policies_json: dict
+
 
 # --- Endpoints ---
 @router.get("")
@@ -27,9 +30,11 @@ async def list_departments():
                 "id": str(d.id),
                 "name": d.name,
                 "type": d.department_type,
-                "district": d.jurisdiction_district
-            } for d in departments
+                "district": d.jurisdiction_district,
+            }
+            for d in departments
         ]
+
 
 @router.get("/{id}")
 async def get_department(id: uuid.UUID):
@@ -39,12 +44,9 @@ async def get_department(id: uuid.UUID):
         dept = result.scalar_one_or_none()
         if not dept:
             raise HTTPException(status_code=404, detail="Department not found")
-            
-        return {
-            "id": str(dept.id),
-            "name": dept.name,
-            "policies": dept.policies_json
-        }
+
+        return {"id": str(dept.id), "name": dept.name, "policies": dept.policies_json}
+
 
 @router.patch("/{id}/policies")
 async def update_policies(id: uuid.UUID, req: PolicyUpdate):
@@ -54,10 +56,11 @@ async def update_policies(id: uuid.UUID, req: PolicyUpdate):
         dept = result.scalar_one_or_none()
         if not dept:
             raise HTTPException(status_code=404, detail="Department not found")
-            
+
         dept.policies_json = req.policies_json
         await session.commit()
         return {"status": "success"}
+
 
 @router.get("/{id}/complaints")
 async def get_dept_complaints(id: uuid.UUID):

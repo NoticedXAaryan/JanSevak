@@ -2,6 +2,7 @@
 Seed the knowledge base vector store with all YAML service data.
 Run: uv run python scripts/seed_knowledge_base.py
 """
+
 import argparse
 import sys
 from pathlib import Path
