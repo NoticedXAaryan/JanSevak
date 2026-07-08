@@ -18,15 +18,21 @@ def get_model():
     return _model
 
 
-def transcribe(audio_path: str) -> dict:
+import asyncio
+
+async def transcribe(audio_path: str) -> dict:
     """
     Transcribe audio file to text.
+    Runs asynchronously off the main thread to prevent blocking the event loop.
 
     Returns:
         dict with keys: text, language, segments
     """
     model = get_model()
-    result = model.transcribe(
+    
+    # Run heavy whisper processing in a thread pool
+    result = await asyncio.to_thread(
+        model.transcribe,
         audio_path,
         task="transcribe",
         language=None,  # Auto-detect

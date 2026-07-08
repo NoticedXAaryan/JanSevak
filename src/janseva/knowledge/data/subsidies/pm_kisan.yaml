@@ -1,0 +1,18 @@
+scheme_id: pm_kisan
+name_en: PM Kisan Samman Nidhi
+name_hi: पीएम किसान सम्मान निधि
+benefit: Income support of ₹6,000 per year provided in three equal installments of
+  ₹2,000 to landholding farmer families.
+eligibility:
+- Must be a landholding farmer family.
+- Institutional landholders and professionals (doctors/lawyers) are excluded.
+- Income tax payers are excluded.
+required_documents:
+- Aadhaar Card
+- Bank Account details linked to Aadhaar
+- Land Ownership Documents (Khatauni)
+application_process:
+- Visit pmkisan.gov.in
+- Click on 'New Farmer Registration' in the Farmers Corner
+- Fill the required details and upload documents.
+helpline: 155261 / 011-24300606

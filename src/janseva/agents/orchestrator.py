@@ -232,23 +232,7 @@ def handle_clarification(state: AgentState) -> dict:
     return {"response": response.content}
 
 
-def handle_placeholder(state: AgentState) -> dict:
-    """
-    Placeholder node for agents not yet implemented.
-    Used for farmer and other missing specialists until their guides are completed.
-    """
-    intent = state.get("intent", "unknown")
-    user_language = state.get("user_language", "hi")
 
-    placeholder_responses = {
-        "anonymous_report": (
-            "🚨 गुमनाम शिकायत प्रणाली जल्द ही उपलब्ध होगी।\n"
-            "Anonymous reporting system coming soon.\n\n"
-            "कृपया /report कमांड का उपयोग करें जब यह तैयार हो।"
-        ),
-    }
-
-    return {"response": placeholder_responses.get(intent, "यह सेवा जल्द उपलब्ध होगी।")}
 
 
 def route_by_intent(state: AgentState) -> str:
@@ -293,7 +277,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_node("healthcare_agent_node", handle_healthcare_query)
     graph.add_node("farmer_agent_node", handle_farmer_query)
     graph.add_node("clarification", handle_clarification)
-    graph.add_node("placeholder", handle_placeholder)
+
 
     # Set entry point
     graph.set_entry_point("load_location_context")
@@ -311,7 +295,6 @@ def build_agent_graph() -> StateGraph:
             "general_chat": "general_chat",
             "escalation": "escalation",
             "clarification": "clarification",
-            "placeholder": "placeholder",
         },
     )
 
@@ -323,7 +306,7 @@ def build_agent_graph() -> StateGraph:
     graph.add_edge("general_chat", END)
     graph.add_edge("escalation", END)
     graph.add_edge("clarification", END)
-    graph.add_edge("placeholder", END)
+
 
     return graph.compile()
 

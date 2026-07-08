@@ -1,0 +1,19 @@
+scheme_id: kcc
+name_en: Kisan Credit Card (KCC)
+name_hi: किसान क्रेडिट कार्ड (KCC)
+benefit: Provides farmers with timely and adequate credit support for agricultural
+  expenses at subsidized interest rates.
+eligibility:
+- All farmers - individuals/joint borrowers who are owner cultivators.
+- Tenant farmers, oral lessees & share croppers.
+- SHGs or Joint Liability Groups of farmers.
+required_documents:
+- Aadhaar Card
+- PAN Card / Voter ID
+- Land documents (Khasra/Khatauni)
+- Recent passport size photograph
+application_process:
+- Visit your nearest commercial bank, regional rural bank, or cooperative bank.
+- Submit the KCC application form with land records.
+- The bank will evaluate and issue the KCC.
+helpline: 'Kisan Call Center: 1800-180-1551'

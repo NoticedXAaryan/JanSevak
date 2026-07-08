@@ -41,6 +41,13 @@ def get_embeddings() -> Any:
             base_url=settings.ollama_base_url,
         )
 
+    if provider == "huggingface":
+        from langchain_community.embeddings import HuggingFaceEmbeddings
+        
+        return HuggingFaceEmbeddings(
+            model_name=settings.embedding_model or "sentence-transformers/all-MiniLM-L6-v2"
+        )
+
     raise ValueError(
         f"Unknown embedding provider: {settings.embedding_provider}. "
         "Set EMBEDDING_PROVIDER to 'gemini' or 'ollama'."

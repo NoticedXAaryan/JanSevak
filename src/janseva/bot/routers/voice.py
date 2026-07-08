@@ -35,6 +35,14 @@ async def handle_voice_message(message: Message) -> None:
         duration_seconds=message.voice.duration,
     )
 
+    # Duration limit check
+    if message.voice.duration > 120:
+        await message.answer(
+            "आपका वॉइस मैसेज बहुत लंबा है। कृपया इसे 2 मिनट (120 सेकंड) से छोटा रखें।\n"
+            "Your voice message is too long. Please keep it under 2 minutes (120 seconds)."
+        )
+        return
+
     # Indicate processing
     await message.chat.do(action="record_voice")
 
@@ -49,12 +57,22 @@ async def handle_voice_message(message: Message) -> None:
         wav_path = ogg_to_wav(ogg_path)
 
         # 3. Transcribe to Text
-        stt_result = transcribe(wav_path)
+        stt_result = await transcribe(wav_path)
         user_text = stt_result.get("text", "")
+
+        # Whisper hallucination filter
+        hallucinations = ["[silence]", "(silence)", "[music]", "(music)", "thank you.", "subtitles by", "amara.org", "blank_audio"]
+        clean_text = user_text.lower().strip()
+        for h in hallucinations:
+            if clean_text == h or h in clean_text:
+                # If the entire text is just a hallucination token
+                if len(clean_text) < len(h) + 10:
+                    user_text = ""
+                    break
 
         if not user_text:
             await message.answer(
-                "मुझे आपकी आवाज़ समझ नहीं आई। कृपया दोबारा कोशिश करें।\nI couldn't understand your voice. Please try again."
+                "मुझे आपकी आवाज़ समझ नहीं आई या बैकग्राउंड में शोर था। कृपया दोबारा कोशिश करें।\nI couldn't understand your voice or there was background noise. Please try again."
             )
             return
 

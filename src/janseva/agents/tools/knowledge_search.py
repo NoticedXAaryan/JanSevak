@@ -34,7 +34,8 @@ def search_services(query: str) -> str:
 
     context_parts = []
     for doc, score in results:
-        if score > 0.0:
+        # Require a minimum similarity to avoid hallucinating from irrelevant noise
+        if score > 0.3:
             context_parts.append(
                 f"--- Source: {doc.metadata.get('service_id', 'unknown')} "
                 f"(relevance: {score:.2f}) ---\n"

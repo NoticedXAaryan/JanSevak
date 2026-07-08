@@ -1,13 +1,20 @@
 scheme_id: pm_awas_yojana
-name_en: PM Awas Yojana
+name_en: PM Awas Yojana (PMAY)
 name_hi: पीएम आवास योजना
-ministry: Ministry of Housing
-benefit: Financial assistance or specific benefits as per scheme guidelines
+ministry: Ministry of Housing and Urban Affairs
+benefit: Financial assistance to build a pucca house. Provides credit-linked subsidy
+  on home loans.
 eligibility:
-- Eligibility criteria apply as per official notifications.
+- The beneficiary family should not own a pucca house anywhere in India.
+- Annual household income must be below ₹18 Lakhs (depending on EWS/LIG/MIG category).
+- A female member must be the co-owner of the property.
 required_documents:
 - Aadhaar Card
-- Bank account details (linked to Aadhaar)
+- Income Certificate
+- Bank Account Details
+- Property Documents
 application_process:
-- Visit the official portal or nearest CSC center.
-helpline: '1076'
+- Apply online through the PMAY official website (pmaymis.gov.in) under 'Citizen Assessment'.
+- Fill out the required details and print the application.
+- Track the assessment status online.
+helpline: 1800-11-6163

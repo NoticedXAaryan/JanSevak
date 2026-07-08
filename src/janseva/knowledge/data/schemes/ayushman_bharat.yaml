@@ -1,13 +1,20 @@
 scheme_id: ayushman_bharat
-name_en: Ayushman Bharat (PMJAY)
-name_hi: आयुष्मान भारत
-ministry: Ministry of Health
-benefit: Financial assistance or specific benefits as per scheme guidelines
+name_en: Ayushman Bharat (PM-JAY)
+name_hi: आयुष्मान भारत (PM-JAY)
+ministry: Ministry of Health and Family Welfare
+benefit: Health insurance coverage of up to ₹5 Lakhs per family per year for secondary
+  and tertiary care hospitalization.
 eligibility:
-- Eligibility criteria apply as per official notifications.
+- Must be listed in the Socio-Economic Caste Census (SECC) 2011 database.
+- Families with no adult male member aged 16-59 years.
+- Landless households deriving major income from manual casual labor.
 required_documents:
 - Aadhaar Card
-- Bank account details (linked to Aadhaar)
+- Ration Card
+- Active Mobile Number
 application_process:
-- Visit the official portal or nearest CSC center.
-helpline: '1076'
+- Visit the official portal (pmjay.gov.in) and click 'Am I Eligible'.
+- Enter mobile number and verify via OTP.
+- Check name in the list and visit an impaneled hospital with Aadhaar to get the Ayushman
+  Card.
+helpline: 14555 or 104

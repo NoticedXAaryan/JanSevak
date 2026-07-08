@@ -73,6 +73,12 @@ Please:
     # Step 2: Anonymize the content
     anonymized_text = strip_metadata(latest_message)
 
+    if not anonymized_text or len(anonymized_text.strip()) < 10:
+        return {
+            "response": "कृपया अपनी शिकायत का विवरण थोड़ा और विस्तार से दें ताकि हम उचित कार्रवाई कर सकें।\n"
+                        "Please provide a bit more detail about your complaint so we can take appropriate action."
+        }
+
     # Step 3: Determine routing
     routing = await determine_routing(
         report_text=anonymized_text,
