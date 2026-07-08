@@ -19,9 +19,8 @@ export class ChatClient {
   private endpoint: string;
 
   constructor(endpoint: string = "/api/v1/chat/stream") {
-    // In dev, assuming proxy or full URL.
     this.endpoint = process.env.NEXT_PUBLIC_API_URL 
-      ? `${process.env.NEXT_PUBLIC_API_URL}/chat/stream` 
+      ? `${process.env.NEXT_PUBLIC_API_URL}/v1/chat/stream` 
       : "http://localhost:8000/api/v1/chat/stream";
   }
 

@@ -29,7 +29,8 @@ export default function CitizenLogin() {
     
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/auth/otp/request", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/v1` : "http://localhost:8000/api/v1";
+      const res = await fetch(`${API_URL}/auth/otp/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone_number: phone })
@@ -58,7 +59,8 @@ export default function CitizenLogin() {
     
     setIsLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/v1/auth/login", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/v1` : "http://localhost:8000/api/v1";
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone_number: phone, otp })
