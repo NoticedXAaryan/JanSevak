@@ -28,9 +28,8 @@ dependencies = [
     # --- Vector Store (RAG) ---
     "chromadb>=0.5,<1",
     # --- Voice Processing ---
-    "torch",                               # Added explicitly to force CPU index override
+    "faster-whisper>=1.0,<2",
     "pydub>=0.25,<1",
-    "openai-whisper>=20231117",
     # --- Security ---
     "cryptography>=43,<44",                # Report encryption
     "python-jose[cryptography]>=3.3,<4",   # JWT for admin auth
@@ -80,11 +79,3 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-
-[tool.uv.sources]
-torch = { index = "pytorch-cpu" }

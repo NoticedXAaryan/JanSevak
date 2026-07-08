@@ -1,7 +1,7 @@
 """Speech-to-Text service using IndicWhisper or standard Whisper."""
 
 import structlog
-import whisper
+from faster_whisper import WhisperModel
 
 logger = structlog.get_logger()
 
@@ -12,9 +12,9 @@ _model = None
 def get_model():
     global _model
     if _model is None:
-        # Use "large-v3" for best quality, "base" for speed
-        _model = whisper.load_model("base")  # Change to "large-v3" for production
-        logger.info("whisper_model_loaded", model="base")
+        # Use "base" or "tiny" for speed, "large-v3" for production
+        _model = WhisperModel("base", device="cpu", compute_type="int8")
+        logger.info("faster_whisper_model_loaded", model="base")
     return _model
 
 
@@ -31,12 +31,13 @@ async def transcribe(audio_path: str) -> dict:
     model = get_model()
     
     # Run heavy whisper processing in a thread pool
-    result = await asyncio.to_thread(
-        model.transcribe,
-        audio_path,
-        task="transcribe",
-        language=None,  # Auto-detect
-    )
+    # faster-whisper returns an iterator of segments and an info object
+    def _run_transcription():
+        segments, info = model.transcribe(audio_path, beam_size=5)
+        text = "".join([segment.text for segment in segments])
+        return {"text": text, "language": info.language, "segments": segments}
+        
+    result = await asyncio.to_thread(_run_transcription)
 
     logger.info(
         "transcription_complete",
