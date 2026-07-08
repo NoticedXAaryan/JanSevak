@@ -5,6 +5,7 @@ import { ClassValue, clsx } from "clsx";
 import * as Color from "color-bits";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
@@ -157,8 +158,8 @@ export function FlickeringFooter() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
           <div className="md:col-span-4">
             <div className="flex items-center gap-3 mb-6">
-              <div className="relative w-12 h-12 rounded-xl bg-foreground flex items-center justify-center shadow-lg">
-                <span className="font-heading font-bold text-xl text-background">JS</span>
+              <div className="relative w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-black">
+                <Image src="/logo.png" alt="JanSevak Logo" width={48} height={48} className="object-contain p-1" />
               </div>
               <span className="font-heading font-bold text-2xl text-foreground">JanSevak</span>
             </div>

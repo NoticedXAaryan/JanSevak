@@ -44,8 +44,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
-              <span className="font-heading font-bold text-2xl tracking-tight text-foreground transition-colors">JanSevak</span>
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center bg-black">
+                <Image src="/logo.png" alt="JanSevak Logo" width={40} height={40} className="object-contain p-1" />
+              </div>
+              <span className="font-heading font-bold text-2xl tracking-tight text-foreground transition-colors group-hover:text-primary">JanSevak</span>
             </Link>
           </div>
           

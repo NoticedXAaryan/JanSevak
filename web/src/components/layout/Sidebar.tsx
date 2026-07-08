@@ -53,7 +53,10 @@ export function Sidebar({ className, role = "citizen" }: SidebarProps) {
     <div className={cn("pb-12 border-r border-border liquid-glass h-screen flex flex-col", className)}>
       <div className="space-y-4 py-4 flex-1">
         <div className="px-3 py-2">
-          <div className="flex items-center mb-2 px-4 mt-2">
+          <div className="flex items-center gap-3 mb-2 px-4 mt-2">
+            <div className="relative w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-black">
+              <Image src="/logo.png" alt="JanSevak Logo" width={32} height={32} className="object-contain p-1" />
+            </div>
             <h2 className="text-2xl font-bold tracking-tight">JanSevak</h2>
           </div>
           <p className="px-4 text-xs text-muted-foreground mb-6">

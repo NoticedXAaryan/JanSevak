@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -26,8 +27,8 @@ export default function Sidebar() {
     <aside className="w-64 bg-card border-r border-border hidden md:flex flex-col">
       <div className="h-16 flex items-center px-6 border-b border-border">
         <div className="flex items-center gap-2">
-          <div className="relative w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <span className="font-heading font-bold text-lg text-primary-foreground">JS</span>
+          <div className="relative w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-black">
+            <Image src="/logo.png" alt="JanSevak Logo" width={32} height={32} className="object-contain p-1" />
           </div>
           <span className="font-heading font-semibold text-xl text-foreground">JanSevak</span>
         </div>

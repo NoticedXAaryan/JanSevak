@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import { MessageSquare, X, Maximize2 } from "lucide-react";
 import ChatInput from "./ChatInput";
 import MessageBubble from "./MessageBubble";
@@ -42,8 +43,8 @@ export default function ChatWidget() {
       {/* Header */}
       <div className="h-14 bg-card border-b border-border flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-            <span className="font-heading font-bold text-xs text-primary">JS</span>
+          <div className="relative w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-black">
+            <Image src="/logo.png" alt="JanSevak Logo" width={32} height={32} className="object-contain p-1" />
           </div>
           <span className="font-heading font-semibold text-foreground">JanSevak AI</span>
         </div>
