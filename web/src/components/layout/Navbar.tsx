@@ -70,9 +70,11 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center space-x-3">
-            <button onClick={toggleLang} className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground liquid-glass rounded-full transition-all">
-              <Globe className="w-4 h-4" />
-              {lang}
+            <button onClick={toggleLang} className="flex items-center gap-2 px-3 py-1.5 text-sm font-semibold text-foreground bg-muted/50 hover:bg-muted border border-border rounded-full transition-all" title="Change Language">
+              <span className="font-serif font-bold text-base">A/अ</span>
+              <span className="hidden xl:inline-block text-xs text-muted-foreground font-medium">
+                {lang === "EN" ? "English" : "हिंदी"}
+              </span>
             </button>
             <button className="p-2.5 text-muted-foreground hover:text-foreground rounded-full transition-colors hidden lg:block">
               <Search className="w-5 h-5" />

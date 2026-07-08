@@ -1,14 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, FileText, ShieldAlert, HeartPulse, MessageSquare, Languages, FileCheck, ArrowRight } from "lucide-react";
+import { Search, MapPin, FileText, ShieldAlert, HeartPulse, MessageSquare, Languages, FileCheck, ArrowRight, Bot, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function LandingPage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [placeholderText, setPlaceholderText] = useState("Ask anything...");
+
+  // Typing effect for placeholders
+  React.useEffect(() => {
+    const examples = [
+      "How do I get my PM Kisan money?",
+      "Mera ration card gum ho gaya hai...",
+      "Where is the nearest govt hospital?",
+      "Report a pothole in my area",
+      "Ayushman Bharat card apply kaise karein?"
+    ];
+    let timeout: NodeJS.Timeout;
+    let currentExampleIndex = 0;
+    let currentCharIndex = 0;
+    let isDeleting = false;
+
+    const type = () => {
+      const currentExample = examples[currentExampleIndex];
+      
+      if (isDeleting) {
+        setPlaceholderText(currentExample.substring(0, currentCharIndex - 1));
+        currentCharIndex--;
+      } else {
+        setPlaceholderText(currentExample.substring(0, currentCharIndex + 1));
+        currentCharIndex++;
+      }
+
+      let nextSpeed = isDeleting ? 30 : 60;
+
+      if (!isDeleting && currentCharIndex === currentExample.length) {
+        isDeleting = true;
+        nextSpeed = 2500;
+      } else if (isDeleting && currentCharIndex === 0) {
+        isDeleting = false;
+        currentExampleIndex = (currentExampleIndex + 1) % examples.length;
+        nextSpeed = 500;
+      }
+      timeout = setTimeout(type, nextSpeed);
+    };
+
+    timeout = setTimeout(type, 800);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +89,7 @@ export default function LandingPage() {
               type="text" 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Ask about PM KISAN, local hospitals, or anything else..."
+              placeholder={placeholderText}
               className="w-full h-20 pl-16 pr-36 text-xl rounded-2xl bg-background border-2 border-border focus-visible:ring-0 focus-visible:border-primary transition-all shadow-md"
             />
             <div className="absolute inset-y-3 right-3 flex items-center">
@@ -55,6 +98,12 @@ export default function LandingPage() {
               </Button>
             </div>
           </form>
+
+          {/* Trust Anchor */}
+          <div className="flex items-center justify-center gap-2 mb-8 text-xs font-medium text-muted-foreground bg-muted/30 px-4 py-2 rounded-full border border-border/50 shadow-sm backdrop-blur-sm">
+            <ShieldAlert className="w-4 h-4 text-emerald-500" />
+            <span>100% Free & Private. We never store your personal IDs or Aadhaar.</span>
+          </div>
 
           {/* Suggestion Chips */}
           <div className="flex flex-wrap justify-center gap-3">
@@ -143,6 +192,51 @@ export default function LandingPage() {
             title="Take Action"
             description="Apply for the scheme or find the location directly from the chat."
           />
+        </div>
+      </section>      {/* 
+        MOCK CHAT PREVIEW (Added UX enhancement)
+      */}
+      <section className="w-full max-w-4xl px-4 py-12 mb-12 flex flex-col items-center">
+        <div className="w-full rounded-3xl border border-border/50 bg-muted/10 shadow-xl overflow-hidden backdrop-blur-sm">
+          <div className="px-6 py-4 border-b border-border/50 bg-background/50 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm">JanSevak Assistant</h4>
+              <p className="text-xs text-muted-foreground">Online • Official Govt Data</p>
+            </div>
+          </div>
+          <div className="p-6 md:p-8 flex flex-col gap-6">
+            {/* User Bubble */}
+            <div className="flex items-start gap-4 self-end flex-row-reverse max-w-[85%] md:max-w-[70%]">
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                <User className="w-5 h-5 text-foreground" />
+              </div>
+              <div className="bg-primary text-primary-foreground px-5 py-3.5 rounded-2xl rounded-tr-none text-sm md:text-base shadow-sm">
+                My street light has been broken for 3 weeks and the local office is ignoring me.
+              </div>
+            </div>
+            
+            {/* Bot Bubble */}
+            <div className="flex items-start gap-4 max-w-[85%] md:max-w-[70%]">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
+                <Bot className="w-5 h-5 text-primary" />
+              </div>
+              <div className="bg-background border border-border/50 px-5 py-4 rounded-2xl rounded-tl-none shadow-sm flex flex-col gap-3">
+                <p className="text-sm md:text-base text-foreground leading-relaxed">
+                  I can help you escalate this directly to the Municipal Corporation's grievance portal. 
+                </p>
+                <p className="text-sm md:text-base text-foreground leading-relaxed">
+                  What is your <strong>Pin Code</strong> so I can locate the correct ward office?
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <button className="text-xs bg-muted/50 hover:bg-muted border border-border px-3 py-1.5 rounded-full transition-colors font-medium">Use my location</button>
+                  <button className="text-xs bg-muted/50 hover:bg-muted border border-border px-3 py-1.5 rounded-full transition-colors font-medium">Type pin code</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
