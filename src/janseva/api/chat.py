@@ -39,7 +39,7 @@ async def chat_sync(req: ChatRequest):
     }
 
     try:
-        result_state = agent_graph.invoke(state_input)
+        result_state = await agent_graph.ainvoke(state_input)
         response_text = result_state.get("response", "")
 
         if not response_text:
