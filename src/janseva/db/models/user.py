@@ -25,7 +25,7 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     # Personal Info
     full_name: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    preferred_language: Mapped[str] = mapped_column(String(10), default="hi", nullable=False)
+    language: Mapped[str] = mapped_column(String(10), default="hi", nullable=False)
 
     # Location
     state: Mapped[str | None] = mapped_column(String(255), nullable=True)
