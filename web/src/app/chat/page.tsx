@@ -165,8 +165,8 @@ function ChatInterface() {
       </div>
 
       {/* Messages Area */}
-      <ScrollArea className="flex-1 px-4 md:px-8 mb-24">
-        <div className="space-y-6 pb-12 flex flex-col">
+      <ScrollArea className="flex-1 px-4 md:px-8">
+        <div className="space-y-6 pb-6 flex flex-col">
           <AnimatePresence initial={false}>
             {messages.map((msg) => (
               <motion.div 
@@ -221,8 +221,8 @@ function ChatInterface() {
         </div>
       </ScrollArea>
 
-      {/* Floating Input Area */}
-      <div className="absolute bottom-4 left-0 right-0 px-4">
+      {/* Docked Input Area */}
+      <div className="w-full px-4 pb-4 pt-2">
         <div className="max-w-3xl mx-auto liquid-glass rounded-full p-2 shadow-2xl relative">
           <div className="absolute -top-px -left-px -right-px h-px tricolor-glow rounded-t-full opacity-50"></div>
           <form onSubmit={handleSend} className="flex gap-2 items-center">
