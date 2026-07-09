@@ -17,6 +17,7 @@ router = APIRouter(tags=["chat"])
 class ChatRequest(BaseModel):
     message: str
     session_id: str = "default_session"
+    language: str = "hi"
 
 
 @router.post("")
@@ -24,11 +25,11 @@ class ChatRequest(BaseModel):
 async def chat_sync(req: ChatRequest):
     """
     Synchronous (non-streaming) chat endpoint for the web frontend.
-    The frontend POSTs { message, session_id } and gets back { response }.
+    The frontend POSTs { message, session_id, language } and gets back { response }.
     """
     state_input = {
         "messages": [HumanMessage(content=req.message)],
-        "user_language": "hi",
+        "user_language": req.language,
         "user_district": "unknown",
         "user_telegram_id": 0,
         "intent": "",
@@ -58,12 +59,12 @@ async def chat_sync(req: ChatRequest):
         )
 
 
-async def generate_chat_stream(message: str, session_id: str) -> AsyncGenerator[str, None]:
+async def generate_chat_stream(message: str, session_id: str, language: str) -> AsyncGenerator[str, None]:
     """Generates an SSE stream from the LangGraph agent."""
 
     state_input = {
         "messages": [HumanMessage(content=message)],
-        "language": "english",  # Can be dynamic later
+        "user_language": language,
         "session_id": session_id,
         "contact_number": None,
     }
@@ -102,5 +103,5 @@ async def chat_stream(req: ChatRequest):
     Endpoint for the web frontend to stream chat responses via SSE.
     """
     return StreamingResponse(
-        generate_chat_stream(req.message, req.session_id), media_type="text/event-stream"
+        generate_chat_stream(req.message, req.session_id, req.language), media_type="text/event-stream"
     )
