@@ -49,11 +49,60 @@ async def handle_language_selection(callback: CallbackQuery):
             user.language = lang_code
             await session.commit()
 
+    # Ask for phone number using ReplyKeyboardMarkup
+    from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+    
+    contact_btn = KeyboardButton(text="📞 Share Contact Number", request_contact=True)
+    if lang_code == "hi":
+        contact_btn = KeyboardButton(text="📞 अपना मोबाइल नंबर शेयर करें", request_contact=True)
+        
+    reply_keyboard = ReplyKeyboardMarkup(
+        keyboard=[[contact_btn]], 
+        resize_keyboard=True, 
+        one_time_keyboard=True
+    )
+    
+    phone_text = "Please share your phone number to verify your account."
+    if lang_code == "hi":
+        phone_text = "अपना अकाउंट वेरीफाई करने के लिए कृपया अपना मोबाइल नंबर शेयर करें।"
+        
+    # Delete the inline keyboard message and send a new message with reply keyboard
+    await callback.message.delete()
+    await callback.message.answer(phone_text, reply_markup=reply_keyboard)
+    await callback.answer()
+
+
+@onboarding_router.message(F.contact)
+async def handle_contact_sharing(message):
+    """Handle the shared contact and prompt for state selection."""
+    if not message.contact or not message.from_user:
+        return
+        
+    telegram_id = message.from_user.id
+    phone_number = message.contact.phone_number
+    
+    # Text in both languages
+    lang_code = "en"
+    async with async_session_factory() as session:
+        result = await session.execute(select(User).where(User.telegram_id == telegram_id))
+        user = result.scalar_one_or_none()
+        
+        if user:
+            user.phone_number = phone_number
+            lang_code = user.language or "en"
+            await session.commit()
+            
+    msg_texts = {
+        "hi": ("आपका नंबर वेरीफाई हो गया है। ✅\n\nअब कृपया अपना राज्य (State) चुनें:"),
+        "en": ("Your number has been verified. ✅\n\nNow please select your State:"),
+    }
+    
+    text = msg_texts.get(lang_code, msg_texts["en"])
+
     # Show state keyboard (2 per row)
     buttons = []
     current_row = []
     for state_name in INDIA_DISTRICTS.keys():
-        # Truncate if too long, though they are mostly fine
         btn_text = state_name[:20]
         current_row.append(InlineKeyboardButton(text=btn_text, callback_data=f"state_{state_name}"))
         if len(current_row) == 2:
@@ -64,8 +113,10 @@ async def handle_language_selection(callback: CallbackQuery):
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
-    await callback.message.edit_text(text, reply_markup=keyboard)
-    await callback.answer()
+    from aiogram.types import ReplyKeyboardRemove
+    # Remove the reply keyboard and show the inline state keyboard
+    await message.answer(text, reply_markup=ReplyKeyboardRemove())
+    await message.answer("Select below:", reply_markup=keyboard)
 
 
 @onboarding_router.callback_query(F.data.startswith("state_"))
