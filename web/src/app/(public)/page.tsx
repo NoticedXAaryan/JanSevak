@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, FileText, ShieldAlert, HeartPulse, MessageSquare, Languages, FileCheck, ArrowRight, Bot, User } from "lucide-react";
+import { Search, MapPin, FileText, ShieldAlert, HeartPulse, MessageSquare, Languages, FileCheck, ArrowRight, Bot, User, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -99,10 +99,21 @@ export default function LandingPage() {
             </div>
           </form>
 
-          {/* Trust Anchor */}
-          <div className="flex items-center justify-center gap-2 mb-8 text-xs font-medium text-muted-foreground bg-muted/30 px-4 py-2 rounded-full border border-border/50 shadow-sm backdrop-blur-sm">
-            <ShieldAlert className="w-4 h-4 text-emerald-500" />
-            <span>100% Free & Private. We never store your personal IDs or Aadhaar.</span>
+          {/* Telegram Bot Link & Trust Anchor */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 w-full max-w-2xl">
+            <a 
+              href="https://t.me/JanSevaHackBot" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-[#0088cc] hover:bg-[#0077b5] text-white px-6 py-2.5 rounded-full font-semibold transition-colors shadow-sm text-sm"
+            >
+              <Send className="w-4 h-4 -mt-0.5" />
+              Try our Telegram Bot
+            </a>
+            <div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground bg-muted/30 px-4 py-2.5 rounded-full border border-border/50 shadow-sm backdrop-blur-sm">
+              <ShieldAlert className="w-4 h-4 text-emerald-500" />
+              <span>100% Free & Private. We never store your personal IDs or Aadhaar.</span>
+            </div>
           </div>
 
           {/* Suggestion Chips */}
