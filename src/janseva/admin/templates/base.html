@@ -92,7 +92,6 @@
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             line-height: 1.6;
@@ -101,8 +100,7 @@
         }
 
         /* Dynamic Background Mesh for Modern Feel */
-        body::before {
-            content: '';
+        .bg-mesh {
             position: fixed;
             top: -50%; left: -50%;
             width: 200%; height: 200%;
@@ -287,42 +285,94 @@
         .badge-danger  { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
         .badge-info    { background: rgba(59, 130, 246, 0.15); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.2); }
 
-        /* ===== Navigation ===== */
-        .nav {
+        /* ===== Sidebar Navigation ===== */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
             position: sticky;
             top: 0;
-            z-index: 50;
+            display: flex;
+            flex-direction: column;
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-glass);
-            transition: all var(--transition-fast);
+            border-right: 1px solid var(--border-glass);
+            transition: width var(--transition-smooth);
+            z-index: 50;
         }
-        .nav-inner {
-            display: flex; align-items: center; justify-content: space-between; height: 80px;
+        .sidebar.minimized {
+            width: 80px;
+        }
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.5rem; height: 80px;
         }
         .nav-brand {
             display: flex; align-items: center; gap: 12px;
             font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
             text-decoration: none; color: var(--text-primary);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.02em; transition: opacity var(--transition-fast);
         }
-        .nav-logo { height: 40px; width: auto; border-radius: var(--radius-sm); }
+        .sidebar.minimized .nav-brand span, .sidebar.minimized .nav-brand-text { display: none; }
+        .nav-logo { height: 32px; width: auto; border-radius: var(--radius-sm); }
         .nav-brand span { color: var(--accent-primary); }
         
-        .nav-links { display: flex; align-items: center; gap: 1.5rem; list-style: none; }
-        .nav-link {
-            display: flex; align-items: center; gap: 0.5rem;
-            font-size: 0.95rem; font-weight: 500;
-            color: var(--text-secondary); text-decoration: none;
-            transition: color var(--transition-fast);
-            position: relative;
+        .toggle-btn {
+            background: transparent; border: none; color: var(--text-secondary);
+            cursor: pointer; padding: 0.5rem; border-radius: var(--radius-sm);
+            transition: all var(--transition-fast); display: flex; align-items: center; justify-content: center;
         }
-        .nav-link:hover { color: var(--text-primary); }
-        .nav-link.active { color: var(--accent-primary); font-weight: 600; }
-        .nav-link.active::after {
-            content: ''; position: absolute; bottom: -28px; left: 0; right: 0; height: 3px;
-            background: var(--accent-gradient); border-radius: 3px 3px 0 0;
+        .toggle-btn:hover { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+        html.dark .toggle-btn:hover { background: rgba(255,255,255,0.1); }
+        
+        .sidebar.minimized .sidebar-header { justify-content: center; padding: 1.5rem 0; }
+        .sidebar.minimized .toggle-btn { display: none; }
+        
+        .nav-links { display: flex; flex-direction: column; gap: 0.5rem; list-style: none; padding: 1rem; flex-grow: 1; }
+        .nav-link {
+            display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem;
+            font-size: 0.95rem; font-weight: 500; border-radius: var(--radius-md);
+            color: var(--text-secondary); text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        .sidebar.minimized .nav-link { justify-content: center; padding: 0.75rem; }
+        .sidebar.minimized .nav-text { display: none; }
+        
+        .nav-link:hover { color: var(--text-primary); background: rgba(0,0,0,0.03); }
+        html.dark .nav-link:hover { background: rgba(255,255,255,0.05); }
+        .nav-link.active { color: var(--accent-primary); background: rgba(249, 115, 22, 0.1); font-weight: 600; }
+        
+        .sidebar-footer { padding: 1rem; border-top: 1px solid var(--border-glass); }
+        .sidebar.minimized .sidebar-footer { padding: 1rem 0.5rem; display: flex; justify-content: center; }
+
+        /* Main Content Area */
+        .main-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: calc(100% - 280px);
+            transition: width var(--transition-smooth);
+        }
+        .sidebar.minimized + .main-wrapper {
+            width: calc(100% - 80px);
+        }
+
+        /* Mobile Adjustments */
+        .mobile-header { display: none; }
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                position: fixed; left: -100%; top: 0; height: 100vh; width: 280px !important;
+                transition: left var(--transition-smooth); box-shadow: var(--shadow-lg);
+            }
+            .sidebar.mobile-open { left: 0; }
+            .main-wrapper { width: 100% !important; margin-left: 0; }
+            .mobile-header {
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 1rem 1.5rem; background: var(--bg-glass); border-bottom: 1px solid var(--border-glass);
+                backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 40;
+            }
         }
 
         /* ===== Tables (Sleek Data Grid) ===== */
@@ -416,58 +466,116 @@
     </style>
     {% block head %}{% endblock %}
 </head>
-<body>
+    <div class="bg-mesh"></div>
 
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="container nav-inner">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <a href="/" class="nav-brand" style="font-size: 1.25rem;">
+            <img src="/static/images/logo.png" alt="JanSeva Logo" class="nav-logo" style="height: 28px;">
+            Jan<span>Seva</span>
+        </a>
+        <button class="toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')">
+            <i data-lucide="menu" style="width:24px;height:24px;"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
             <a href="/" class="nav-brand">
                 <img src="/static/images/logo.png" alt="JanSeva Logo" class="nav-logo">
-                Jan<span>Seva</span>
+                <span class="nav-brand-text">Jan<span style="color:var(--accent-primary)">Seva</span></span>
             </a>
-            <ul class="nav-links">
-                {% if admin %}
-                    <li><a href="/admin" class="nav-link {% if request.url.path == '/admin' %}active{% endif %}">
-                        <i data-lucide="layout-dashboard" style="width:18px;height:18px;"></i> Dashboard
-                    </a></li>
-                    <li><a href="/admin/queries" class="nav-link {% if '/queries' in request.url.path %}active{% endif %}">
-                        <i data-lucide="message-square" style="width:18px;height:18px;"></i> Queries
-                    </a></li>
-                    <li><a href="/admin/reports" class="nav-link {% if '/reports' in request.url.path %}active{% endif %}">
-                        <i data-lucide="shield-alert" style="width:18px;height:18px;"></i> Reports
-                    </a></li>
-                    {% if admin.get('role') == 'super_admin' %}
-                    <li><a href="/admin/organizations" class="nav-link {% if '/organizations' in request.url.path %}active{% endif %}">
-                        <i data-lucide="building-2" style="width:18px;height:18px;"></i> Authorities
-                    </a></li>
-                    <li><a href="/admin/users" class="nav-link {% if '/users' in request.url.path %}active{% endif %}">
-                        <i data-lucide="users" style="width:18px;height:18px;"></i> Staff
-                    </a></li>
-                    {% endif %}
-                    <li><a href="/admin/logout" class="btn btn-danger btn-sm" style="margin-left: 1rem;">
-                        <i data-lucide="log-out" style="width:16px;height:16px;"></i> Logout
-                    </a></li>
-                {% else %}
-                    <li><a href="/admin/login" class="btn btn-primary btn-sm">Admin Portal</a></li>
+            <button class="toggle-btn" onclick="toggleSidebar()" title="Minimize sidebar">
+                <i data-lucide="panel-left-close" style="width:20px;height:20px;" id="sidebar-icon"></i>
+            </button>
+        </div>
+        
+        <ul class="nav-links">
+            {% if admin %}
+                <li><a href="/admin" class="nav-link {% if request.url.path == '/admin' %}active{% endif %}" title="Dashboard">
+                    <i data-lucide="layout-dashboard" style="width:20px;height:20px;"></i> <span class="nav-text">Dashboard</span>
+                </a></li>
+                <li><a href="/admin/queries" class="nav-link {% if '/queries' in request.url.path %}active{% endif %}" title="Queries">
+                    <i data-lucide="message-square" style="width:20px;height:20px;"></i> <span class="nav-text">Queries</span>
+                </a></li>
+                <li><a href="/admin/reports" class="nav-link {% if '/reports' in request.url.path %}active{% endif %}" title="Reports">
+                    <i data-lucide="shield-alert" style="width:20px;height:20px;"></i> <span class="nav-text">Reports</span>
+                </a></li>
+                {% if admin.get('role') == 'super_admin' %}
+                <li><a href="/admin/organizations" class="nav-link {% if '/organizations' in request.url.path %}active{% endif %}" title="Authorities">
+                    <i data-lucide="building-2" style="width:20px;height:20px;"></i> <span class="nav-text">Authorities</span>
+                </a></li>
+                <li><a href="/admin/users" class="nav-link {% if '/users' in request.url.path %}active{% endif %}" title="Staff">
+                    <i data-lucide="users" style="width:20px;height:20px;"></i> <span class="nav-text">Staff</span>
+                </a></li>
                 {% endif %}
-            </ul>
+            {% else %}
+                <li><a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}" title="Home">
+                    <i data-lucide="home" style="width:20px;height:20px;"></i> <span class="nav-text">Home</span>
+                </a></li>
+                <li><a href="/admin/login" class="nav-link" title="Admin Login">
+                    <i data-lucide="log-in" style="width:20px;height:20px;"></i> <span class="nav-text">Admin Login</span>
+                </a></li>
+            {% endif %}
+        </ul>
+        
+        {% if admin %}
+        <div class="sidebar-footer">
+            <a href="/admin/logout" class="btn btn-danger btn-sm" style="width: 100%; display: flex; justify-content: center;">
+                <i data-lucide="log-out" style="width:16px;height:16px;"></i> <span class="nav-text">Logout</span>
+            </a>
         </div>
-    </nav>
+        {% endif %}
+    </aside>
 
-    <!-- Main Content -->
-    <main style="flex-grow:1;">
-        {% block content %}{% endblock %}
-    </main>
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <main style="flex-grow:1; padding: 2rem 0;">
+            {% block content %}{% endblock %}
+        </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 JanSeva — AI-Powered Public Services Platform. Built for India.</p>
-        </div>
-    </footer>
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2026 JanSeva — AI-Powered Public Services Platform. Built for India.</p>
+            </div>
+        </footer>
+    </div>
 
     <!-- Initialize Lucide Icons -->
-    <script>lucide.createIcons();</script>
+    <script>
+        lucide.createIcons();
+        
+        // Sidebar Toggle Logic
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('sidebar-icon');
+            sidebar.classList.toggle('minimized');
+            if (sidebar.classList.contains('minimized')) {
+                icon.setAttribute('data-lucide', 'panel-right-close');
+                localStorage.setItem('sidebarState', 'minimized');
+            } else {
+                icon.setAttribute('data-lucide', 'panel-left-close');
+                localStorage.setItem('sidebarState', 'expanded');
+            }
+            lucide.createIcons();
+        }
+        
+        // Restore sidebar state
+        document.addEventListener('DOMContentLoaded', () => {
+            const state = localStorage.getItem('sidebarState');
+            if (state === 'minimized') {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) {
+                    sidebar.classList.add('minimized');
+                    const icon = document.getElementById('sidebar-icon');
+                    if (icon) icon.setAttribute('data-lucide', 'panel-right-close');
+                    lucide.createIcons();
+                }
+            }
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
