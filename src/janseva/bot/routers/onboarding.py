@@ -4,7 +4,7 @@ Handles the guided onboarding flow (language and district selection).
 
 import structlog
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from sqlalchemy import select
 
 from janseva.bot.helpers.constants import INDIA_DISTRICTS
