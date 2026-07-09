@@ -98,6 +98,11 @@ admin_app.include_router(dept_router)
 admin_app.include_router(public_reports_router)
 admin_app.include_router(uploads_router)
 
+# Mount diagnostics API
+from janseva.api.diagnostics import router as diagnostics_router
+
+admin_app.include_router(diagnostics_router, prefix="/api/v1")
+
 # Mount OAuth router
 from janseva.admin.oauth import router as oauth_router
 
