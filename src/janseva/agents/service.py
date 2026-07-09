@@ -130,7 +130,7 @@ async def process_message(
                 "escalation_reason": "",
             }
 
-            result_state = agent_graph.invoke(initial_state)
+            result_state = await agent_graph.ainvoke(initial_state)
             response_text = result_state.get("response", "")
             interactive_options = result_state.get("interactive_options", [])
 

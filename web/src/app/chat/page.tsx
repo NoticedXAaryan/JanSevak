@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -194,7 +196,15 @@ function ChatInterface() {
                   {msg.role === "assistant" && (
                     <div className="absolute top-0 left-0 w-full h-[2px] tricolor-glow"></div>
                   )}
-                  <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  {msg.role === "user" ? (
+                    <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                  ) : (
+                    <div className="prose prose-sm dark:prose-invert prose-p:leading-relaxed max-w-none prose-a:text-blue-500">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}

@@ -15,14 +15,18 @@ import {
   Activity, 
   Settings,
   LayoutDashboard,
-  Users
+  Users,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   role?: "citizen" | "department" | "admin";
+  isCollapsed?: boolean;
+  setIsCollapsed?: (collapsed: boolean) => void;
 }
 
-export function Sidebar({ className, role = "citizen" }: SidebarProps) {
+export function Sidebar({ className, role = "citizen", isCollapsed = false, setIsCollapsed }: SidebarProps) {
   const pathname = usePathname();
 
   const citizenRoutes = [
@@ -50,38 +54,53 @@ export function Sidebar({ className, role = "citizen" }: SidebarProps) {
   const routes = role === "admin" ? adminRoutes : role === "department" ? departmentRoutes : citizenRoutes;
 
   return (
-    <div className={cn("pb-12 border-r border-border liquid-glass h-screen flex flex-col", className)}>
+    <div className={cn("pb-12 border-r border-border liquid-glass h-screen flex flex-col relative", className)}>
       <div className="space-y-4 py-4 flex-1">
         <div className="px-3 py-2">
-          <div className="flex items-center gap-3 mb-2 px-4 mt-2">
-            <div className="relative w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-black">
+          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3 px-4'} mb-2 mt-2`}>
+            <div className="relative w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center bg-black shrink-0">
               <Image src="/logo.png" alt="JanSevak Logo" width={32} height={32} className="object-contain p-1" />
             </div>
-            <h2 className="text-2xl font-bold tracking-tight">JanSevak</h2>
+            {!isCollapsed && <h2 className="text-2xl font-bold tracking-tight whitespace-nowrap">JanSevak</h2>}
           </div>
-          <p className="px-4 text-xs text-muted-foreground mb-6">
-            {role === "citizen" ? "Citizen Portal" : role === "department" ? "Department Portal" : "Admin Portal"}
-          </p>
-          <div className="space-y-1">
+          {!isCollapsed && (
+            <p className="px-4 text-xs text-muted-foreground mb-6 whitespace-nowrap">
+              {role === "citizen" ? "Citizen Portal" : role === "department" ? "Department Portal" : "Admin Portal"}
+            </p>
+          )}
+          {isCollapsed && <div className="h-6 mb-6"></div>}
+          <div className="space-y-1 mt-2">
             {routes.map((route) => (
               <Link
                 key={route.path}
                 href={route.path}
+                title={isCollapsed ? route.name : undefined}
                 className={cn(
                   buttonVariants({
                     variant: pathname === route.path ? "default" : "ghost",
                   }),
-                  "w-full justify-start",
+                  isCollapsed ? "w-full justify-center px-0" : "w-full justify-start",
                   pathname === route.path && "bg-foreground text-background hover:bg-foreground/90 shadow-md"
                 )}
               >
-                <route.icon className="mr-2 h-4 w-4" />
-                {route.name}
+                <route.icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
+                {!isCollapsed && <span className="whitespace-nowrap">{route.name}</span>}
               </Link>
             ))}
           </div>
         </div>
       </div>
+      
+      {setIsCollapsed && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute -right-3 top-6 h-6 w-6 rounded-full border border-border bg-background shadow-md z-20 hover:bg-accent flex items-center justify-center"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
+      )}
     </div>
   );
 }
