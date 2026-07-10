@@ -102,7 +102,7 @@ export default function LandingPage() {
           {/* Telegram Bot Link & Trust Anchor */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 w-full max-w-2xl">
             <a 
-              href="https://t.me/JanSevaHackBot" 
+              href="https://t.me/JanSavakBot" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-[#0088cc] hover:bg-[#0077b5] text-white px-6 py-2.5 rounded-full font-semibold transition-colors shadow-sm text-sm"
