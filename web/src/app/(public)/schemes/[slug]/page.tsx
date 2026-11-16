@@ -3,12 +3,21 @@
 import React, { use } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileText, CheckCircle2, ChevronRight, Share2, Info } from "lucide-react";
+import { ArrowLeft, FileText, CheckCircle2, Share2, Info } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+
+type SchemeProfile = {
+  name: string;
+  ministry: string;
+  amount: string;
+  description: string;
+  benefits: string[];
+  eligibility: string[];
+  documents: string[];
+};
 
 // Mock data since DB is not wired for this view in the demo
-const MOCK_SCHEMES: Record<string, any> = {
+const MOCK_SCHEMES: Record<string, SchemeProfile> = {
   "scheme-1": {
     name: "PM KISAN Samman Nidhi",
     ministry: "Ministry of Agriculture and Farmers Welfare",

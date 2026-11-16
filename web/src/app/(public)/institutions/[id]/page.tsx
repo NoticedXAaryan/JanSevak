@@ -6,8 +6,17 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, Phone, Mail, Clock, ExternalLink, Building2, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
-// Mock data
-const MOCK_INSTS: Record<string, any> = {
+type InstitutionProfile = {
+  name: string;
+  type: string;
+  address: string;
+  phone: string;
+  email: string;
+  hours: string;
+  services: string[];
+};
+
+const MOCK_INSTS: Record<string, InstitutionProfile> = {
   "1": {
     name: "Civil Hospital, Central",
     type: "Healthcare",

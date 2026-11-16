@@ -29,7 +29,7 @@ async def process_message(
     user_text: str,
     language: str = "hi",
     district: str = "unknown",
-) -> str:
+) -> tuple[str, list[dict[str, str]]]:
     """
     Process a user's text message through the AI agent pipeline.
 
@@ -49,7 +49,7 @@ async def process_message(
 
         if user is None:
             logger.error("user_not_found", telegram_id=telegram_id)
-            return "❌ कृपया पहले /start कमांड भेजें। Please send /start first."
+            return "❌ कृपया पहले /start कमांड भेजें। Please send /start first.", []
 
         # 2. Find or create an active conversation
         result = await session.execute(

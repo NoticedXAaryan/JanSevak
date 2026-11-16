@@ -12,9 +12,7 @@ The entire flow happens WITHOUT storing the user's Telegram ID in the report.
 """
 
 import structlog
-from langchain_core.messages import HumanMessage, SystemMessage
 
-from janseva.agents.llm import get_llm
 from janseva.db.engine import async_session_factory
 from janseva.db.models.anonymous_report import AnonymousReport
 from janseva.reporting.anonymizer import strip_metadata
@@ -24,20 +22,6 @@ from janseva.reporting.tokens import generate_report_token
 
 logger = structlog.get_logger()
 
-REPORT_SYSTEM_PROMPT = """You are JanSeva's anonymous reporting assistant.
-Your role is to help the user describe their complaint clearly and completely.
-
-RULES:
-1. Respond in the SAME LANGUAGE the user uses.
-2. Be empathetic and reassuring — the user may be scared.
-3. NEVER ask for the user's name, phone number, or any personal details.
-4. Help them describe: WHAT happened, WHERE it happened, WHO is involved (titles/roles, not personal info), WHEN it happened.
-5. Keep responses concise and focused.
-6. Once you have enough detail, summarize the complaint and ask for confirmation.
-
-User's language: {user_language}"""
-
-
 async def handle_anonymous_report(state: dict) -> dict:
     """
     Process an anonymous report submission.
@@ -46,31 +30,11 @@ async def handle_anonymous_report(state: dict) -> dict:
     It processes the user's complaint, anonymizes it, encrypts it,
     routes it to the correct authority, and returns the anonymous token.
     """
-    llm = get_llm()
-    user_language = state.get("user_language", "hi")
     latest_message = state["messages"][-1].content if state["messages"] else ""
+    if not isinstance(latest_message, str):
+        latest_message = str(latest_message)
 
-    # Step 1: Use LLM to structure the complaint
-    system_msg = SystemMessage(
-        content=REPORT_SYSTEM_PROMPT.format(
-            user_language=user_language,
-        )
-    )
-
-    structuring_prompt = HumanMessage(
-        content=f"""
-The user wants to submit an anonymous report. Their message is:
-"{latest_message}"
-
-Please:
-1. Acknowledge their report
-2. Summarize what they reported in a clear, structured format
-3. Explain that their identity is fully protected
-4. Provide their anonymous tracking token (will be inserted below)
-"""
-    )
-
-    # Step 2: Anonymize the content
+    # Anonymize the content
     anonymized_text = strip_metadata(latest_message)
 
     if not anonymized_text or len(anonymized_text.strip()) < 10:
@@ -96,9 +60,9 @@ Please:
             content_encrypted=encrypted_content,
             district=state.get("user_district"),
             state=None,
-            target_authority_title=routing.get("target_authority_title"),
+            target_authority_title=routing.get("target_authority_title")
+            or routing.get("department"),
             routed_to_level=routing["routed_to_level"],
-            routed_to_department=routing.get("department"),
             status="submitted",
             severity=routing.get("severity", "medium"),
         )

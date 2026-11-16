@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bot, Mail, Shield, ShieldCheck } from "lucide-react";
+import { Bot, Mail, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   return (

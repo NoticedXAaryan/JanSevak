@@ -15,11 +15,12 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 @router.post("/image")
 async def upload_image(file: UploadFile = File(...)):
     """Upload an image file (e.g., pothole photo)."""
-    if not file.content_type.startswith("image/"):
+    content_type = file.content_type or ""
+    if not content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
-    # Generate safe filename
-    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = file.filename or ""
+    ext = filename.rsplit(".", 1)[-1] if "." in filename else "jpg"
     safe_filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / safe_filename
 

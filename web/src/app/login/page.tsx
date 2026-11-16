@@ -3,15 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { toast } from "sonner";
-import Image from "next/image";
-
 export default function CitizenLogin() {
   const router = useRouter();
   const [phone, setPhone] = useState("");
@@ -43,8 +40,8 @@ export default function CitizenLogin() {
       
       toast.success(data.message || `OTP sent successfully to ${phone} via Telegram`);
       setOtpSent(true);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to send OTP");
     } finally {
       setIsLoading(false);
     }
@@ -75,8 +72,8 @@ export default function CitizenLogin() {
       localStorage.setItem("jansevak_isLoggedIn", "true");
       // Store token if needed: localStorage.setItem("token", data.access_token);
       router.push("/chat");
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Invalid OTP");
     } finally {
       setIsLoading(false);
     }

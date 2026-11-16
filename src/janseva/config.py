@@ -11,7 +11,10 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # --- Telegram ---
-    telegram_bot_token: str = Field(..., description="Telegram bot token from BotFather")
+    telegram_bot_token: str = Field(
+        "",
+        description="Telegram bot token from BotFather. Required to start the bot.",
+    )
 
     # --- Database ---
     database_url: str = Field(

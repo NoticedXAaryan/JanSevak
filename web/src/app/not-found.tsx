@@ -30,7 +30,7 @@ export default function NotFound() {
           Under Maintenance
         </h1>
         <p className="text-gray-500 mb-8 leading-relaxed">
-          This feature is currently under active development. We're working hard to 
+          This feature is currently under active development. We&apos;re working hard to 
           bring you a better experience. Please check back later!
         </p>
 

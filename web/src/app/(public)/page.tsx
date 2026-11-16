@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, FileText, ShieldAlert, HeartPulse, MessageSquare, Languages, FileCheck, ArrowRight, Bot, User, Send } from "lucide-react";
+import { Search, MapPin, FileText, ShieldAlert, HeartPulse, MessageSquare, FileCheck, ArrowRight, Bot, User, Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -150,7 +150,7 @@ export default function LandingPage() {
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tight mb-4">Everything you need, in one place</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            We've combined hundreds of separate government portals into a single, easy-to-use assistant that understands you.
+            We&apos;ve combined hundreds of separate government portals into a single, easy-to-use assistant that understands you.
           </p>
         </div>
 
@@ -236,7 +236,7 @@ export default function LandingPage() {
               </div>
               <div className="bg-background border border-border/50 px-5 py-4 rounded-2xl rounded-tl-none shadow-sm flex flex-col gap-3">
                 <p className="text-sm md:text-base text-foreground leading-relaxed">
-                  I can help you escalate this directly to the Municipal Corporation's grievance portal. 
+                  I can help you escalate this directly to the Municipal Corporation&apos;s grievance portal. 
                 </p>
                 <p className="text-sm md:text-base text-foreground leading-relaxed">
                   What is your <strong>Pin Code</strong> so I can locate the correct ward office?

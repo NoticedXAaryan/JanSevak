@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -20,6 +20,33 @@ type Message = {
   content: string;
 };
 
+type SpeechErrorEvent = { error: string };
+type SpeechResultEvent = { results: ArrayLike<ArrayLike<{ transcript: string }>> };
+type SpeechRecognitionInstance = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: SpeechErrorEvent) => void) | null;
+  onresult: ((event: SpeechResultEvent) => void) | null;
+  start: () => void;
+};
+type SpeechRecognitionCtor = new () => SpeechRecognitionInstance;
+
+function subscribeLanguage(onStoreChange: () => void) {
+  window.addEventListener("languageChange", onStoreChange);
+  window.addEventListener("storage", onStoreChange);
+  return () => {
+    window.removeEventListener("languageChange", onStoreChange);
+    window.removeEventListener("storage", onStoreChange);
+  };
+}
+
+function readLang() {
+  return localStorage.getItem("jansevak_lang") || "EN";
+}
+
 // We wrap the main chat interface in a sub-component so we can use useSearchParams safely with Suspense
 function ChatInterface() {
   const searchParams = useSearchParams();
@@ -35,33 +62,11 @@ function ChatInterface() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [lang, setLang] = useState("EN");
+  const lang = useSyncExternalStore(subscribeLanguage, readLang, () => "EN");
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasInitialized = useRef(false);
 
-  // Sync Language State from Navbar
-  useEffect(() => {
-    const handleLangChange = () => setLang(localStorage.getItem("jansevak_lang") || "EN");
-    handleLangChange();
-    window.addEventListener("languageChange", handleLangChange);
-    return () => window.removeEventListener("languageChange", handleLangChange);
-  }, []);
-
-  // Handle Initial Search Query from Landing Page
-  useEffect(() => {
-    if (initialQuery && !hasInitialized.current) {
-      hasInitialized.current = true;
-      sendMessage(initialQuery);
-    }
-  }, [initialQuery]);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  const sendMessage = async (text: string) => {
+  const sendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return;
 
     const userMessage: Message = {
@@ -96,7 +101,7 @@ function ChatInterface() {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
+    } catch {
       toast.error("Failed to reach AI. Using fallback response.");
       
       setTimeout(() => {
@@ -111,7 +116,20 @@ function ChatInterface() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [lang]);
+
+  useEffect(() => {
+    if (initialQuery && !hasInitialized.current) {
+      hasInitialized.current = true;
+      void sendMessage(initialQuery);
+    }
+  }, [initialQuery, sendMessage]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,8 +142,11 @@ function ChatInterface() {
       return;
     }
     
-    // Type definitions for Web Speech API
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const speechWindow = window as Window & {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
+    const SpeechRecognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition is not supported in your browser.");
       return;
@@ -138,7 +159,7 @@ function ChatInterface() {
 
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
       setIsListening(false);
       if (event.error !== "no-speech") {
@@ -146,7 +167,7 @@ function ChatInterface() {
       }
     };
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInput((prev) => prev + (prev ? " " : "") + transcript);
     };

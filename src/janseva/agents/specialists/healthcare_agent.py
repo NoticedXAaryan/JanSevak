@@ -22,7 +22,7 @@ async def find_facilities(district: str, limit: int = 3) -> list[HealthcareFacil
             select(HealthcareFacility)
             .where(
                 HealthcareFacility.district.ilike(f"%{district}%"),
-                HealthcareFacility.is_accepting_patients == True,
+                HealthcareFacility.is_accepting_patients.is_(True),
             )
             .limit(limit)
         )
@@ -58,7 +58,7 @@ async def handle_healthcare_query(state: dict) -> dict:
 
     # 3. LLM call to generate a friendly response
     prompt = f"""
-You are JanSeva's Healthcare Assistant. 
+You are JanSeva's Healthcare Assistant.
 The user said: "{latest_message}"
 Their district is: {user_district}
 

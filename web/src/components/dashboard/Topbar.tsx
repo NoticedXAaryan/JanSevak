@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
 import { Bell, Search, Menu } from "lucide-react";
-import Link from "next/link";
-
 export default function Topbar() {
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6">

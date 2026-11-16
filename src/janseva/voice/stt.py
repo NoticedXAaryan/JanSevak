@@ -1,5 +1,7 @@
 """Speech-to-Text service using IndicWhisper or standard Whisper."""
 
+import asyncio
+
 import structlog
 from faster_whisper import WhisperModel
 
@@ -16,9 +18,6 @@ def get_model():
         _model = WhisperModel("base", device="cpu", compute_type="int8")
         logger.info("faster_whisper_model_loaded", model="base")
     return _model
-
-
-import asyncio
 
 
 async def transcribe(audio_path: str) -> dict:

@@ -7,7 +7,6 @@ import {
   LayoutDashboard, 
   Users, 
   FileText, 
-  Settings, 
   HelpCircle,
   Building2
 } from "lucide-react";

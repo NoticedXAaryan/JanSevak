@@ -1,8 +1,9 @@
 import os
-import shutil
+from pathlib import Path
+
 import yaml
 
-base_dir = r"c:\Users\notic\OneDrive\Desktop\Hackathon\GoogleXParul\src\janseva\knowledge\data"
+base_dir = str(Path(__file__).resolve().parent / "src" / "janseva" / "knowledge" / "data")
 services_dir = os.path.join(base_dir, "services")
 schemes_dir = os.path.join(base_dir, "schemes")
 subsidies_dir = os.path.join(base_dir, "subsidies")

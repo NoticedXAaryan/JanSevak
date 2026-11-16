@@ -1,21 +1,21 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import DataTable from "@/components/dashboard/DataTable";
 import { Users, FileText, Activity, AlertTriangle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
 
-export default function DashboardOverview() {
-  const [orgType, setOrgType] = useState<string>("generic");
+function subscribeSession() {
+  return () => {};
+}
 
-  useEffect(() => {
-    // In a real app, we fetch the org type from the user's session
-    const session = getSession();
-    if (session?.orgType) {
-      setOrgType(session.orgType);
-    }
-  }, []);
+function readOrgType() {
+  return getSession()?.orgType || "generic";
+}
+
+export default function DashboardOverview() {
+  const orgType = useSyncExternalStore(subscribeSession, readOrgType, () => "generic");
 
   const getStats = () => {
     switch (orgType) {
@@ -70,7 +70,7 @@ export default function DashboardOverview() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-heading font-semibold text-foreground">Dashboard Overview</h1>
-          <p className="text-muted-foreground text-sm">Welcome back. Here is what's happening today.</p>
+          <p className="text-muted-foreground text-sm">Welcome back. Here is what&apos;s happening today.</p>
         </div>
         <div className="flex gap-3">
           <Link href={`/dashboard/${orgType === 'generic' ? 'municipal' : orgType}`} className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg transition-colors">

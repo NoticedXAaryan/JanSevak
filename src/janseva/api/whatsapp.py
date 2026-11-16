@@ -1,6 +1,7 @@
 """FastAPI router for handling WhatsApp webhooks via Twilio."""
 
 import logging
+from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Form, Request
 from fastapi.responses import Response
@@ -27,7 +28,9 @@ async def handle_whatsapp_message(from_number: str, body: str):
         pseudo_telegram_id = int(numeric_id)
 
         # 1. Pass through the same exact AI agent pipeline as Telegram!
-        response_text = await process_message(telegram_id=pseudo_telegram_id, user_text=body)
+        response_text, _interactive_options = await process_message(
+            telegram_id=pseudo_telegram_id, user_text=body
+        )
 
         # 2. Send the response back via Twilio API
         if len(response_text) > 1600:
@@ -45,17 +48,17 @@ async def handle_whatsapp_message(from_number: str, body: str):
 async def twilio_webhook(
     request: Request,
     background_tasks: BackgroundTasks,
-    From: str = Form(...),
-    Body: str = Form(...),
+    sender: Annotated[str, Form(alias="From")],
+    message_body: Annotated[str, Form(alias="Body")],
 ):
     """
     Webhook endpoint for Twilio incoming WhatsApp messages.
     Must return a 200 OK immediately, so we process the message in the background.
     """
-    logger.info(f"Received WhatsApp message from {From}: {Body[:50]}...")
+    logger.info(f"Received WhatsApp message from {sender}: {message_body[:50]}...")
 
     # Process message in background to avoid Twilio timeout
-    background_tasks.add_task(handle_whatsapp_message, From, Body)
+    background_tasks.add_task(handle_whatsapp_message, sender, message_body)
 
     # Return empty TwiML response
     return Response(content="<Response></Response>", media_type="application/xml")

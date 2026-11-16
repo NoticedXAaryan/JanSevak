@@ -20,17 +20,17 @@ export default function TermsPage() {
             
             <h2 className="text-2xl font-semibold mt-8 mb-4">1. Acceptance of Terms</h2>
             <p className="mb-4 text-muted-foreground leading-relaxed">
-              By accessing and using JanSevak ("the Platform"), you agree to be bound by these Terms of Service. The Platform serves as a digital bridge between citizens and government services, utilizing AI to streamline access to information.
+              By accessing and using JanSevak (&quot;the Platform&quot;), you agree to be bound by these Terms of Service. The Platform serves as a digital bridge between citizens and government services, utilizing AI to streamline access to information.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">2. Use of AI and Information Accuracy</h2>
             <p className="mb-4 text-muted-foreground leading-relaxed">
-              JanSevak uses advanced Artificial Intelligence (LLMs) to retrieve and summarize government schemes, policies, and location data. While we strive for high accuracy, the Platform's responses should not be considered legally binding government directives. Users must verify critical information on official `.gov.in` portals.
+              JanSevak uses advanced Artificial Intelligence (LLMs) to retrieve and summarize government schemes, policies, and location data. While we strive for high accuracy, the Platform&apos;s responses should not be considered legally binding government directives. Users must verify critical information on official `.gov.in` portals.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">3. User Conduct</h2>
             <p className="mb-4 text-muted-foreground leading-relaxed">
-              You agree to use the Platform for lawful civic purposes only. You must not submit false grievances, impersonate officials, or attempt to manipulate the Platform's infrastructure. Anonymous reporting must be used responsibly for valid civic issues.
+              You agree to use the Platform for lawful civic purposes only. You must not submit false grievances, impersonate officials, or attempt to manipulate the Platform&apos;s infrastructure. Anonymous reporting must be used responsibly for valid civic issues.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">4. Data Privacy</h2>

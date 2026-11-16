@@ -2,22 +2,34 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Menu, X, Bot, User, Globe } from "lucide-react";
+import { Search, Menu, X, Bot, Globe } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+
+function subscribeClientPrefs(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener("languageChange", onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener("languageChange", onStoreChange);
+  };
+}
+
+function readLoggedIn() {
+  return localStorage.getItem("jansevak_isLoggedIn") === "true";
+}
+
+function readLang() {
+  return localStorage.getItem("jansevak_lang") || "EN";
+}
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [lang, setLang] = React.useState("EN");
+  const isLoggedIn = React.useSyncExternalStore(subscribeClientPrefs, readLoggedIn, () => false);
+  const lang = React.useSyncExternalStore(subscribeClientPrefs, readLang, () => "EN");
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsLoggedIn(localStorage.getItem("jansevak_isLoggedIn") === "true");
-      setLang(localStorage.getItem("jansevak_lang") || "EN");
-    }
-    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -27,11 +39,8 @@ export default function Navbar() {
 
   const toggleLang = () => {
     const newLang = lang === "EN" ? "HI" : "EN";
-    setLang(newLang);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("jansevak_lang", newLang);
-      window.dispatchEvent(new Event("languageChange"));
-    }
+    localStorage.setItem("jansevak_lang", newLang);
+    window.dispatchEvent(new Event("languageChange"));
   };
 
   return (

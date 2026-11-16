@@ -9,7 +9,7 @@ export default function ShaderBackground() {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none opacity-80 mix-blend-screen">
       <ShaderGradientCanvas
-        // @ts-ignore
+        // @ts-expect-error shadergradient's canvas types omit the importedFiber prop
         importedFiber={{ ...fiber, ...drei, ...reactSpring }}
         style={{
           position: 'absolute',

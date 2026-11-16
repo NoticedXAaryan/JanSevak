@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { ShieldAlert, Send, Lock, EyeOff } from "lucide-react";
+import { ShieldAlert, Lock, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -54,8 +54,8 @@ export default function AnonymousReport() {
         router.push("/");
       }, 5000);
       
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to submit report");
     } finally {
       setIsSubmitting(false);
     }

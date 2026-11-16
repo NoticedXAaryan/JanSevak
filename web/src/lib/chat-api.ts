@@ -19,9 +19,10 @@ export class ChatClient {
   private endpoint: string;
 
   constructor(endpoint: string = "/api/v1/chat/stream") {
-    this.endpoint = process.env.NEXT_PUBLIC_API_URL 
-      ? `${process.env.NEXT_PUBLIC_API_URL}/v1/chat/stream` 
-      : "http://localhost:8000/api/v1/chat/stream";
+    const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+    // NEXT_PUBLIC_API_URL already includes the /api prefix used by the rest of the app.
+    this.endpoint = apiBase ? `${apiBase}${path.replace(/^\/api/, "")}` : `http://localhost:8000${path}`;
   }
 
   /**
@@ -67,7 +68,7 @@ export class ChatClient {
                 fullMessage += data.content;
                 options.onMessage?.(data.content);
               }
-            } catch (e) {
+            } catch {
               console.warn("Failed to parse SSE data chunk:", dataStr);
             }
           }

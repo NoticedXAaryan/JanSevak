@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowLeft, Clock, FileCheck, Landmark, MessageSquare } from "lucide-react";
 
-export default function ServiceDetailPage({ params }: { params: { slug: string } }) {
+export default function ServiceDetailPage() {
   return (
     <div className="w-full max-w-4xl mx-auto px-6 py-12">
       <Link href="/services" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors">
@@ -47,7 +47,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
       <div className="prose prose-invert max-w-none">
         <h2 className="text-2xl font-heading font-semibold mt-8 mb-4 border-b border-border pb-2">Overview</h2>
         <p className="text-muted-foreground mb-6">
-          The Income Certificate is an important document required to avail various subsidies, schemes, and educational benefits provided by the State and Central Government. It serves as proof of your family's annual income from all sources.
+          The Income Certificate is an important document required to avail various subsidies, schemes, and educational benefits provided by the State and Central Government. It serves as proof of your family&apos;s annual income from all sources.
         </p>
 
         <h2 className="text-2xl font-heading font-semibold mt-8 mb-4 border-b border-border pb-2">Documents Required</h2>

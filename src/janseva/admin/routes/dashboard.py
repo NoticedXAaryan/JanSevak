@@ -7,13 +7,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from janseva.admin.auth import get_current_admin
-
-TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
-templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 from janseva.db.engine import get_session
 from janseva.db.models.anonymous_report import AnonymousReport
 from janseva.db.models.conversation import Conversation
 from janseva.db.models.user import User
+
+TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 router = APIRouter()
 
@@ -43,20 +43,16 @@ async def dashboard_home(
     # 3. Active Escalations (Not yet implemented, just a placeholder)
     escalations_count = 0
 
-    # 4. Pending Reports
-    reports_query = (
-        select(func.count()).select_from(AnonymousReport).where(AnonymousReport.status == "pending")
-    )
-    if admin_user["role"] != "super_admin":
-        if admin_user.get("org_id"):
-            reports_query = reports_query.where(
-                AnonymousReport.organization_id == admin_user["org_id"]
-            )
-        else:
-            # No org assigned -> no reports
-            reports_query = None
-
-    reports_count = await session.scalar(reports_query) if reports_query is not None else 0
+    # Open reports. The model uses submitted/under_review/investigating, not "pending".
+    # Reports are not linked to organizations, so org admins do not get a scoped count.
+    if admin_user["role"] == "super_admin":
+        reports_count = await session.scalar(
+            select(func.count())
+            .select_from(AnonymousReport)
+            .where(AnonymousReport.status.in_(("submitted", "under_review", "investigating")))
+        )
+    else:
+        reports_count = 0
 
     return templates.TemplateResponse(
         request=request,

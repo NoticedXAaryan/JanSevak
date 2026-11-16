@@ -35,6 +35,9 @@ redisdata/
 # Models (large files)
 /models/
 
+# Local upload scratch space created by the API
+/uploads/
+
 # Logs
 *.log
 logs/
