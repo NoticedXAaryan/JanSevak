@@ -28,14 +28,6 @@ RUN uv sync --frozen --no-install-project --no-dev --no-cache
 # Copy the rest of the application source
 COPY . .
 
-# DEBUG: List what actually got copied to find out what's missing
-RUN echo "=== /app/src contents ===" && \
-    find /app/src -type f -name "*.py" | head -50 && \
-    echo "=== Looking for db/models ===" && \
-    find /app/src -path "*/db/models*" && \
-    echo "=== Full directory tree ===" && \
-    find /app/src -type d | sort
-
 # Setup entrypoint script
 RUN chmod +x /app/scripts/start.sh
 

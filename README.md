@@ -1,154 +1,110 @@
-# 🙏 JanSeva (जनसेवा) — AI-Powered Government Services Platform
+# JanSeva (जनसेवा)
 
-> **"Service to the People"** — Simplifying citizen interactions with Indian government authorities through AI, starting on Telegram.
+An AI assistant that helps Indian citizens get government work done in the language they already speak.
 
----
+Ask for an income certificate, a scheme they might qualify for, a nearby hospital, or today's mandi price. JanSeva answers in Hindi or English, on Telegram and on the web, and can file an anonymous report without storing who sent it.
 
-## What is JanSeva?
+## Highlights
 
-JanSeva is an AI-powered conversational platform that helps Indian citizens navigate government bureaucracy. Instead of traveling to government offices, standing in queues, and filling confusing forms, citizens can simply send a message (text or voice) in Hindi or any Indian language and get:
+- **One conversation, several specialists.** A LangGraph orchestrator classifies each message and routes it to service navigation, healthcare, farmer services, anonymous reporting, or escalation.
+- **Answers grounded in a knowledge base.** Schemes, services, and subsidies live as YAML and are retrieved through a vector store before the model replies.
+- **Hindi and English, text or voice.** The Telegram bot accepts text and voice notes. Speech-to-text uses Faster Whisper.
+- **Anonymous reports with a tracking token.** Complaint text is stripped of obvious identifiers, encrypted, and returned with a token the citizen can use to check status. The report row has no user foreign key.
+- **Two front doors.** A Next.js public site for citizens, and a FastAPI + HTMX admin console for officials. Admin assets are bundled locally so the console does not depend on a third-party CDN.
 
-- 📋 **Service Requirements** — "What do I need for an income certificate?"
-- 📝 **Form Generation** — Pre-filled application forms
-- 🚨 **Anonymous Reporting** — Safely report corruption or misconduct
-- 🏥 **Healthcare Help** — Find hospitals, book appointments
-- 🌾 **Farmer Services** — Navigate subsidies, check mandi prices
-- 🔔 **Smart Notifications** — Get alerted about relevant schemes and deadlines
+## Tech stack
 
-## Architecture
+| Layer | What it uses |
+| --- | --- |
+| Public site | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
+| API and admin | FastAPI, Jinja2, HTMX |
+| Bot | aiogram 3 |
+| Agents | LangGraph, LangChain, Gemini / OpenRouter / Ollama |
+| Data | PostgreSQL 16, SQLAlchemy 2, Alembic, ChromaDB |
+| Voice | Faster Whisper |
+| Packaging | uv, Docker |
 
-```
-Telegram / WhatsApp → Channel Normalizer → LangGraph AI Agents → Response
-                                                    ↕
-                              PostgreSQL + Redis + ChromaDB (Knowledge Base)
-                                                    ↕
-                                        Admin Dashboard (FastAPI + HTMX)
-```
+## What works today
 
-## Tech Stack
+- Telegram onboarding, text chat, and voice notes wired into the agent graph
+- Specialist flows for service questions, healthcare lookup, farmer and mandi questions, escalation, and anonymous reports
+- Knowledge ingestion from YAML, plus retrieval used by the service navigator
+- Admin login, dashboard counts, organizations, users, queries, and report review
+- Citizen web pages for services, schemes, institutions, chat, complaints, and anonymous reports
+- Institution dashboards for a hospital and a police station, plus a department console
+- Phone OTP and email login APIs, complaint and department APIs, and a Twilio WhatsApp webhook
 
-| Layer | Technology |
-|-------|-----------|
-| **Messaging** | aiogram 3.x (Telegram), WhatsApp Business API |
-| **AI Agents** | LangGraph + LangChain |
-| **LLM** | Google Gemini / Ollama (local) |
-| **Voice** | AI4Bharat IndicWhisper (STT) + IndicTTS |
-| **Database** | PostgreSQL 16 + Redis 7 |
-| **Vector Store** | ChromaDB (dev) → pgvector (prod) |
-| **Backend** | FastAPI + Pydantic |
-| **Admin** | FastAPI + HTMX + Jinja2 |
-| **Task Queue** | ARQ (async, Redis-backed) |
-| **Infra** | Docker Compose |
+## What is still incomplete
 
-## Design Philosophy & Compliance
+These are present in the tree, but they are stubs, demos, or not wired end to end:
 
-JanSeva uses a split frontend architecture to meet the specific needs of citizens vs government officials:
+- Mandi sync returns sample prices. The data.gov.in call is not implemented.
+- Scheme alerts are scheduled, then do nothing.
+- Location context only recognizes a handful of Uttar Pradesh and Madhya Pradesh districts.
+- Several web screens use mock institutions, schemes, and dashboard numbers.
+- Anonymous reports are not linked to an organization, so only a super admin can list them.
+- WhatsApp delivery depends on Twilio credentials and a citizen row that already exists.
+- There is no project license yet.
 
-### 1. Public Facing Landing Page (Next.js)
-The public marketing site (`web/`) is built in Next.js to provide a highly interactive, modern, and trustworthy first impression for citizens discovering the project. It showcases live stats and the platform's capabilities visually.
+## Setup
 
-### 2. Internal Admin Dashboard (Jinja2 + HTMX)
-The actual operational dashboard (`src/janseva/admin/`) strictly adheres to Indian government cybersecurity and accessibility guidelines for internal tools. This air-gapped ready architecture is an intentional, compliance-driven choice:
-
-- **Zero Third-Party Phone-Homes:** Government platforms operate on isolated internal networks. We do not rely on external CDNs (all assets like HTMX and fonts are bundled locally).
-- **Maximum Accessibility & Low Bandwidth:** Rural officials often operate on older devices with 2G/3G connections. SSR HTML guarantees an extremely small initial payload.
-- **Progressive Interactivity:** HTMX provides SPA-like capabilities (dynamic updates, modals) without the complexity of a Node.js runtime on the protected internal server.
-- **Decade-Long Maintainability:** "Boring" and proven technologies like HTML, CSS, and Jinja2 are highly stable. Future government contractors can easily maintain this codebase 10 years from now.
-
-## Quick Start
-
-### Docker / Dokploy
+Requires Python 3.11+, [uv](https://docs.astral.sh/uv/), Node.js 22, and a PostgreSQL database.
 
 ```bash
-# 1. Copy and configure environment
 cp .env.example .env
-# Fill TELEGRAM_BOT_TOKEN and GOOGLE_API_KEY.
-# Compose derives container-safe DATABASE_URL/REDIS_URL values from
-# POSTGRES_* and REDIS_HOST, so it will not use localhost by accident.
+# Set TELEGRAM_BOT_TOKEN and an LLM key (GOOGLE_API_KEY or OPENROUTER_API_KEY).
+# Point DATABASE_URL and DATABASE_URL_SYNC at your Postgres instance.
+# Use localhost when Postgres runs on the same machine.
 
-# 2. Build and start the full stack
-docker compose up -d --build
-
-# 3. View logs
-docker compose logs -f bot
-```
-
-For a CPU-only VPS, use cloud LLM/embedding APIs and do not add PyTorch, Whisper, CUDA, or local model dependencies to the default Docker image. See [Deployment](docs/deployment.md) for the Dokploy checklist.
-
-### Local Development
-
-```bash
-# 1. Clone and enter the project
-cd GoogleXParul
-
-# 2. Install dependencies
-uv sync
-
-# 3. Copy and configure environment
-cp .env.example .env
-# Edit .env with your TELEGRAM_BOT_TOKEN and GOOGLE_API_KEY
-# If running the bot directly on your host, change postgres/redis hostnames
-# in DATABASE_URL, DATABASE_URL_SYNC, and REDIS_URL to localhost.
-
-# 4. Start database services
-docker compose up -d
-
-# 5. Run database migrations
+uv sync --extra dev
 uv run alembic upgrade head
-
-# 6. Seed the knowledge base
 uv run python scripts/seed_knowledge_base.py
 
-# 7. Start the bot
 uv run python -m janseva.bot.main
+uv run uvicorn janseva.admin.app:admin_app --reload --port 8000
 ```
 
-## Documentation
+The public site:
 
-All documentation lives in `docs/ai/`:
-
-| Document | Description |
-|----------|-------------|
-| [Project Brief](docs/ai/00-project-brief.md) | Vision, scope, and success metrics |
-| [Architecture](docs/ai/01-architecture.md) | Tech stack, data model, design decisions |
-| [Active Context](docs/ai/02-active-context.md) | Current state and next steps |
-| [Master Guide](docs/ai/03-implementation-master.md) | **Start here** — Complete implementation roadmap |
-| [Deployment](docs/deployment.md) | CPU-only VPS and Dokploy deployment checklist |
-
-### Implementation Guides (in order)
-
-| # | Guide | Phase | Status |
-|---|-------|-------|--------|
-| 01 | [Project Setup](docs/ai/guides/01-project-setup.md) | Foundation | 📝 Ready |
-| 02 | [Telegram Bot](docs/ai/guides/02-telegram-bot.md) | Foundation | 📝 Ready |
-| 03 | [AI Agent Core](docs/ai/guides/03-ai-agent-core.md) | Foundation | 📝 Ready |
-| 04 | [Knowledge Base & RAG](docs/ai/guides/04-knowledge-base-rag.md) | Core Features | 📝 Ready |
-| 05 | [Anonymous Reporting](docs/ai/guides/05-anonymous-reporting.md) | Core Features | 📝 Ready |
-| 06 | [Query Escalation](docs/ai/guides/06-query-escalation.md) | Core Features | 📝 Ready |
-| 07 | [Admin Dashboard](docs/ai/guides/07-admin-dashboard.md) | Core Features | 📝 Ready |
-| 08 | [Voice Processing](docs/ai/guides/08-voice-processing.md) | Voice & Language | 📝 Ready |
-| 09 | [Healthcare Agent](docs/ai/guides/09-healthcare-agent.md) | Extended | 📝 Ready |
-| 10 | [Farmer Services](docs/ai/guides/10-farmer-services.md) | Extended | 📝 Ready |
-| 11 | [Notifications](docs/ai/guides/11-notifications-profiling.md) | Extended | 📝 Ready |
-| 12 | [WhatsApp](docs/ai/guides/12-whatsapp-integration.md) | Scale | 📝 Ready |
-| 13 | [Performance](docs/ai/guides/13-scaling-performance.md) | Scale | 📝 Ready |
-
-## Project Structure
-
+```bash
+cd web
+npm ci
+npm run dev
 ```
-src/janseva/
-├── config.py          # Central configuration
-├── bot/               # Telegram bot (aiogram)
-├── agents/            # AI agents (LangGraph)
-├── knowledge/         # Knowledge base & RAG
-├── voice/             # Speech-to-Text / Text-to-Speech
-├── admin/             # Admin dashboard (FastAPI)
-├── reporting/         # Anonymous reporting engine
-├── notifications/     # Notification system
-├── db/                # Database models & repositories
-└── common/            # Shared utilities
+
+Open http://localhost:3000. The site calls the API at `NEXT_PUBLIC_API_URL`, defaulting to `http://localhost:8000/api`.
+
+### Docker
+
+`docker-compose.yml` builds the API/bot and the Next.js site and expects an external Postgres instance plus a `dokploy-network`. See [docs/deployment.md](docs/deployment.md). For a VPS without Dokploy, add the Caddy overlay:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.standalone.yml up -d --build
 ```
+
+## Checks
+
+```bash
+uv run ruff check .
+uv run pytest -q
+cd web && npm run lint && npm run build
+```
+
+GitHub Actions runs those commands on every push and pull request. `mypy` is configured with `strict = true` and still reports a large set of pre-existing annotation gaps, so it is not a CI gate yet.
+
+## Suggested GitHub description
+
+AI assistant for Indian government services: certificates, schemes, healthcare, and farmer help in Hindi and English.
+
+Suggested topics: `civic-tech`, `india`, `government-services`, `langchain`, `langgraph`, `fastapi`, `nextjs`, `telegram-bot`, `rag`, `python`
+
+## Docs
+
+- [Project brief](docs/ai/00-project-brief.md)
+- [Architecture](docs/ai/01-architecture.md)
+- [Deployment](docs/deployment.md)
+- [Knowledge base guide](docs/KNOWLEDGE_BASE_GENERATION_GUIDE.md)
 
 ## License
 
-Open source. Specific license TBD.
+No license file yet. All rights reserved by the repository owner until one is added.

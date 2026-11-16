@@ -3,10 +3,9 @@
 import { ChevronRightIcon, Bot, Mail, ShieldCheck } from "lucide-react";
 import { ClassValue, clsx } from "clsx";
 import * as Color from "color-bits";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {

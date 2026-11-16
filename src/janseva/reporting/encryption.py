@@ -7,15 +7,25 @@ from cryptography.fernet import Fernet
 
 from janseva.config import settings
 
+_dev_fernet_key: str | None = None
+
 
 def get_fernet() -> Fernet:
-    """Get the Fernet encryption instance."""
+    """Get the Fernet encryption instance.
+
+    A placeholder key must not mint a new secret on every call, or development
+    ciphertext written earlier in the process can never be decrypted.
+    """
+    global _dev_fernet_key
     key = settings.report_encryption_key
-    if key == "change-me":
+    if not key or key == "change-me":
         if settings.env == "production":
-            raise ValueError("REPORT_ENCRYPTION_KEY must be set in production to prevent data loss.")
-        # Generate a key for development — in production, set a real key
-        key = Fernet.generate_key().decode()
+            raise ValueError(
+                "REPORT_ENCRYPTION_KEY must be set in production to prevent data loss."
+            )
+        if _dev_fernet_key is None:
+            _dev_fernet_key = Fernet.generate_key().decode()
+        key = _dev_fernet_key
     return Fernet(key.encode() if isinstance(key, str) else key)
 
 

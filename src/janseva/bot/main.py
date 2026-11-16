@@ -30,6 +30,8 @@ async def main() -> None:
     """Initialize and start the bot."""
     # Set up structured logging
     setup_logging()
+    if not settings.telegram_bot_token:
+        raise SystemExit("TELEGRAM_BOT_TOKEN is required to start the bot.")
     logger.info("starting_bot", env=settings.env)
 
     # Create bot instance

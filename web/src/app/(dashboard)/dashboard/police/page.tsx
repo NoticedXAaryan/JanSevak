@@ -2,7 +2,7 @@
 import React from "react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import DataTable from "@/components/dashboard/DataTable";
-import { Users, FileText, Activity, AlertTriangle, ArrowLeft, ShieldAlert, Car, PhoneCall } from "lucide-react";
+import { Users, FileText, ArrowLeft, Car, PhoneCall } from "lucide-react";
 import Link from "next/link";
 
 export default function PoliceDashboard() {

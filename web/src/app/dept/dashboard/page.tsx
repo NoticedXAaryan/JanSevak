@@ -3,7 +3,7 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Users, FileText, AlertTriangle, ShieldAlert, BarChart3, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
+import { Users, AlertTriangle, ShieldAlert, BarChart3, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { MinimalProfessionalCard } from "@/components/ui/minimal-professional-card";
@@ -136,13 +136,13 @@ export default function DeptDashboard() {
                   <h4 className="font-semibold text-primary text-sm flex items-center mb-2">
                     <TrendingUp className="w-4 h-4 mr-2" /> Surge Detected
                   </h4>
-                  <p className="text-sm">24% increase in "Water Supply" complaints in Sector 4 over the last 48 hours. Consider dispatching an inspection team.</p>
+                  <p className="text-sm">24% increase in &quot;Water Supply&quot; complaints in Sector 4 over the last 48 hours. Consider dispatching an inspection team.</p>
                 </div>
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
                   <h4 className="font-semibold text-amber-600 dark:text-amber-500 text-sm flex items-center mb-2">
                     <AlertTriangle className="w-4 h-4 mr-2" /> Policy Gap
                   </h4>
-                  <p className="text-sm">Many citizens are asking the AI about "Solar Subsidy" but your local policy data is outdated.</p>
+                  <p className="text-sm">Many citizens are asking the AI about &quot;Solar Subsidy&quot; but your local policy data is outdated.</p>
                   <Link href="/dept/policies" className={cn(buttonVariants({ variant: "link" }), "px-0 h-auto text-amber-600 dark:text-amber-500")}>Update Policy Now <ArrowRight className="w-3 h-3 ml-1" /></Link>
                 </div>
               </CardContent>

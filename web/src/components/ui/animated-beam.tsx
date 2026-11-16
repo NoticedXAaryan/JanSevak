@@ -31,7 +31,7 @@ export const AnimatedBeam = ({
   toRef,
   curvature = 0,
   reverse = false, // Include the reverse prop
-  duration = Math.random() * 3 + 4,
+  duration = 5,
   delay = 0,
   pathColor = "gray",
   pathWidth = 2,
@@ -90,10 +90,8 @@ export const AnimatedBeam = ({
       }
     };
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        updatePath();
-      }
+    const resizeObserver = new ResizeObserver(() => {
+      updatePath();
     });
 
     if (containerRef.current) {

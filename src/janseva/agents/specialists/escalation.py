@@ -18,7 +18,6 @@ def handle_escalation(state: dict) -> dict:
     Phase 2 (Guide 06): Store in DB, notify admin, track resolution.
     """
     latest_message = state["messages"][-1].content if state["messages"] else "unknown"
-    user_language = state.get("user_language", "hi")
 
     logger.warning(
         "query_escalated",

@@ -4,6 +4,8 @@ Retrieves relevant knowledge base entries and uses them to provide
 accurate, sourced answers about government services.
 """
 
+import re
+
 from langchain_core.messages import SystemMessage
 
 from janseva.agents.llm import get_llm
@@ -26,14 +28,12 @@ RULES:
 5. NEVER fabricate specific addresses, phone numbers, or fees not in the context.
 6. Format with bullet points and numbered lists for clarity.
 7. Include both Hindi and English names when available in the context.
-8. INTERACTIVE OPTIONS: If you suggest specific schemes or services the user should explore further, append them at the VERY END of your response in this exact format, one per line: 
+8. INTERACTIVE OPTIONS: If you suggest specific schemes or services the user should explore further, append them at the VERY END of your response in this exact format, one per line:
 [OPTION: Short Scheme Name]
 
 User's language: {user_language}
 User's district: {user_district}
 Location context: {location_context}"""
-
-import re
 
 
 def handle_service_query(state: dict) -> dict:

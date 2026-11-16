@@ -1,10 +1,8 @@
-import { cn } from "@/lib/utils";
 import React, { useRef, useEffect, useState } from 'react';
 import { useTheme } from "next-themes";
 
 export const MinimalProfessionalCard = () => {
     const { theme } = useTheme();
-    const [count, setCount] = useState(0);
     const cardRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     const [activeTab, setActiveTab] = useState('overview');

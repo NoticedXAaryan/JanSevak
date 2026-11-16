@@ -2,8 +2,6 @@ import React from "react";
 import Link from "next/link";
 import { Search, ChevronRight, FileText } from "lucide-react";
 import { DotPattern } from "@/components/ui/dot-pattern";
-import { cn } from "@/lib/utils";
-
 export default function ServicesPage() {
   const categories = [
     "Certificates & Licenses", "Healthcare", "Agriculture", 

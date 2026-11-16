@@ -18,7 +18,7 @@ export default function AboutPage() {
         
         <h2>How It Works</h2>
         <p>
-          At its core, JanSevak is a centralized knowledge base connected to multiple institutional endpoints. When a citizen asks a question or submits a request, our AI routing engine (powered by LangGraph) determines the intent and securely interfaces with the relevant department—whether it's checking hospital bed availability, applying for a certificate, or filing a grievance.
+          At its core, JanSevak is a centralized knowledge base connected to multiple institutional endpoints. When a citizen asks a question or submits a request, our AI routing engine (powered by LangGraph) determines the intent and securely interfaces with the relevant department—whether it&apos;s checking hospital bed availability, applying for a certificate, or filing a grievance.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-12 not-prose">

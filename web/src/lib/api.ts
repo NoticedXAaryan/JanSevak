@@ -10,9 +10,9 @@ interface FetchOptions extends RequestInit {
 
 class ApiError extends Error {
   status: number;
-  data: any;
+  data: unknown;
 
-  constructor(status: number, data: any, message: string) {
+  constructor(status: number, data: unknown, message: string) {
     super(message);
     this.status = status;
     this.data = data;

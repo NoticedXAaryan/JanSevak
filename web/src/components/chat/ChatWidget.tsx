@@ -102,7 +102,7 @@ export default function ChatWidget() {
                     : msg
                 ));
               },
-              onError: (err) => {
+              onError: () => {
                 setMessages(prev => prev.map(msg => 
                   msg.id === assistantId 
                     ? { ...msg, content: msg.content + "\n\n**Error:** Could not reach JanSevak AI." } 

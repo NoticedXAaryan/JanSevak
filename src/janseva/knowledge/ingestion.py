@@ -90,10 +90,12 @@ Description (Hindi):
             f"Required Documents for {data.get('name_en', '')} / {data.get('name_hi', '')}:\n\n"
         )
         for i, doc in enumerate(docs_list, 1):
-            doc_name_en = (
-                doc.get("name_en") or doc if isinstance(doc, str) else doc.get("name_en", "")
-            )
-            doc_name_hi = doc.get("name_hi", "") if isinstance(doc, dict) else ""
+            if isinstance(doc, str):
+                doc_name_en = doc
+                doc_name_hi = ""
+            else:
+                doc_name_en = doc.get("name_en", "")
+                doc_name_hi = doc.get("name_hi", "")
             mandatory = (
                 "✅ Required" if (isinstance(doc, dict) and doc.get("mandatory")) else "⭕ Optional"
             )
